@@ -1,10 +1,11 @@
-import { StyleSheet, TextInput } from 'react-native';
+import { BackHandler, Pressable, StyleSheet, TextInput } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
+import { Link } from 'expo-router';
 
 const logIn = () => {
     const [email, onChangeEmail] = useState('example@gmail.com');
@@ -81,15 +82,24 @@ const logIn = () => {
                     style={{ padding: 10, backgroundColor: 'white', width: 350, height: 45, borderRadius: 12, fontSize: 16 }}
                 />
 
+                {/* Routes to one file above, then the home folder, where it goes to 'home/index', however to route accurately only '/' is needed */}
                 <ThemedView style={styles.submit}>
-                    <ThemedText style={styles.submitText}>
-                        Submit
-                    </ThemedText>
+                    <Link href={'../home/'} asChild>
+                        <Pressable>
+                            <ThemedText style={styles.submitText}>
+                                Submit
+                            </ThemedText>
+                        </Pressable>
+                    </Link>
                 </ThemedView>
 
-                <ThemedText style={styles.logInText}>
-                    Sign Up?
-                </ThemedText>
+                {/* Do not use '/index' as '/' routes to index. '/index' does not route to anything */}
+                {/* asChild applies the routing of the link to the children, in this case the ThemedText */}
+                <Link href={'/'} asChild>
+                    <ThemedText style={styles.logInText}>
+                        Sign Up?
+                    </ThemedText>
+                </Link>
 
             </ThemedView>
         </SafeAreaView>
