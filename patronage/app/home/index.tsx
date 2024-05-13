@@ -4,19 +4,36 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from 'react';
+import { Link } from 'expo-router';
 
 export default function HomeScreen() {
-
-  const [email, onChangeEmail] = useState('example@gmail.com');
-  const [password, onChangePassword] = useState('Input Password');
 
   return (
     <SafeAreaView>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText style={styles.titleText}>
-          Home
+
+        <ThemedText style={styles.header}>
+          Patronage
         </ThemedText>
+
+        <ThemedText style={styles.titleText}>
+          Writing Style
+        </ThemedText>
+
+        <ThemedView style={styles.card}>
+          <Link href={'./read'} asChild>
+            <ThemedText style={styles.cardText}>Short Stories</ThemedText>
+          </Link>
+        </ThemedView>
+
+        <ThemedView style={styles.card}>
+          <ThemedText style={styles.cardText}>Coming Soon...</ThemedText>
+        </ThemedView>
+
+        <ThemedView style={styles.card}>
+          <ThemedText style={styles.cardText}>Coming Soon...</ThemedText>
+        </ThemedView>
+
       </ThemedView>
     </SafeAreaView>
   );
@@ -30,36 +47,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingTop: 25
   },
+  header: {
+    fontFamily: 'Italianno',
+    fontSize: 64,
+    padding: 20,
+    paddingTop: 45
+  },
   titleText: {
     fontFamily: 'Baskervville',
     fontSize: 40,
-    padding: 20,
-    marginTop: 80
+    padding: 20
   },
-  inputText: {
+  card: {
+    height: 150,
+    width: 350,
+    backgroundColor: '#9A3E53',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopLeftRadius: 25,
+    borderBottomLeftRadius: 25,
+    marginRight: -25,
+    marginBottom: 20
+  },
+  cardText: {
     fontFamily: 'Baskervville',
     fontSize: 32,
-    padding: 20,
-    marginTop: 20
-  },
-  submit: {
-    backgroundColor: '#CAA775',
-    paddingTop: 18,
-    paddingBottom: 12,
-    paddingLeft: 30,
-    paddingEnd: 30,
-    borderRadius: 12,
-    marginTop: 50
-  },
-  submitText: {
     color: 'white',
-    fontFamily: 'Baskervville',
-    fontSize: 24
-  },
-  logInText: {
-    textDecorationLine: 'underline',
-    fontFamily: 'Baskervville',
-    fontSize: 24,
-    marginTop: 100
+    paddingTop: 20
   }
 });
