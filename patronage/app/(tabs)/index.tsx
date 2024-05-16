@@ -55,13 +55,23 @@ const signUp = () => {
         }
     });
 
-
     return (
         <SafeAreaView>
             <ThemedView style={styles.titleContainer}>
                 <ThemedText style={styles.titleText}>
                     Sign Up
                 </ThemedText>
+
+                <ThemedText style={styles.inputText}>
+                    Username
+                </ThemedText>
+                <TextInput
+                    editable
+                    maxLength={60}
+                    onChangeText={email => onChangeEmail(email)}
+                    value={email}
+                    style={{ padding: 10, backgroundColor: 'white', width: 350, height: 45, borderRadius: 12, fontSize: 16 }}
+                />
 
                 <ThemedText style={styles.inputText}>
                     Email
