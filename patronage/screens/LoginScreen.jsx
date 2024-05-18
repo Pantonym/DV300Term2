@@ -5,8 +5,8 @@ import { handleLogin } from '../services/authService';
 
 const LoginScreen = ({ navigation }) => {
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('Glen@gmail.com');
+    const [password, setPassword] = useState('Glen1234');
 
     //  Login Function
     const login = () => {
