@@ -4,7 +4,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useFonts } from 'expo-font';
 
 import UserStack from './components/stacks/UserStack';
-import RegisterStack from './components/stacks/RegisterStack'
+import RegisterStack from './components/stacks/RegisterStack';
+import { CurrentRouteProvider } from './context/CurrentRouteContext';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -36,7 +37,9 @@ export default function App() {
   return (
     <>
       {loggedIn ? (
-        <UserStack />
+        <CurrentRouteProvider>
+          <UserStack />
+        </CurrentRouteProvider>
       ) : (
         <RegisterStack />
       )}
