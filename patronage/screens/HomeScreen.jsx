@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         backgroundColor: "#F6EEE3",
         flexDirection: 'column',
-        textAlign: 'center',
+        textAlign: 'center'
     },
     header: {
         fontFamily: 'Italianno',

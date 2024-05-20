@@ -44,6 +44,8 @@ const NavbarComponent = () => {
                 newIndex = 2;
                 break;
             case 'ProfileScreen':
+            case 'SettingsScreen':
+            case 'PersonalStoriesScreen':
                 newIndex = 3;
                 break;
             default:
@@ -89,7 +91,7 @@ const NavbarComponent = () => {
                     style={styles.navImage}
                     size={35}
                     color={'white'}
-                    name={getIconName('person', ['ProfileScreen'])}
+                    name={getIconName('person', ['ProfileScreen', 'SettingsScreen', 'PersonalStoriesScreen'])}
                     onPress={() => navigation.navigate('ProfileScreen')}
                 />
 
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     navImage: {
-        margin: 25,
+        margin: '9%',
         marginTop: 0,
         marginBottom: 0,
     },

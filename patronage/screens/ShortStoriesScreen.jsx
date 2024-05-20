@@ -48,7 +48,7 @@ const ShortStoriesScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <View>
 
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                     <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
                         <Image
                             style={styles.imgBack}
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         backgroundColor: "#F6EEE3",
         flexDirection: 'column',
-        textAlign: 'center',
+        textAlign: 'center'
     },
     header: {
         fontFamily: 'Italianno',

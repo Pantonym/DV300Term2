@@ -1,5 +1,6 @@
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Log In
 export const handleLogin = (email, password) => {
@@ -10,6 +11,9 @@ export const handleLogin = (email, password) => {
             // Signed in 
             const user = userCredential.user;
             console.log("Logged In User: " + user.email)
+
+            // Similar to localStorage
+            AsyncStorage.setItem('UserEmail', user.email);
         })
         .catch((error) => {
             const errorCode = error.code;

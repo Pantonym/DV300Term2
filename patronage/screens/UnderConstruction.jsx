@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: "#F6EEE3",
         flexDirection: 'column',
-        textAlign: 'center',
+        textAlign: 'center'
     },
     title: {
         fontFamily: 'Baskervville',

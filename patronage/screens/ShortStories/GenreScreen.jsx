@@ -4,13 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 // This page will change what is displayed depending on the genre which was chosen. This is done so a different page is not made for each genre, which allows genres to be added dynamically as well.
 
-const GenreScreen = ({ route }) => {
+const GenreScreen = ({ route, navigation }) => {
     const activeGenre = route.params;
 
     return (
         <SafeAreaView style={styles.container}>
 
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('ShortStoriesScreen')}>
                     <Image
                         style={styles.imgBack}
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         backgroundColor: "#F6EEE3",
         flexDirection: 'column',
-        textAlign: 'center',
+        textAlign: 'center'
     },
     header: {
         fontFamily: 'Italianno',

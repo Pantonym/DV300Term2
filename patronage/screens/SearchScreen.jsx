@@ -34,7 +34,7 @@ const SearchScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
 
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
                     <Image
                         style={styles.imgBack}
@@ -61,7 +61,7 @@ const SearchScreen = ({ navigation }) => {
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.item}>
-                        <Text>{item.name}</Text>
+                        <Text style={styles.itemText}>{item.name}</Text>
                     </View>
                 )}
             />
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         backgroundColor: "#F6EEE3",
         flexDirection: 'column',
-        textAlign: 'center',
+        textAlign: 'center'
     },
     header: {
         fontFamily: 'Italianno',
@@ -94,25 +94,31 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     searchContainer: {
-        marginTop: 20,
+        marginTop: 10,
         marginBottom: 10,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
     },
     input: {
-        height: 40,
-        width: '80%',
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 5,
+        height: 45,
+        width: '90%',
+        borderRadius: 15,
         paddingHorizontal: 10,
+        fontSize: 20,
+        backgroundColor: 'white',
+        paddingLeft: 15,
+        paddingRight: 15
     },
     item: {
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
     },
+    itemText: {
+        fontSize: 16,
+        fontFamily: 'Baskervville',
+    }
 });
 
 export default SearchScreen

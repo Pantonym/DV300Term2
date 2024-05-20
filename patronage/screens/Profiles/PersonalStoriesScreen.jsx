@@ -1,17 +1,12 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-// This page will change what is displayed depending on the genre which was chosen. This is done so a different page is not made for each genre, which allows genres to be added dynamically as well.
-
-const LeaderboardScreen = ({ route, navigation }) => {
-    const activeGenre = route.params;
-
+const PersonalStoriesScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
 
             <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('ShortStoriesScreen')}>
+                <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
                     <Image
                         style={styles.imgBack}
                         source={require("../../assets/images/Arrow.png")} />
@@ -22,9 +17,10 @@ const LeaderboardScreen = ({ route, navigation }) => {
                 </Text>
             </View>
 
-            <View>
-                <Text>{activeGenre}</Text>
-            </View>
+            <Text style={styles.titleText}>
+                Stories
+            </Text>
+
         </SafeAreaView>
     )
 }
@@ -44,8 +40,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Italianno',
         fontSize: 64,
         padding: 20,
-        paddingTop: 0,
         paddingBottom: 0,
+        paddingTop: 0,
         textAlign: 'center'
     },
     imgBack: {
@@ -53,6 +49,14 @@ const styles = StyleSheet.create({
         width: 60,
         marginTop: 15
     },
+    titleText: {
+        fontFamily: 'Baskervville',
+        fontSize: 40,
+        padding: 20,
+        paddingTop: 0,
+        paddingBottom: 10,
+        textAlign: 'center'
+    },
 });
 
-export default LeaderboardScreen
+export default PersonalStoriesScreen

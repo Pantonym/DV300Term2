@@ -20,6 +20,8 @@ import GenreScreen from '../../screens/ShortStories/GenreScreen';
 import LeaderboardScreen from '../../screens/ShortStories/LeaderboardScreen';
 import WriteScreen from '../../screens/WriteScreen';
 import WriteEditorScreen from '../../screens/Write/WriteEditorScreen';
+import PersonalStoriesScreen from '../../screens/Profiles/PersonalStoriesScreen';
+import SettingsScreen from '../../screens/Profiles/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,8 +50,10 @@ const UserStack = () => {
                 {/* Search Screen */}
                 <Stack.Screen name="SearchScreen" component={SearchScreen} options={{ headerShown: false }} />
 
-                {/* Profile Screen */}
+                {/* Profile Screen Flow */}
                 <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="PersonalStoriesScreen" component={PersonalStoriesScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ headerShown: false }} />
 
                 {/* --Writing User Flow */}
                 <Stack.Screen name="WriteScreen" component={WriteScreen} options={{ headerShown: false }} />
