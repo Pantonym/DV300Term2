@@ -2,8 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-const HomeScreen = ({navigation}) => {
-
+const WriteScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View>
@@ -13,11 +12,11 @@ const HomeScreen = ({navigation}) => {
                 </Text>
 
                 <Text style={styles.titleText}>
-                    Read
+                    Write
                 </Text>
 
                 <View style={styles.card}>
-                    <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('ShortStoriesScreen')}>
+                    <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('WriteEditorScreen')}>
                         <Text style={styles.cardText}>Short Stories</Text>
                     </TouchableOpacity>
                 </View>
@@ -87,4 +86,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default HomeScreen
+export default WriteScreen

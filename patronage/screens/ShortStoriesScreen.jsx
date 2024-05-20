@@ -2,39 +2,44 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'rea
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// example data for genres
 const genres = [
-    { name: 'Horror', screen: 'UnderConstruction' },
-    { name: 'Sci-Fi', screen: 'UnderConstruction' },
-    { name: 'Fantasy', screen: 'UnderConstruction' },
+    { name: 'Horror', screen: 'GenreScreen' },
+    { name: 'Sci-Fi', screen: 'GenreScreen' },
+    { name: 'Fantasy', screen: 'GenreScreen' },
 ];
 
+// example data for leaderboards
 const leaderboards = [
-    { name: 'Horror', screen: 'UnderConstruction' },
-    { name: 'Sci-Fi', screen: 'UnderConstruction' },
-    { name: 'Fantasy', screen: 'UnderConstruction' },
+    { name: 'Horror', screen: 'LeaderboardScreen' },
+    { name: 'Sci-Fi', screen: 'LeaderboardScreen' },
+    { name: 'Fantasy', screen: 'LeaderboardScreen' },
 ];
 
 const ShortStoriesScreen = ({ navigation }) => {
+
+    // Dynamically render an amount of items in the carousel depending on how many genres there are
     const renderGenres = () => {
         return genres.map((genre, index) => (
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
-                onPress={() => navigation.navigate(genre.screen)}
+                onPress={() => navigation.navigate(genre.screen, genre.name)}
             >
                 <Text style={styles.genreText}>{genre.name}</Text>
             </TouchableOpacity>
         ));
     };
 
+    // Dynamically render an amount of items in the carousel depending on how many genres there are
     const renderLeaderboards = () => {
         return leaderboards.map((leaderboard, index) => (
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
-                onPress={() => navigation.navigate(leaderboards.screen)}
+                onPress={() => navigation.navigate(leaderboard.screen, leaderboard.name)}
             >
-                <Text style={styles.genreText}>{leaderboards.name}</Text>
+                <Text style={styles.genreText}>{leaderboard.name}</Text>
             </TouchableOpacity>
         ));
     };
@@ -62,6 +67,7 @@ const ShortStoriesScreen = ({ navigation }) => {
                         </Text>
                     </View>
 
+                    {/* Render all of the data inside of a scrollview set to horizontal so it appears like a carousel */}
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
@@ -83,7 +89,7 @@ const ShortStoriesScreen = ({ navigation }) => {
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.carousel}
                     >
-                        {renderGenres()}
+                        {renderLeaderboards()}
                     </ScrollView>
                 </View>
 
