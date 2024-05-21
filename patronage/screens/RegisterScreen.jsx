@@ -1,19 +1,16 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { handleRegister } from '../services/authService';
 
 const RegisterScreen = ({ navigation }) => {
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
 
     const register = () => {
-        // Email: Glen@gmail.com
-        // Password: Glen1234
-        handleRegister(email, password)
-    }
+        handleRegister(email, password, username);
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -55,11 +52,10 @@ const RegisterScreen = ({ navigation }) => {
                     <Text style={styles.pageLinkText}>Already Have an Account? </Text>
                     <Text style={styles.pageLinkTextUnderline}>Log In Here! </Text>
                 </TouchableOpacity>
-
             </View>
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -118,6 +114,6 @@ const styles = StyleSheet.create({
         fontSize: 24,
         textDecorationLine: 'underline'
     }
-})
+});
 
-export default RegisterScreen
+export default RegisterScreen;

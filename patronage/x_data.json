@@ -19,7 +19,7 @@
             "place": "bronze"
         }
     ],
-    "drafts": [
+    "works": [
         {
             "completed": false,
             "genre": "Horror",
@@ -31,48 +31,6 @@
                     "chapterContent": "When Mark arrived on the mountain, the rude nature of it was apparent.",
                     "comments": [],
                     "ratings": []
-                }
-            ]
-        }
-    ],
-    "completed": [
-        {
-            "completed": true,
-            "genre": "Horror",
-            "title": "Until Dawn",
-            "description": "We want to survive... until dawn!!!!",
-            "chapters": [
-                {
-                    "chapterTitle": "Until Dawn",
-                    "chapterContent": "When Mark arrived on the mountain, the rude nature of it was apparent.",
-                    "comments": [
-                        {
-                            "commenterID": "yklTUmzCx2Ou1aW87JACgU4cdN52",
-                            "commentContent": "I think that the vibes on this rude mountain are perfect."
-                        },
-                        {
-                            "commenterID": "yklTUmzCx2Ou1aW87JACgU4cdN52",
-                            "commentContent": "This is odd..."
-                        }
-                    ],
-                    "ratings": [
-                        {
-                            "ratingAmount": 1,
-                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
-                        },
-                        {
-                            "ratingAmount": 5,
-                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
-                        },
-                        {
-                            "ratingAmount": 6,
-                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
-                        },
-                        {
-                            "ratingAmount": 7,
-                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
-                        }
-                    ]
                 }
             ]
         },

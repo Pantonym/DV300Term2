@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native'; // Import ActivityIndicator
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator, Alert } from 'react-native'; // Import Alert
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUser } from '../services/accountService';
+import { handleSignOut } from '../services/authService';
 
 const ProfileScreen = ({ navigation }) => {
     const [email, setEmail] = useState(null);
     const [userID, setUserID] = useState(null);
     const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(true);
 
     const getUserEmail = async () => {
         const userEmail = await AsyncStorage.getItem('UserEmail');
@@ -32,10 +33,33 @@ const ProfileScreen = ({ navigation }) => {
     }, [userID]);
 
     const handleGetProfile = async () => {
-        setLoading(true); // Set loading state to true when fetching data
+        setLoading(true);
         const data = await getUser(userID);
         setUserData(data);
-        setLoading(false); // Set loading state to false when data is fetched
+        setLoading(false);
+    };
+
+    const handleLogout = async () => {
+        handleSignOut();
+    };
+
+    const confirmLogout = () => {
+        Alert.alert(
+            "Confirm Sign Out",
+            "Are you sure you want to sign out?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Sign out cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: handleLogout
+                }
+            ],
+            { cancelable: false }
+        );
     };
 
     const getCardColor = (place) => {
@@ -100,6 +124,10 @@ const ProfileScreen = ({ navigation }) => {
 
                     <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('SettingsScreen')}>
                         <Text style={styles.profileButtonText}>Settings</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.profileButton} onPress={confirmLogout}>
+                        <Text style={styles.profileButtonText}>Log Out</Text>
                     </TouchableOpacity>
                 </View>
             )}

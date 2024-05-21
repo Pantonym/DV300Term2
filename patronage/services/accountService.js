@@ -1,4 +1,4 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 export const getUser = async (userID) => {
@@ -14,4 +14,19 @@ export const getUser = async (userID) => {
         console.log("No such document!");
         return null;
     }
+}
+
+export const createUser = async (data, userID) => {
+
+    try {
+
+        await setDoc(doc(db, "users", userID), data);
+
+        console.log("Created user: ", userID)
+
+    } catch (error) {
+        console.log(error)
+        console.log("error data: ", data)
+    }
+
 }
