@@ -1,0 +1,120 @@
+{
+    "username": "Glen Doe",
+    "email": "Glen@gmail.com",
+    "userImg": "../assets/icons/GlenIcon.jpg",
+    "awards": [
+        {
+            "genre": "Fantasy",
+            "year": 2023,
+            "place": "gold"
+        },
+        {
+            "genre": "Horror",
+            "year": 2024,
+            "place": "silver"
+        },
+        {
+            "genre": "Sci-Fi",
+            "year": 2024,
+            "place": "bronze"
+        }
+    ],
+    "drafts": [
+        {
+            "completed": false,
+            "genre": "Horror",
+            "title": "Until Dawn",
+            "description": "We want to survive... until dawn!!!!",
+            "chapters": [
+                {
+                    "chapterTitle": "Until Dawn",
+                    "chapterContent": "When Mark arrived on the mountain, the rude nature of it was apparent.",
+                    "comments": [],
+                    "ratings": []
+                }
+            ]
+        }
+    ],
+    "completed": [
+        {
+            "completed": true,
+            "genre": "Horror",
+            "title": "Until Dawn",
+            "description": "We want to survive... until dawn!!!!",
+            "chapters": [
+                {
+                    "chapterTitle": "Until Dawn",
+                    "chapterContent": "When Mark arrived on the mountain, the rude nature of it was apparent.",
+                    "comments": [
+                        {
+                            "commenterID": "yklTUmzCx2Ou1aW87JACgU4cdN52",
+                            "commentContent": "I think that the vibes on this rude mountain are perfect."
+                        },
+                        {
+                            "commenterID": "yklTUmzCx2Ou1aW87JACgU4cdN52",
+                            "commentContent": "This is odd..."
+                        }
+                    ],
+                    "ratings": [
+                        {
+                            "ratingAmount": 1,
+                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
+                        },
+                        {
+                            "ratingAmount": 5,
+                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
+                        },
+                        {
+                            "ratingAmount": 6,
+                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
+                        },
+                        {
+                            "ratingAmount": 7,
+                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "completed": true,
+            "genre": "Horror",
+            "title": "Until Dawn",
+            "description": "We want to survive... until dawn!!!!",
+            "chapters": [
+                {
+                    "chapterTitle": "Until Dawn",
+                    "chapterContent": "When Mark arrived on the mountain, the rude nature of it was apparent.",
+                    "comments": [
+                        {
+                            "commenterID": "yklTUmzCx2Ou1aW87JACgU4cdN52",
+                            "commentContent": "I think that the vibes on this rude mountain are perfect."
+                        },
+                        {
+                            "commenterID": "yklTUmzCx2Ou1aW87JACgU4cdN52",
+                            "commentContent": "This is odd..."
+                        }
+                    ],
+                    "ratings": [
+                        {
+                            "ratingAmount": 1,
+                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
+                        },
+                        {
+                            "ratingAmount": 5,
+                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
+                        },
+                        {
+                            "ratingAmount": 6,
+                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
+                        },
+                        {
+                            "ratingAmount": 7,
+                            "userVoted": "yklTUmzCx2Ou1aW87JACgU4cdN52"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

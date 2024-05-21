@@ -14,6 +14,7 @@ export const handleLogin = (email, password) => {
 
             // Similar to localStorage
             AsyncStorage.setItem('UserEmail', user.email);
+            AsyncStorage.setItem('UserID', user.uid);
         })
         .catch((error) => {
             const errorCode = error.code;
