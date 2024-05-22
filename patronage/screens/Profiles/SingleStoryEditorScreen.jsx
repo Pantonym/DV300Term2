@@ -1,8 +1,35 @@
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
-import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, TextInput, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { updateStory } from '../../services/storiesService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SingleStoryEditorScreen = ({ route, navigation }) => {
-    const { story } = route.params;
+    const { story, refreshStories } = route.params;
+
+    const [userID, setUserID] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+    const [title, setTitle] = useState(story.title);
+    const [chapterContent, setChapterContent] = useState(story.chapters[0].chapterContent);
+    const storyTitle = story.title;
+
+    const getUserID = async () => {
+        const userID = await AsyncStorage.getItem('UserID');
+        setUserID(userID);
+    };
+
+    useEffect(() => {
+        getUserID();
+    }, []);
+
+    const handleSave = async () => {
+        var newTitle = title;
+        var newContent = chapterContent;
+
+        await updateStory(userID, storyTitle, newContent, newTitle);
+        setIsEditing(false);
+        refreshStories();
+        navigation.goBack();
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -16,12 +43,39 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                     Patronage
                 </Text>
             </View>
-            <Text style={styles.titleText}>
-                {story.title}
-            </Text>
-            <Text style={styles.storyContent}>
-                {story.chapters[0].chapterContent}
-            </Text>
+
+            {isEditing ? (
+                <>
+                    <TextInput
+                        style={styles.titleText}
+                        value={title}
+                        onChangeText={setTitle}
+                    />
+                    <TextInput
+                        style={styles.storyContent}
+                        value={chapterContent}
+                        onChangeText={setChapterContent}
+                        multiline
+                    />
+
+                    <TouchableOpacity onPress={handleSave}>
+                        <Text>Save</Text>
+                    </TouchableOpacity>
+                </>
+            ) : (
+                <>
+                    <Text style={styles.titleText}>
+                        {title}
+                    </Text>
+                    <Text style={styles.storyContent}>
+                        {chapterContent}
+                    </Text>
+
+                    <TouchableOpacity onPress={() => setIsEditing(true)} >
+                        <Text>Edit</Text>
+                    </TouchableOpacity>
+                </>
+            )}
         </SafeAreaView>
     );
 };

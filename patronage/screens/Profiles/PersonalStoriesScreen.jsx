@@ -5,17 +5,14 @@ import { deleteStory, fetchUserStories, publishStory, unPublishStory } from '../
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const PersonalStoriesScreen = ({ navigation }) => {
-    // UseStates
     const [userID, setUserID] = useState(null);
     const [stories, setStories] = useState([]);
 
-    // Get the userID. This is done in this method to ensure it is received before the app moves on
     const getUserID = async () => {
         const userID = await AsyncStorage.getItem('UserID');
         setUserID(userID);
     };
 
-    // Get all of the stories from the currently logged in user
     const fetchStories = async () => {
         if (userID) {
             const fetchedStories = await fetchUserStories(userID);
@@ -27,27 +24,22 @@ const PersonalStoriesScreen = ({ navigation }) => {
         getUserID();
     }, []);
 
-
     useEffect(() => {
         fetchStories();
-        // Collect the stories once the ID is collected - this stops the app from moving on with null data from not having the ID
     }, [userID]);
 
     const handleDelete = async (title) => {
         await deleteStory(userID, title);
-
         fetchStories();
     }
 
     const handlePublish = async (title) => {
         await publishStory(userID, title);
-
         fetchStories();
     }
 
     const handleUnPublish = async (title) => {
         await unPublishStory(userID, title);
-
         fetchStories();
     }
 
@@ -72,7 +64,6 @@ const PersonalStoriesScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-
             <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
                     <Image
@@ -89,14 +80,11 @@ const PersonalStoriesScreen = ({ navigation }) => {
             </Text>
 
             <ScrollView>
-                {/* Map through the collected stories to generate a clickable component for each. */}
                 {stories.map((story, index) => (
                     <TouchableOpacity
                         key={index}
                         style={styles.storyContainer}
-                        // navigate to the single page, sending the data of the story as a parameter so that only one page can display any story (instead of having infinite story pages)
-                        onPress={() => navigation.navigate('SingleStoryEditorScreen', { story })}>
-
+                        onPress={() => navigation.navigate('SingleStoryEditorScreen', { story, refreshStories: fetchStories })}>
                         <View style={styles.storyItemContainer}>
                             <View>
                                 <Text style={styles.storyTitle}>{story.title}</Text>
@@ -122,11 +110,9 @@ const PersonalStoriesScreen = ({ navigation }) => {
                                             <Text style={styles.buttonText}>Publish Story</Text>
                                         </TouchableOpacity>
                                     )}
-
                                 </View>
                             </View>
 
-                            {/* Display a checkmark if the story is completed. */}
                             {story.completed ? (
                                 <View style={styles.checkmark}>
                                     <Ionicons
@@ -135,15 +121,11 @@ const PersonalStoriesScreen = ({ navigation }) => {
                                         name={'checkmark-circle-outline'}
                                     />
                                 </View>
-                            ) :
-                                null
-                            }
+                            ) : null}
                         </View>
-
                     </TouchableOpacity>
                 ))}
             </ScrollView>
-
         </SafeAreaView>
     );
 };
