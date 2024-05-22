@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
@@ -31,6 +31,9 @@ const WriteEditorScreen = ({ navigation }) => {
     // Error message state
     const [errorMessage, setErrorMessage] = useState('');
 
+    // Loading state
+    const [loading, setLoading] = useState(false);
+
     // Genre example data
     const genres = [
         { label: 'Adventure', value: 'Adventure' },
@@ -62,6 +65,8 @@ const WriteEditorScreen = ({ navigation }) => {
         if (selectedGenre === "" || storyTitle === "" || storyDesc === "" || storyContent === "") {
             setErrorMessage('Please fill in all fields.');
         } else {
+            setLoading(true);
+            setErrorMessage('');
             const storyDetails = {
                 completed: false,
                 genre: selectedGenre,
@@ -77,8 +82,14 @@ const WriteEditorScreen = ({ navigation }) => {
                 ]
             }
 
-            await handleStoryCreate(storyDetails, userID);
-            navigation.navigate('PersonalStoriesScreen');
+            try {
+                await handleStoryCreate(storyDetails, userID);
+                navigation.navigate('PersonalStoriesScreen');
+            } catch (error) {
+                setErrorMessage('An error occurred while submitting your story. Please try again.');
+            } finally {
+                setLoading(false);
+            }
         }
     }
 
@@ -93,7 +104,7 @@ const WriteEditorScreen = ({ navigation }) => {
                 {!showLargeTextInput ? (
                     <ScrollView>
                         <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                            <TouchableOpacity onPress={() => navigation.navigate('WriteScreen')}>
+                            <TouchableOpacity onPress={() => navigation.navigate('WriteScreen')} disabled={loading}>
                                 <Image
                                     style={styles.imgBack}
                                     source={require("../../assets/images/Arrow.png")} />
@@ -109,7 +120,9 @@ const WriteEditorScreen = ({ navigation }) => {
                             <Picker
                                 selectedValue={selectedGenre}
                                 style={styles.picker}
-                                onValueChange={handleGenreChange}>
+                                onValueChange={handleGenreChange}
+                                enabled={!loading}
+                            >
                                 {genres.map((genre) => (
                                     <Picker.Item key={genre.value} label={genre.label} value={genre.value} />
                                 ))}
@@ -123,6 +136,7 @@ const WriteEditorScreen = ({ navigation }) => {
                                 placeholder="Title"
                                 onChangeText={handleTitleChange}
                                 value={storyTitle}
+                                editable={!loading}
                             />
                         </View>
 
@@ -134,11 +148,12 @@ const WriteEditorScreen = ({ navigation }) => {
                                 placeholder="Description"
                                 onChangeText={handleDescriptionChange}
                                 value={storyDesc}
+                                editable={!loading}
                             />
                         </View>
 
                         <View style={{ width: '100%', alignItems: 'center' }}>
-                            <TouchableOpacity style={styles.btnStart} onPress={() => setShowLargeTextInput(true)}>
+                            <TouchableOpacity style={styles.btnStart} onPress={() => setShowLargeTextInput(true)} disabled={loading}>
                                 <Text style={styles.btnStartText}>Start!</Text>
                             </TouchableOpacity>
                         </View>
@@ -146,7 +161,7 @@ const WriteEditorScreen = ({ navigation }) => {
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         {errorMessage ? (
-                            <View style={{width: '100%'}}>
+                            <View style={{ width: '100%' }}>
                                 <View style={styles.errorContainer}>
                                     <Text style={styles.errorText}>{errorMessage}</Text>
                                 </View>
@@ -156,6 +171,7 @@ const WriteEditorScreen = ({ navigation }) => {
                                     placeholder="Start writing your story..."
                                     onChangeText={handleContentChange}
                                     value={storyContent}
+                                    editable={!loading}
                                 />
                             </View>
                         ) : (
@@ -165,18 +181,26 @@ const WriteEditorScreen = ({ navigation }) => {
                                 placeholder="Start writing your story..."
                                 onChangeText={handleContentChange}
                                 value={storyContent}
+                                editable={!loading}
                             />
                         )}
 
                         <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row' }}>
-                            <TouchableOpacity style={styles.btnSubmit} onPress={() => setShowLargeTextInput(false)}>
+                            <TouchableOpacity style={styles.btnSubmit} onPress={() => setShowLargeTextInput(false)} disabled={loading}>
                                 <Text style={styles.btnSubmitText}>Back</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.btnSubmit} onPress={() => handleSubmit()}>
+                            <TouchableOpacity style={styles.btnSubmit} onPress={handleSubmit} disabled={loading}>
                                 <Text style={styles.btnSubmitText}>Done!</Text>
                             </TouchableOpacity>
                         </View>
+                    </View>
+                )}
+
+                {loading && (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color="#fff" />
+                        <Text style={styles.loadingText}>Submitting...</Text>
                     </View>
                 )}
 
@@ -290,6 +314,24 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: '#cc0000',
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        textAlign: 'center'
+    },
+    loadingContainer: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: [{ translateX: -50 }, { translateY: -50 }],
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: 10,
+        padding: 20,
+    },
+    loadingText: {
+        marginTop: 10,
+        color: 'white',
         fontFamily: 'Baskervville',
         fontSize: 18,
         textAlign: 'center'
