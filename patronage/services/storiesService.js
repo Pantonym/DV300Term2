@@ -46,13 +46,106 @@ export const fetchUserStories = async (userID) => {
 };
 
 export const deleteStory = async (userID, storyTitle) => {
-    console.log('Delete: ', userID, storyTitle)
+    console.log('Delete: ', userID, storyTitle);
+
+    try {
+        const docRef = doc(db, "users", userID);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const userData = docSnap.data();
+            var works = userData.works;
+            var newWorks = [];
+
+            // Find the index of the story the user clicked on
+            for (let k = 0; k < works.length; k++) {
+
+                if (works[k].title == storyTitle) {
+                    // Skip the story the user wants to delete
+                    console.log('Found Item To Delete')
+                } else {
+                    // push all other works
+                    newWorks.push(works[k])
+                }
+
+            }
+
+            works = newWorks;
+
+            // Update the user's document in Firestore with the new works array
+            await setDoc(docRef, { ...userData, works });
+
+            console.log("Story deleted successfully");
+        } else {
+            console.log("No such document!");
+        }
+    } catch (error) {
+        console.error("Error publishing story: ", error);
+    }
 }
 
 export const publishStory = async (userID, storyTitle) => {
-    console.log('Publish: ', userID, storyTitle)
+    console.log('Publish: ', userID, storyTitle);
+
+    try {
+        const docRef = doc(db, "users", userID);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const userData = docSnap.data();
+            var works = userData.works;
+
+            // Find the index of the story the user clicked on
+            for (let k = 0; k < works.length; k++) {
+
+                if (works[k].title == storyTitle) {
+                    // Set that work's completed value to true
+                    works[k].completed = true
+                }
+
+            }
+
+            // Update the user's document in Firestore with the new works array
+            await setDoc(docRef, { ...userData, works });
+
+            console.log("Story published successfully");
+        } else {
+            console.log("No such document!");
+        }
+    } catch (error) {
+        console.error("Error publishing story: ", error);
+    }
 }
 
 export const unPublishStory = async (userID, storyTitle) => {
     console.log('Unpublish: ', userID, storyTitle)
+
+    try {
+        const docRef = doc(db, "users", userID);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const userData = docSnap.data();
+            var works = userData.works;
+
+            // Find the index of the story the user clicked on
+            for (let k = 0; k < works.length; k++) {
+
+                if (works[k].title == storyTitle) {
+                    // Set that work's completed value to true
+                    works[k].completed = false
+                }
+
+            }
+
+            // Update the user's document in Firestore with the new works array
+            await setDoc(docRef, { ...userData, works });
+
+            console.log("Story unpublished successfully");
+        } else {
+            console.log("No such document!");
+        }
+    } catch (error) {
+        console.error("Error unpublishing story: ", error);
+    }
 }

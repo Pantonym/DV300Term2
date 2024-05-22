@@ -5,17 +5,17 @@
     "awards": [
         {
             "genre": "Fantasy",
-            "year": 2023,
+            "year": "2023",
             "place": "gold"
         },
         {
             "genre": "Horror",
-            "year": 2024,
+            "year": "2024",
             "place": "silver"
         },
         {
             "genre": "Sci-Fi",
-            "year": 2024,
+            "year": "2024",
             "place": "bronze"
         }
     ],

@@ -15,32 +15,40 @@ const PersonalStoriesScreen = ({ navigation }) => {
         setUserID(userID);
     };
 
+    // Get all of the stories from the currently logged in user
+    const fetchStories = async () => {
+        if (userID) {
+            const fetchedStories = await fetchUserStories(userID);
+            setStories(fetchedStories);
+        }
+    };
+
     useEffect(() => {
         getUserID();
     }, []);
 
-    // Get all of the stories from the currently logged in user
+
     useEffect(() => {
-        const fetchStories = async () => {
-            if (userID) {
-                const fetchedStories = await fetchUserStories(userID);
-                setStories(fetchedStories);
-            }
-        };
         fetchStories();
         // Collect the stories once the ID is collected - this stops the app from moving on with null data from not having the ID
     }, [userID]);
 
     const handleDelete = async (title) => {
         await deleteStory(userID, title);
+
+        fetchStories();
     }
 
     const handlePublish = async (title) => {
         await publishStory(userID, title);
+
+        fetchStories();
     }
 
     const handleUnPublish = async (title) => {
         await unPublishStory(userID, title);
+
+        fetchStories();
     }
 
     const confirmDelete = (clickedTitle) => {
