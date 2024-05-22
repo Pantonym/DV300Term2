@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleStoryCreate } from '../../services/storiesService';
+import { CommonActions } from '@react-navigation/native';
 
 const WriteEditorScreen = ({ navigation }) => {
 
@@ -60,13 +61,19 @@ const WriteEditorScreen = ({ navigation }) => {
         setStoryContent(text);
     }
 
-    // Submit and save story
+    // Submit and save the story
     const handleSubmit = async () => {
+        // If the user has not entered all the information they need
         if (selectedGenre === "" || storyTitle === "" || storyDesc === "" || storyContent === "") {
             setErrorMessage('Please fill in all fields.');
         } else {
+            // Tell the user the app is processing the request
             setLoading(true);
+
+            // Empty the error message as it has been resolved (if an error was made)
             setErrorMessage('');
+
+            // Generate the data that will be sent to the database
             const storyDetails = {
                 completed: false,
                 genre: selectedGenre,
@@ -76,15 +83,24 @@ const WriteEditorScreen = ({ navigation }) => {
                     {
                         chapterTitle: storyTitle,
                         chapterContent: storyContent,
+                        // Comments and ratings are included for easier changing later
                         comments: [],
                         ratings: []
                     }
                 ]
             }
 
+            // Attempt to create the story
             try {
                 await handleStoryCreate(storyDetails, userID);
-                navigation.navigate('PersonalStoriesScreen');
+
+                // Reset the navigation stack to remove the ability to swipe back
+                navigation.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: 'PersonalStoriesScreen' }],
+                    })
+                );
             } catch (error) {
                 setErrorMessage('An error occurred while submitting your story. Please try again.');
             } finally {
