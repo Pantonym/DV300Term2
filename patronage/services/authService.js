@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createUser } from "./accountService";
 
 // Log In
-export const handleLogin = (email, password, username) => {
+export const handleLogin = (email, password) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
@@ -12,18 +12,6 @@ export const handleLogin = (email, password, username) => {
 
             AsyncStorage.setItem('UserEmail', user.email);
             AsyncStorage.setItem('UserID', user.uid);
-
-            const userData = {
-                "username": username,
-                "email": email,
-                "userImg": "../assets/icons/ProfileIcon.png",
-                "awards": [],
-                "works": []
-            };
-
-            console.log("USERNAME: ----------------", username);
-
-            createUser(userData, user.uid);
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -36,10 +24,24 @@ export const handleLogin = (email, password, username) => {
 // Sign Up
 export const handleRegister = (email, password, username) => {
     createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
             const user = userCredential.user;
             console.log("Signed Up User: " + user.email);
-            handleLogin(email, password, username);
+
+            const userData = {
+                "username": username,
+                "email": email,
+                "userImg": "../assets/icons/ProfileIcon.png",
+                "awards": [],
+                "works": []
+            };
+
+            console.log("USERNAME: ----------------", username);
+
+            await createUser(userData, user.uid);
+
+            // Log the user in after account creation
+            handleLogin(email, password);
         })
         .catch((error) => {
             const errorCode = error.code;

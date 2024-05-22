@@ -1,13 +1,26 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { handleStoryCreate } from '../../services/storiesService';
 
 const WriteEditorScreen = ({ navigation }) => {
 
+    // Logged in user details
+    const [userID, setUserID] = useState('');
+
+    const getUserID = async () => {
+        const userID = await AsyncStorage.getItem('UserID');
+        setUserID(userID);
+    };
+
+    useEffect(() => {
+        getUserID();
+    }, []);
+
     // Variables the user enters.
-    const [selectedGenre, setSelectedGenre] = useState('');
+    const [selectedGenre, setSelectedGenre] = useState('Adventure');
     const [storyTitle, setStoryTitle] = useState('');
     const [storyDesc, setStoryDesc] = useState('');
     const [storyContent, setStoryContent] = useState('');
@@ -17,11 +30,11 @@ const WriteEditorScreen = ({ navigation }) => {
 
     // Genre example data
     const genres = [
-        { label: 'Adventure', value: 'adventure' },
-        { label: 'Fantasy', value: 'fantasy' },
-        { label: 'Science Fiction', value: 'science_fiction' },
-        { label: 'Mystery', value: 'mystery' },
-        { label: 'Romance', value: 'romance' },
+        { label: 'Adventure', value: 'Adventure' },
+        { label: 'Fantasy', value: 'Fantasy' },
+        { label: 'Science Fiction', value: 'Sci-Fi' },
+        { label: 'Mystery', value: 'Mystery' },
+        { label: 'Romance', value: 'Romance' },
     ];
 
     // Collects data the user inputs
@@ -43,14 +56,24 @@ const WriteEditorScreen = ({ navigation }) => {
 
     // Submit and save story
     const handleSubmit = async () => {
+        // const storyDetails = [selectedGenre, storyTitle, storyDesc, storyContent, userID];
+        const storyDetails = {
+            completed: false,
+            genre: selectedGenre,
+            title: storyTitle,
+            description: storyDesc,
+            chapters: [
+                {
+                    chapterTitle: storyTitle,
+                    chapterContent: storyContent,
+                    comments: [],
+                    ratings: []
+                }
+            ]
+        }
 
-        // Similar to localStorage
-        loggedInUser = await AsyncStorage.getItem('UserEmail');
-
-        const storyDetails = [selectedGenre, storyTitle, storyDesc, storyContent, loggedInUser];
-        console.log(storyDetails);
-
-        navigation.navigate('ProfileScreen')
+        await handleStoryCreate(storyDetails, userID);
+        // navigation.navigate('PersonalSToriesScreen');
     }
 
     return (
