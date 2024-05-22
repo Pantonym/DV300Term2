@@ -43,6 +43,44 @@ const PersonalStoriesScreen = ({ navigation }) => {
         fetchStories();
     }
 
+    const confirmPublish = (clickedTitle) => {
+        Alert.alert(
+            "Confirm Publish",
+            "Are you sure you want to publish this story? Future edits here will not be reflected on the leaderboards.",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Publish cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: () => handlePublish(clickedTitle)
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
+    const confirmUnPublish = (clickedTitle) => {
+        Alert.alert(
+            "Confirm delete",
+            "Are you sure you want to unpublish this story? All votes and comments will be lost.",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Unpublish cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: () => handleUnPublish(clickedTitle)
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
     const confirmDelete = (clickedTitle) => {
         Alert.alert(
             "Confirm delete",
@@ -103,13 +141,13 @@ const PersonalStoriesScreen = ({ navigation }) => {
                                     {story.completed ? (
                                         <TouchableOpacity
                                             style={styles.btnUnPublish}
-                                            onPress={() => handleUnPublish(story.title)}>
+                                            onPress={() => confirmUnPublish(story.title)}>
                                             <Text style={styles.buttonText}>Unpublish Story</Text>
                                         </TouchableOpacity>
                                     ) : (
                                         <TouchableOpacity
                                             style={styles.btnPublish}
-                                            onPress={() => handlePublish(story.title)}>
+                                            onPress={() => confirmPublish(story.title)}>
                                             <Text style={styles.buttonText}>Publish Story</Text>
                                         </TouchableOpacity>
                                     )}

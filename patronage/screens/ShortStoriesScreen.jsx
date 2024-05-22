@@ -13,7 +13,7 @@ const ShortStoriesScreen = ({ navigation }) => {
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
-                onPress={() => navigation.navigate('GenreScreen', genre.label)}
+                onPress={() => navigation.navigate('GenreScreen', genre.value)}
             >
                 <Text style={styles.genreText}>{genre.label}</Text>
             </TouchableOpacity>
@@ -26,7 +26,7 @@ const ShortStoriesScreen = ({ navigation }) => {
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
-                onPress={() => navigation.navigate('LeaderboardScreen', leaderboard.label)}
+                onPress={() => navigation.navigate('LeaderboardScreen', leaderboard.value)}
             >
                 <Text style={styles.genreText}>{leaderboard.label}</Text>
             </TouchableOpacity>
