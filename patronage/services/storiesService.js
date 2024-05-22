@@ -1,4 +1,4 @@
-import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 // create a new story
@@ -45,6 +45,7 @@ export const fetchUserStories = async (userID) => {
     }
 };
 
+// Delete a work
 export const deleteStory = async (userID, storyTitle) => {
     console.log('Delete: ', userID, storyTitle);
 
@@ -84,6 +85,7 @@ export const deleteStory = async (userID, storyTitle) => {
     }
 }
 
+// Publish a work
 export const publishStory = async (userID, storyTitle) => {
     console.log('Publish: ', userID, storyTitle);
 
@@ -117,6 +119,7 @@ export const publishStory = async (userID, storyTitle) => {
     }
 }
 
+// unpublish a work
 export const unPublishStory = async (userID, storyTitle) => {
     console.log('Unpublish: ', userID, storyTitle)
 
@@ -150,9 +153,8 @@ export const unPublishStory = async (userID, storyTitle) => {
     }
 }
 
-export const updateStory = async (userID, storyTitle, newContent, newTitle) => {
-    console.log('Update: ', userID, storyTitle, " to: ", newTitle, ' with: ', newContent)
-
+// update a work
+export const updateStory = async (userID, storyTitle, newContent, newTitle, newDescription, newGenre) => {
     try {
         const docRef = doc(db, "users", userID);
         const docSnap = await getDoc(docRef);
@@ -172,6 +174,8 @@ export const updateStory = async (userID, storyTitle, newContent, newTitle) => {
                     works[k].chapters[0].chapterTitle = newTitle;
                     works[k].chapters[0].chapterContent = newContent;
                     works[k].title = newTitle;
+                    works[k].description = newDescription;
+                    works[k].genre = newGenre;
 
                     console.log(works[k])
                 }

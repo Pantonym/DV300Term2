@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleStoryCreate } from '../../services/storiesService';
 import { CommonActions } from '@react-navigation/native';
+import { arrGenres } from '../../context/genres';
 
 const WriteEditorScreen = ({ navigation }) => {
 
@@ -35,14 +36,8 @@ const WriteEditorScreen = ({ navigation }) => {
     // Loading state
     const [loading, setLoading] = useState(false);
 
-    // Genre example data
-    const genres = [
-        { label: 'Adventure', value: 'Adventure' },
-        { label: 'Fantasy', value: 'Fantasy' },
-        { label: 'Science Fiction', value: 'Sci-Fi' },
-        { label: 'Mystery', value: 'Mystery' },
-        { label: 'Romance', value: 'Romance' },
-    ];
+    // Genre data
+    const genres = arrGenres;
 
     // Collects data the user inputs
     const handleGenreChange = (itemValue, itemIndex) => {
