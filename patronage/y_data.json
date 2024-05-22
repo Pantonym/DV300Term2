@@ -3,7 +3,7 @@
         {
             "horror": [
                 {
-                    "authorID": 123,
+                    "authorID": "123",
                     "genre": "Horror",
                     "description": "This is about...",
                     "title": "Story Title",
@@ -13,20 +13,23 @@
                             "chapterContent": "In the first days...",
                             "comments": [
                                 {
-                                    "commenterID": 12,
+                                    "commenterID": "12",
                                     "commentContent": "I think that..."
                                 },
                                 {
-                                    "commenterID": 16,
+                                    "commenterID": "16",
                                     "commentContent": "Another..."
                                 }
                             ],
                             "ratings": [
-                                1,
-                                2,
-                                5,
-                                1,
-                                2
+                                {
+                                    "voterID": "12",
+                                    "voteAmount": 7
+                                },
+                                {
+                                    "voterID": "16",
+                                    "voteAmount": 9
+                                }
                             ]
                         }
                     ]
@@ -34,7 +37,7 @@
             ],
             "sciFi": [
                 {
-                    "authorID": 123,
+                    "authorID": "123",
                     "genre": "Horror",
                     "description": "This is about...",
                     "title": "Story Title",
@@ -65,7 +68,7 @@
             ],
             "poems": [
                 {
-                    "authorID": 123,
+                    "authorID": "123",
                     "genre": "Horror",
                     "description": "This is about...",
                     "title": "Story Title",

@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, query, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 // create a new story
@@ -96,6 +96,8 @@ export const publishStory = async (userID, storyTitle) => {
         if (docSnap.exists()) {
             const userData = docSnap.data();
             var works = userData.works;
+            var leaderboardItem = []
+            var chosenGenre = "";
 
             // Find the index of the story the user clicked on
             for (let k = 0; k < works.length; k++) {
@@ -103,6 +105,26 @@ export const publishStory = async (userID, storyTitle) => {
                 if (works[k].title == storyTitle) {
                     // Set that work's completed value to true
                     works[k].completed = true
+
+                    // build the leaderboard item
+                    leaderboardItem = {
+                        "authorID": userID,
+                        "genre": works[k].genre,
+                        "description": works[k].description,
+                        "title": works[k].title,
+                        "chapters": [
+                            {
+                                "chapterTitle": works[k].title,
+                                "chapterContent": works[k].chapters[0].chapterContent,
+                                "comments": [],
+                                "ratings": []
+                            }
+                        ]
+                    }
+
+                    chosenGenre = works[k].genre;
+                    chosenGenre = chosenGenre.toLowerCase();
+
                 }
 
             }
@@ -111,6 +133,34 @@ export const publishStory = async (userID, storyTitle) => {
             await setDoc(docRef, { ...userData, works });
 
             console.log("Story published successfully");
+
+            // Once everything is done, upload the data
+            try {
+                const storiesRef = doc(db, 'leaderboards', 'shortStories');
+                const docSnapLeader = await getDoc(storiesRef);
+
+                if (docSnapLeader.exists()) {
+                    const leaderboardsData = docSnapLeader.data();
+                    const genreData = leaderboardsData[chosenGenre];
+
+                    if (genreData) {
+                        // Push the new leaderboard item to the genreData array
+                        genreData.push(leaderboardItem);
+                        // Update the genreData in Firestore
+                        await updateDoc(storiesRef, {
+                            [chosenGenre]: genreData
+                        });
+                        console.log("Genre data updated successfully");
+                    } else {
+                        console.log(`No such genre '${chosenGenre}' in 'shortStories'!`);
+                    }
+                } else {
+                    console.log("No such document 'shortStories'!");
+                }
+            } catch (error) {
+                console.error("Error updating genre data: ", error);
+            }
+
         } else {
             console.log("No such document!");
         }
@@ -130,21 +180,73 @@ export const unPublishStory = async (userID, storyTitle) => {
         if (docSnap.exists()) {
             const userData = docSnap.data();
             var works = userData.works;
+            var chosenGenre = "";
+
+            let unpublishedItem = null;
 
             // Find the index of the story the user clicked on
             for (let k = 0; k < works.length; k++) {
+                if (works[k].title === storyTitle) {
+                    // Set that work's completed value to false
+                    works[k].completed = false;
 
-                if (works[k].title == storyTitle) {
-                    // Set that work's completed value to true
-                    works[k].completed = false
+                    // Prepare the unpublished item for deletion
+                    unpublishedItem = {
+                        authorID: userID,
+                        title: works[k].title
+                    };
+
+                    chosenGenre = works[k].genre;
+                    chosenGenre = chosenGenre.toLowerCase();
                 }
-
             }
 
             // Update the user's document in Firestore with the new works array
             await setDoc(docRef, { ...userData, works });
 
             console.log("Story unpublished successfully");
+
+            // Delete the item from the leaderboard
+            try {
+                const storiesRef = doc(db, 'leaderboards', 'shortStories');
+                const docSnapLeader = await getDoc(storiesRef);
+
+                if (docSnapLeader.exists()) {
+                    const leaderboardsData = docSnapLeader.data();
+                    const genreData = leaderboardsData[chosenGenre];
+
+                    console.log(genreData)
+
+                    if (genreData) {
+                        // Find the index of the item to delete
+                        const indexToDelete = genreData.findIndex(item =>
+                            item.authorID === unpublishedItem.authorID &&
+                            item.title === unpublishedItem.title
+                        );
+
+                        if (indexToDelete !== -1) {
+                            // Remove the item from the array
+                            genreData.splice(indexToDelete, 1);
+
+                            // Update the genreData in Firestore
+                            await updateDoc(storiesRef, {
+                                [chosenGenre]: genreData
+                            });
+
+                            console.log("Item deleted from leaderboard");
+                        } else {
+                            console.log(`No matching item found in leaderboard for ${unpublishedItem.title}`);
+                        }
+                    } else {
+                        console.log(`No such genre '${chosenGenre}' in 'shortStories'!`);
+                    }
+                } else {
+                    console.log("No such document 'shortStories'!");
+                }
+            } catch (error) {
+                console.error("Error deleting item from leaderboard: ", error);
+            }
+
         } else {
             console.log("No such document!");
         }
@@ -191,5 +293,25 @@ export const updateStory = async (userID, storyTitle, newContent, newTitle, newD
         }
     } catch (error) {
         console.error("Error editing story: ", error);
+    }
+};
+
+// Get short stories of a specific genres
+export const getShortStoriesByGenre = async (genre) => {
+    try {
+        const storiesRef = doc(db, 'leaderboards', 'shortStories');
+        const docSnap = await getDoc(storiesRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+
+            return data[genre] || [];
+        } else {
+            console.log("No such document!");
+            return [];
+        }
+    } catch (error) {
+        console.error("Error fetching short stories by genre:", error);
+        return [];
     }
 };

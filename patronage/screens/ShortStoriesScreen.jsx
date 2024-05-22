@@ -1,22 +1,11 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// example data for genres
-const genres = [
-    { name: 'Horror', screen: 'GenreScreen' },
-    { name: 'Sci-Fi', screen: 'GenreScreen' },
-    { name: 'Fantasy', screen: 'GenreScreen' },
-];
-
-// example data for leaderboards
-const leaderboards = [
-    { name: 'Horror', screen: 'LeaderboardScreen' },
-    { name: 'Sci-Fi', screen: 'LeaderboardScreen' },
-    { name: 'Fantasy', screen: 'LeaderboardScreen' },
-];
+import { arrGenres } from '../context/genres';
 
 const ShortStoriesScreen = ({ navigation }) => {
+
+    const genres = arrGenres;
 
     // Dynamically render an amount of items in the carousel depending on how many genres there are
     const renderGenres = () => {
@@ -24,22 +13,22 @@ const ShortStoriesScreen = ({ navigation }) => {
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
-                onPress={() => navigation.navigate(genre.screen, genre.name)}
+                onPress={() => navigation.navigate('GenreScreen', genre.label)}
             >
-                <Text style={styles.genreText}>{genre.name}</Text>
+                <Text style={styles.genreText}>{genre.label}</Text>
             </TouchableOpacity>
         ));
     };
 
     // Dynamically render an amount of items in the carousel depending on how many genres there are
     const renderLeaderboards = () => {
-        return leaderboards.map((leaderboard, index) => (
+        return genres.map((leaderboard, index) => (
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
-                onPress={() => navigation.navigate(leaderboard.screen, leaderboard.name)}
+                onPress={() => navigation.navigate('LeaderboardScreen', leaderboard.label)}
             >
-                <Text style={styles.genreText}>{leaderboard.name}</Text>
+                <Text style={styles.genreText}>{leaderboard.label}</Text>
             </TouchableOpacity>
         ));
     };
