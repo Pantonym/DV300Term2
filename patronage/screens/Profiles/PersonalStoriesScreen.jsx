@@ -85,9 +85,11 @@ const PersonalStoriesScreen = ({ navigation }) => {
                         key={index}
                         style={styles.storyContainer}
                         onPress={() => navigation.navigate('SingleStoryEditorScreen', { story, refreshStories: fetchStories })}>
+
                         <View style={styles.storyItemContainer}>
                             <View>
                                 <Text style={styles.storyTitle}>{story.title}</Text>
+                                <Text style={styles.storyGenre}>{story.genre}</Text>
                                 <Text style={styles.storyDescription}>{story.description}</Text>
 
                                 <View style={{ flexDirection: 'row' }}>
@@ -97,6 +99,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
                                         <Text style={styles.buttonText}>Delete Story</Text>
                                     </TouchableOpacity>
 
+                                    {/* Change the button depending on wether or not the story is completed */}
                                     {story.completed ? (
                                         <TouchableOpacity
                                             style={styles.btnUnPublish}
@@ -113,6 +116,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
                                 </View>
                             </View>
 
+                            {/* Add a checkmark if the story is marked as completed */}
                             {story.completed ? (
                                 <View style={styles.checkmark}>
                                     <Ionicons
@@ -177,6 +181,14 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    storyGenre: {
+        fontFamily: 'Baskervville',
+        fontSize: 16,
+        color: '#666',
+        marginLeft: 10,
+        marginTop: 5,
+        marginBottom: 5
     },
     storyDescription: {
         fontFamily: 'Baskervville',

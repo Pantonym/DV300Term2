@@ -6,21 +6,31 @@ import { Picker } from '@react-native-picker/picker';
 import { arrGenres } from '../../context/genres';
 
 const SingleStoryEditorScreen = ({ route, navigation }) => {
+    // Receive the story that was selected from the parameters
     const { story, refreshStories } = route.params;
 
+    // Receive the User ID
     const [userID, setUserID] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
 
+    // Edited Data States
     const [title, setTitle] = useState(story.title);
     const [chapterDescription, setChapterDescription] = useState(story.description);
     const [selectedGenre, setSelectedGenre] = useState(story.genre);
     const [chapterContent, setChapterContent] = useState(story.chapters[0].chapterContent);
 
+    // Default Data States, used to initialise and return the data to its default value if the user cancels editing.
     const storyTitle = story.title;
     const storyContent = story.chapters[0].chapterContent;
     const storyDescription = story.description;
     const storyGenre = story.genre;
 
+    // Genre data
+    const genres = arrGenres;
+
+    // UI Output Altering Variables
+    const [isEditing, setIsEditing] = useState(false);
+
+    // Get the userID from storage
     const getUserID = async () => {
         const userID = await AsyncStorage.getItem('UserID');
         setUserID(userID);
@@ -30,6 +40,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
         getUserID();
     }, []);
 
+    // Save the new data to the database
     const handleSave = async () => {
         var newTitle = title;
         var newContent = chapterContent;
@@ -42,6 +53,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
         navigation.goBack();
     };
 
+    // Cancel changing the data and return it to its default state.
     const handleCancel = async () => {
         setChapterContent(storyContent);
         setChapterDescription(storyDescription);
@@ -52,10 +64,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
         refreshStories();
     }
 
-    // Genre data
-    const genres = arrGenres;
-
-    // Collects data the user inputs
+    // When the genre changes, change the useState
     const handleGenreChange = (itemValue, itemIndex) => {
         setSelectedGenre(itemValue);
     };
@@ -79,6 +88,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                 </View>
 
                 <ScrollView>
+                    {/* When the user is editing, display the following */}
                     {isEditing ? (
                         <View>
                             <Text style={styles.inputLabel}>Title: </Text>
@@ -128,10 +138,20 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                             </View>
                         </View>
                     ) : (
+                        // When the user is not editing, display the following
                         <View>
                             <Text style={styles.titleText}>
                                 {title}
                             </Text>
+                            <View
+                                style={{
+                                    borderBottomColor: 'black',
+                                    borderBottomWidth: 2.5,
+                                    width: '80%',
+                                    alignSelf: 'center'
+                                }}
+                            />
+
                             <Text style={styles.storyContent}>
                                 {chapterContent}
                             </Text>
@@ -259,7 +279,8 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         borderRadius: 15,
         marginLeft: 10,
-        marginRight: 10
+        marginRight: 10,
+        marginBottom: 20
     },
     btnEditText: {
         fontSize: 24,
