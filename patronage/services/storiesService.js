@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 // create a new story
@@ -44,3 +44,15 @@ export const fetchUserStories = async (userID) => {
         return [];
     }
 };
+
+export const deleteStory = async (userID, storyTitle) => {
+    console.log('Delete: ', userID, storyTitle)
+}
+
+export const publishStory = async (userID, storyTitle) => {
+    console.log('Publish: ', userID, storyTitle)
+}
+
+export const unPublishStory = async (userID, storyTitle) => {
+    console.log('Unpublish: ', userID, storyTitle)
+}

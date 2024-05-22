@@ -102,8 +102,10 @@ const WriteEditorScreen = ({ navigation }) => {
                     })
                 );
             } catch (error) {
+                // If there's an error creating the story
                 setErrorMessage('An error occurred while submitting your story. Please try again.');
             } finally {
+                // remove the loading no matter if there's an error or not.
                 setLoading(false);
             }
         }
@@ -117,6 +119,7 @@ const WriteEditorScreen = ({ navigation }) => {
 
             <SafeAreaView style={styles.container}>
 
+                {/* Changes between the large and smaller text inputs, depending on if there's an error */}
                 {!showLargeTextInput ? (
                     <ScrollView>
                         <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
@@ -213,6 +216,7 @@ const WriteEditorScreen = ({ navigation }) => {
                     </View>
                 )}
 
+                {/* The loading that displays once the button is clicked */}
                 {loading && (
                     <View style={styles.loadingContainer}>
                         <ActivityIndicator size="large" color="#fff" />
@@ -271,7 +275,8 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: 'white',
         borderRadius: 12,
-        padding: 10
+        padding: 10,
+        marginBottom: 10
     },
     inputLong: {
         height: 175,

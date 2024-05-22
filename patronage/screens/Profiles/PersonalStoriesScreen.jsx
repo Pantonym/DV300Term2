@@ -1,12 +1,15 @@
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchUserStories } from '../../services/storiesService';
+import { deleteStory, fetchUserStories, publishStory, unPublishStory } from '../../services/storiesService';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const PersonalStoriesScreen = ({ navigation }) => {
+    // UseStates
     const [userID, setUserID] = useState(null);
     const [stories, setStories] = useState([]);
 
+    // Get the userID. This is done in this method to ensure it is received before the app moves on
     const getUserID = async () => {
         const userID = await AsyncStorage.getItem('UserID');
         setUserID(userID);
@@ -16,6 +19,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
         getUserID();
     }, []);
 
+    // Get all of the stories from the currently logged in user
     useEffect(() => {
         const fetchStories = async () => {
             if (userID) {
@@ -24,10 +28,43 @@ const PersonalStoriesScreen = ({ navigation }) => {
             }
         };
         fetchStories();
+        // Collect the stories once the ID is collected - this stops the app from moving on with null data from not having the ID
     }, [userID]);
+
+    const handleDelete = async (title) => {
+        await deleteStory(userID, title);
+    }
+
+    const handlePublish = async (title) => {
+        await publishStory(userID, title);
+    }
+
+    const handleUnPublish = async (title) => {
+        await unPublishStory(userID, title);
+    }
+
+    const confirmDelete = (clickedTitle) => {
+        Alert.alert(
+            "Confirm delete",
+            "Are you sure you want to delete this story? It will not be recoverable.",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Delete cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: () => handleDelete(clickedTitle)
+                }
+            ],
+            { cancelable: false }
+        );
+    };
 
     return (
         <SafeAreaView style={styles.container}>
+
             <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
                     <Image
@@ -38,20 +75,67 @@ const PersonalStoriesScreen = ({ navigation }) => {
                     Patronage
                 </Text>
             </View>
+
             <Text style={styles.titleText}>
                 Stories
             </Text>
+
             <ScrollView>
+                {/* Map through the collected stories to generate a clickable component for each. */}
                 {stories.map((story, index) => (
                     <TouchableOpacity
                         key={index}
                         style={styles.storyContainer}
+                        // navigate to the single page, sending the data of the story as a parameter so that only one page can display any story (instead of having infinite story pages)
                         onPress={() => navigation.navigate('SingleStoryEditorScreen', { story })}>
-                        <Text style={styles.storyTitle}>{story.title}</Text>
-                        <Text style={styles.storyDescription}>{story.description}</Text>
+
+                        <View style={styles.storyItemContainer}>
+                            <View>
+                                <Text style={styles.storyTitle}>{story.title}</Text>
+                                <Text style={styles.storyDescription}>{story.description}</Text>
+
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity
+                                        style={styles.btnDelete}
+                                        onPress={() => confirmDelete(story.title)}>
+                                        <Text style={styles.buttonText}>Delete Story</Text>
+                                    </TouchableOpacity>
+
+                                    {story.completed ? (
+                                        <TouchableOpacity
+                                            style={styles.btnUnPublish}
+                                            onPress={() => handleUnPublish(story.title)}>
+                                            <Text style={styles.buttonText}>Unpublish Story</Text>
+                                        </TouchableOpacity>
+                                    ) : (
+                                        <TouchableOpacity
+                                            style={styles.btnPublish}
+                                            onPress={() => handlePublish(story.title)}>
+                                            <Text style={styles.buttonText}>Publish Story</Text>
+                                        </TouchableOpacity>
+                                    )}
+
+                                </View>
+                            </View>
+
+                            {/* Display a checkmark if the story is completed. */}
+                            {story.completed ? (
+                                <View style={styles.checkmark}>
+                                    <Ionicons
+                                        size={35}
+                                        color={'#9A3E53'}
+                                        name={'checkmark-circle-outline'}
+                                    />
+                                </View>
+                            ) :
+                                null
+                            }
+                        </View>
+
                     </TouchableOpacity>
                 ))}
             </ScrollView>
+
         </SafeAreaView>
     );
 };
@@ -109,6 +193,47 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#666',
     },
+    storyItemContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    checkmark: {
+        marginRight: 10
+    },
+    btnDelete: {
+        backgroundColor: '#ffcccc',
+        height: 'auto',
+        width: 125,
+        padding: 10,
+        borderRadius: 12,
+        marginTop: 10,
+        marginRight: 15,
+        alignItems: 'center'
+    },
+    btnPublish: {
+        backgroundColor: '#deffcc',
+        height: 'auto',
+        width: 145,
+        padding: 10,
+        borderRadius: 12,
+        marginTop: 10,
+        alignItems: 'center'
+    },
+    btnUnPublish: {
+        backgroundColor: '#fffdcc',
+        height: 'auto',
+        width: 145,
+        padding: 10,
+        borderRadius: 12,
+        marginTop: 10,
+        alignItems: 'center'
+    },
+    buttonText: {
+        fontFamily: 'Baskervville',
+        fontSize: 16
+    }
 });
 
 export default PersonalStoriesScreen;
