@@ -25,3 +25,22 @@ export const handleStoryCreate = async (storyDetails, userID) => {
         console.error("Error adding story: ", error);
     }
 };
+
+// fetch user stories
+export const fetchUserStories = async (userID) => {
+    try {
+        const docRef = doc(db, "users", userID);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const userData = docSnap.data();
+            return userData.works || [];
+        } else {
+            console.log("No such document!");
+            return [];
+        }
+    } catch (error) {
+        console.error("Error fetching stories: ", error);
+        return [];
+    }
+};

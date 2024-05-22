@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
@@ -28,6 +28,9 @@ const WriteEditorScreen = ({ navigation }) => {
     // Variable to change output
     const [showLargeTextInput, setShowLargeTextInput] = useState(false);
 
+    // Error message state
+    const [errorMessage, setErrorMessage] = useState('');
+
     // Genre example data
     const genres = [
         { label: 'Adventure', value: 'Adventure' },
@@ -56,24 +59,27 @@ const WriteEditorScreen = ({ navigation }) => {
 
     // Submit and save story
     const handleSubmit = async () => {
-        // const storyDetails = [selectedGenre, storyTitle, storyDesc, storyContent, userID];
-        const storyDetails = {
-            completed: false,
-            genre: selectedGenre,
-            title: storyTitle,
-            description: storyDesc,
-            chapters: [
-                {
-                    chapterTitle: storyTitle,
-                    chapterContent: storyContent,
-                    comments: [],
-                    ratings: []
-                }
-            ]
-        }
+        if (selectedGenre === "" || storyTitle === "" || storyDesc === "" || storyContent === "") {
+            setErrorMessage('Please fill in all fields.');
+        } else {
+            const storyDetails = {
+                completed: false,
+                genre: selectedGenre,
+                title: storyTitle,
+                description: storyDesc,
+                chapters: [
+                    {
+                        chapterTitle: storyTitle,
+                        chapterContent: storyContent,
+                        comments: [],
+                        ratings: []
+                    }
+                ]
+            }
 
-        await handleStoryCreate(storyDetails, userID);
-        // navigation.navigate('PersonalSToriesScreen');
+            await handleStoryCreate(storyDetails, userID);
+            navigation.navigate('PersonalStoriesScreen');
+        }
     }
 
     return (
@@ -139,13 +145,28 @@ const WriteEditorScreen = ({ navigation }) => {
                     </ScrollView>
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <TextInput
-                            style={styles.largeTextInput}
-                            multiline={true}
-                            placeholder="Start writing your story..."
-                            onChangeText={handleContentChange}
-                            value={storyContent}
-                        />
+                        {errorMessage ? (
+                            <View style={{width: '100%'}}>
+                                <View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>{errorMessage}</Text>
+                                </View>
+                                <TextInput
+                                    style={styles.largeTextInputError}
+                                    multiline={true}
+                                    placeholder="Start writing your story..."
+                                    onChangeText={handleContentChange}
+                                    value={storyContent}
+                                />
+                            </View>
+                        ) : (
+                            <TextInput
+                                style={styles.largeTextInput}
+                                multiline={true}
+                                placeholder="Start writing your story..."
+                                onChangeText={handleContentChange}
+                                value={storyContent}
+                            />
+                        )}
 
                         <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row' }}>
                             <TouchableOpacity style={styles.btnSubmit} onPress={() => setShowLargeTextInput(false)}>
@@ -239,6 +260,13 @@ const styles = StyleSheet.create({
         width: '100%',
         padding: 15
     },
+    largeTextInputError: {
+        backgroundColor: 'white',
+        borderRadius: 12,
+        height: '60%',
+        width: '100%',
+        padding: 15
+    },
     btnSubmit: {
         height: 50,
         width: 150,
@@ -253,7 +281,19 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         fontSize: 24,
         textAlign: 'center'
+    },
+    errorContainer: {
+        marginVertical: 10,
+        padding: 10,
+        backgroundColor: '#ffcccc',
+        borderRadius: 10,
+    },
+    errorText: {
+        color: '#cc0000',
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        textAlign: 'center'
     }
 });
 
-export default WriteEditorScreen
+export default WriteEditorScreen;

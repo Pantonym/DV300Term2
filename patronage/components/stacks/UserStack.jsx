@@ -22,6 +22,7 @@ import WriteScreen from '../../screens/WriteScreen';
 import WriteEditorScreen from '../../screens/Write/WriteEditorScreen';
 import PersonalStoriesScreen from '../../screens/Profiles/PersonalStoriesScreen';
 import SettingsScreen from '../../screens/Profiles/SettingsScreen';
+import SingleStoryEditorScreen from '../../screens/Profiles/SingleStoryEditorScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,7 @@ const UserStack = () => {
                 <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="PersonalStoriesScreen" component={PersonalStoriesScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="SingleStoryEditorScreen" component={SingleStoryEditorScreen} options={{ headerShown: false }} />
 
                 {/* --Writing User Flow */}
                 <Stack.Screen name="WriteScreen" component={WriteScreen} options={{ headerShown: false }} />
