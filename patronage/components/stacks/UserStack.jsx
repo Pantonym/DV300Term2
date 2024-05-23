@@ -79,9 +79,8 @@ const UserStack = () => {
                 <Stack.Screen name="UnderConstruction" component={UnderConstruction} options={{ headerShown: false }} />
             </Stack.Navigator>
 
-            {/* Renders the Navbar */}
-            <NavbarComponent />
-
+            {/* Conditionally render the Navbar */}
+            {!hideNavbarRoutes.includes(currentRoute) && <NavbarComponent />}
         </NavigationContainer>
     )
 }
