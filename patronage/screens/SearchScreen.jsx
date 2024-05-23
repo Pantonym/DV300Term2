@@ -1,44 +1,71 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, FlatList } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, FlatList, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getAllShortStories, getAuthorUsername } from '../services/storiesService';
 
 const SearchScreen = ({ navigation }) => {
-    // Input for searching
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Output after searching
     const [filteredData, setFilteredData] = useState([]);
+    const [shortStories, setShortStories] = useState([]);
+    const [authorUsernames, setAuthorUsernames] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Example data
-    const data = [
-        { id: 1, name: 'Green Eyes' },
-        { id: 2, name: 'POWER' },
-        { id: 3, name: 'Pretty Young Lads' },
-        { id: 4, name: 'Elderberry Wine' },
-        { id: 5, name: 'The Scrolls of Elder Times' },
-        { id: 6, name: 'A Dance With Death' },
-        { id: 7, name: 'Grapevine' },
-    ];
+    useEffect(() => {
+        // Fetch short stories from Firestore when the component mounts
+        fetchShortStories();
+    }, []);
 
-    // Filters through the data to retrieve items that match what was entered in the search input
+    const fetchShortStories = async () => {
+        try {
+            const storiesData = await getAllShortStories();
+            if (storiesData) {
+                // Flatten the shortStories object into an array of stories
+                const storiesArray = Object.values(storiesData).flat();
+                setShortStories(storiesArray);
+
+                const usernames = await Promise.all(
+                    storiesArray.map(story => getAuthorUsername(story.authorID))
+                );
+
+                setAuthorUsernames(usernames);
+                setLoading(false); // Set loading to false once data is fetched
+            }
+        } catch (error) {
+            console.error("Error fetching short stories", error);
+        }
+    };
+
     const handleSearch = (text) => {
         setSearchQuery(text);
-        const filtered = data.filter(item =>
-            item.name.toLowerCase().includes(text.toLowerCase())
+        const filtered = shortStories.filter(item =>
+            item.title.toLowerCase().includes(text.toLowerCase())
         );
-
-        // Change the displayed data
         setFilteredData(filtered);
     };
 
+    const navigateToStoryScreen = (item) => {
+        navigation.navigate('StoryScreen', {
+            story: item,
+            authorUsername: authorUsernames[shortStories.indexOf(item)]
+        });
+    };
+
+    if (loading) {
+        return (
+            <View style={[styles.container, styles.loadingContainer]}>
+                <ActivityIndicator size="large" color="#332511" />
+            </View>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.container}>
-
             <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
                     <Image
                         style={styles.imgBack}
-                        source={require("../assets/images/Arrow.png")} />
+                        source={require("../assets/images/Arrow.png")}
+                    />
                 </TouchableOpacity>
 
                 <Text style={styles.header}>
@@ -55,19 +82,23 @@ const SearchScreen = ({ navigation }) => {
                 />
             </View>
 
-            {/* Dynamically renders the data, changing what is displayed as the user searches */}
             <FlatList
-                data={searchQuery ? filteredData : data}
-                keyExtractor={(item) => item.id.toString()}
+                data={searchQuery ? filteredData : shortStories}
+                keyExtractor={(item) => item.title}
                 renderItem={({ item }) => (
-                    <View style={styles.item}>
-                        <Text style={styles.itemText}>{item.name}</Text>
-                    </View>
+                    <TouchableOpacity
+                        onPress={() => navigateToStoryScreen(item)}
+                    >
+                        <View style={styles.item}>
+                            <Text style={styles.itemText}>{item.title}</Text>
+                            <Text>{authorUsernames[shortStories.indexOf(item)]}</Text>
+                        </View>
+                    </TouchableOpacity>
                 )}
             />
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -118,7 +149,12 @@ const styles = StyleSheet.create({
     itemText: {
         fontSize: 16,
         fontFamily: 'Baskervville',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     }
 });
 
-export default SearchScreen
+export default SearchScreen;

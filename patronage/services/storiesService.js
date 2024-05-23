@@ -337,3 +337,22 @@ export const getAuthorUsername = async (userID) => {
         return null;
     }
 };
+
+// Get all short stories
+export const getAllShortStories = async () => {
+    try {
+        const storiesRef = doc(db, 'leaderboards', 'shortStories');
+        const docSnap = await getDoc(storiesRef);
+
+        if (docSnap.exists()) {
+            const storiesData = docSnap.data();
+            return storiesData; // Return the entire shortStories object
+        } else {
+            console.log("No such document!");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching short stories", error);
+        return null;
+    }
+};
