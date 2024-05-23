@@ -64,7 +64,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
 
     const confirmUnPublish = (clickedTitle) => {
         Alert.alert(
-            "Confirm delete",
+            "Confirm Unpublish",
             "Are you sure you want to unpublish this story? All votes and comments will be lost.",
             [
                 {
@@ -83,7 +83,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
 
     const confirmDelete = (clickedTitle) => {
         Alert.alert(
-            "Confirm delete",
+            "Confirm Delete",
             "Are you sure you want to delete this story? It will not be recoverable.",
             [
                 {
@@ -98,6 +98,13 @@ const PersonalStoriesScreen = ({ navigation }) => {
             ],
             { cancelable: false }
         );
+    };
+
+    const truncateText = (text, length) => {
+        if (text.length <= length) return text;
+        const truncated = text.substring(0, length);
+        const lastSpaceIndex = truncated.lastIndexOf(' ');
+        return truncated.substring(0, lastSpaceIndex) + '...';
     };
 
     return (
@@ -128,7 +135,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
                             <View>
                                 <Text style={styles.storyTitle}>{story.title}</Text>
                                 <Text style={styles.storyGenre}>{story.genre}</Text>
-                                <Text style={styles.storyDescription}>{story.description}</Text>
+                                <Text style={styles.storyDescription}>{truncateText(story.description, 100)}</Text>
 
                                 <View style={{ flexDirection: 'row' }}>
                                     <TouchableOpacity
@@ -232,6 +239,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         fontSize: 18,
         color: '#666',
+        flex: 1,
+        maxWidth: '90%',
     },
     storyItemContainer: {
         flex: 1,

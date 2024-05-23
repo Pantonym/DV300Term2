@@ -296,7 +296,7 @@ export const updateStory = async (userID, storyTitle, newContent, newTitle, newD
     }
 };
 
-// Get short stories of a specific genres
+// Get short stories of a specific genre and calculate average ratings
 export const getShortStoriesByGenre = async (genre) => {
     try {
         const storiesRef = doc(db, 'leaderboards', 'shortStories');
@@ -304,8 +304,17 @@ export const getShortStoriesByGenre = async (genre) => {
 
         if (docSnap.exists()) {
             const data = docSnap.data();
+            const stories = data[genre] || [];
 
-            return data[genre] || [];
+            // Calculate the average rating for each story
+            stories.forEach(story => {
+                const ratings = story.chapters[0].ratings || [];
+                const totalRating = ratings.reduce((sum, rating) => sum + rating.voteAmount, 0);
+                const averageRating = ratings.length > 0 ? totalRating / ratings.length : 0;
+                story.averageRating = averageRating;
+            });
+
+            return stories;
         } else {
             console.log("No such document!");
             return [];
@@ -313,5 +322,18 @@ export const getShortStoriesByGenre = async (genre) => {
     } catch (error) {
         console.error("Error fetching short stories by genre:", error);
         return [];
+    }
+};
+
+// Get Author Username
+export const getAuthorUsername = async (userID) => {
+    const userRef = doc(db, 'users', userID);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+        return docSnap.data().username;
+    } else {
+        console.log('No such document!');
+        return null;
     }
 };

@@ -7,8 +7,7 @@ export const getUser = async (userID) => {
 
     if (docSnap.exists()) {
         const data = docSnap.data();
-        // console.log("User data from Firestore:", data);
-
+        
         return data;
     } else {
         console.log("No such document!");

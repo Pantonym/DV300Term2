@@ -1,24 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getShortStoriesByGenre } from '../../services/storiesService';
+import { getAuthorUsername, getShortStoriesByGenre } from '../../services/storiesService';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const GenreScreen = ({ route, navigation }) => {
     const activeGenre = route.params;
     const activeGenreParam = activeGenre.toLowerCase();
     const [stories, setStories] = useState([]);
-    const [loading, setLoading] = useState(true); // Added loading state
+    const [loading, setLoading] = useState(true);
+    const [authorUsernames, setAuthorUsernames] = useState([]);
 
     useEffect(() => {
         const fetchStories = async () => {
             setLoading(true);
-
             try {
                 const data = await getShortStoriesByGenre(activeGenreParam);
-
                 if (data) {
                     const stories = data.flatMap(story => story || []);
                     setStories(stories);
+
+                    const usernames = await Promise.all(
+                        stories.map(story => getAuthorUsername(story.authorID))
+                    );
+
+                    setAuthorUsernames(usernames);
+
                 } else {
                     console.log('No Data');
                     setStories([]);
@@ -45,10 +52,41 @@ const GenreScreen = ({ route, navigation }) => {
 
         return stories.map((story, index) => (
             <View key={index} style={styles.storyCard}>
-                <Text style={styles.storyTitle}>{story.title}</Text>
-                <Text style={styles.storyDescription}>{story.description}</Text>
-                {/* Add more story details as needed */}
-            </View>
+                <TouchableOpacity onPress={() => navigation.navigate('StoryScreen', { story, authorUsername: authorUsernames[index] })}>
+                    <View style={styles.topHolder}>
+                        <View style={styles.titleHolder}>
+                            <Text style={styles.storyTitle}>{story.title}</Text>
+
+                            <TouchableOpacity onPress={() => navigation.navigate('AuthorProfileScreen', { authorID: story.authorID })}>
+                                <Text style={styles.authorUsername}> by {authorUsernames[index]}</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.ratingHolder}>
+                            <Text style={styles.averageRating}>{story.averageRating.toFixed(1)} / 10</Text>
+                            <Ionicons
+                                style={styles.imgStar}
+                                size={25}
+                                color={'white'}
+                                name={'star'}
+                            />
+                        </View>
+                    </View>
+
+                    <View
+                        style={{
+                            borderBottomColor: 'black',
+                            borderBottomWidth: 2.5,
+                            width: '100%',
+                            alignSelf: 'center',
+                            marginBottom: 20,
+                            marginTop: 10
+                        }}
+                    />
+
+                    <Text style={styles.storyDescription}>{story.description}</Text>
+                </TouchableOpacity>
+            </View >
         ));
     };
 
@@ -60,16 +98,11 @@ const GenreScreen = ({ route, navigation }) => {
                         style={styles.imgBack}
                         source={require("../../assets/images/Arrow.png")} />
                 </TouchableOpacity>
-
-                <Text style={styles.header}>
-                    Patronage
-                </Text>
+                <Text style={styles.header}>Patronage</Text>
             </View>
-
             <View>
                 <Text style={styles.genreTitle}>{activeGenre}</Text>
             </View>
-
             <ScrollView contentContainerStyle={styles.storiesContainer}>
                 {renderStories()}
             </ScrollView>
@@ -112,7 +145,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#CAA775',
         borderRadius: 15,
         padding: 20,
-        marginBottom: 10,
+        marginBottom: 20,
     },
     storyTitle: {
         fontFamily: 'Baskervville',
@@ -123,7 +156,34 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         fontSize: 16,
         color: 'black',
-    }
+    },
+    authorUsername: {
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        color: 'black',
+        textDecorationLine: 'underline',
+    },
+    topHolder: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    titleHolder: {
+        flexDirection: 'column',
+        width: '70%',
+    },
+    ratingHolder: {
+        alignItems: 'center',
+        width: '30%',
+    },
+    averageRating: {
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        color: 'black',
+    },
+    imgStar: {
+        color: '#F6EEE3',
+    },
 });
 
 export default GenreScreen;

@@ -32,6 +32,10 @@ const NavbarComponent = () => {
             case 'ShortStoriesScreen':
             case 'GenreScreen':
             case 'LeaderboardScreen':
+            case 'StoryScreen':
+            case 'AuthorProfileScreen':
+            case 'AuthorStoriesScreen':
+            case 'AuthorSingleStoryScreen':
                 newIndex = 0;
                 break;
             // All pages that match these names will have the index be set to 1
@@ -68,7 +72,7 @@ const NavbarComponent = () => {
                     style={styles.navImage}
                     size={35}
                     color={'white'}
-                    name={getIconName('book', ['HomeScreen', 'ShortStoriesScreen', 'GenreScreen', 'LeaderboardScreen'])}
+                    name={getIconName('book', ['HomeScreen', 'ShortStoriesScreen', 'GenreScreen', 'LeaderboardScreen', 'StoryScreen', 'AuthorProfileScreen', 'AuthorStoriesScreen', 'AuthorSingleStoryScreen'])}
                     onPress={() => navigation.navigate('HomeScreen')}
                 />
 

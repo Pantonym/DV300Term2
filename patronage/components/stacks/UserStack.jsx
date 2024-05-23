@@ -15,7 +15,7 @@ import ProfileScreen from '../../screens/ProfileScreen';
 // Components:
 import NavbarComponent from '../navbar/NavbarComponent';
 
-import { CurrentRouteProvider, useCurrentRoute } from '../../context/CurrentRouteContext';
+import { useCurrentRoute } from '../../context/CurrentRouteContext';
 import GenreScreen from '../../screens/ShortStories/GenreScreen';
 import LeaderboardScreen from '../../screens/ShortStories/LeaderboardScreen';
 import WriteScreen from '../../screens/WriteScreen';
@@ -23,13 +23,16 @@ import WriteEditorScreen from '../../screens/Write/WriteEditorScreen';
 import PersonalStoriesScreen from '../../screens/Profiles/PersonalStoriesScreen';
 import SettingsScreen from '../../screens/Profiles/SettingsScreen';
 import SingleStoryEditorScreen from '../../screens/Profiles/SingleStoryEditorScreen';
+import StoryScreen from '../../screens/ShortStories/StoryScreen';
+import AuthorProfileScreen from '../../screens/ShortStories/AuthorProfileScreen';
+import AuthorSingleStoryScreen from '../../screens/ShortStories/AuthorSingleStoryScreen';
+import AuthorStoriesScreen from '../../screens/ShortStories/AuthorStoriesScreen';
 
 const Stack = createNativeStackNavigator();
 
 const UserStack = () => {
-
     const navigationRef = useNavigationContainerRef();
-    const { setCurrentRoute } = useCurrentRoute();
+    const { currentRoute, setCurrentRoute } = useCurrentRoute();
 
     useEffect(() => {
         const unsubscribe = navigationRef.addListener('state', () => {
@@ -39,11 +42,12 @@ const UserStack = () => {
         return unsubscribe;
     }, [navigationRef]);
 
+    // Screens where the navbar should be hidden
+    const hideNavbarRoutes = ['StoryScreen', 'SingleStoryEditorScreen'];
+
     return (
         <NavigationContainer ref={navigationRef}>
-
             <StatusBar style='auto' />
-
             <Stack.Navigator initialRouteName="HomeScreen">
                 {/* Index Screen */}
                 <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
@@ -65,6 +69,11 @@ const UserStack = () => {
                 <Stack.Screen name="ShortStoriesScreen" component={ShortStoriesScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="GenreScreen" component={GenreScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="LeaderboardScreen" component={LeaderboardScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="StoryScreen" component={StoryScreen} options={{ headerShown: false }} />
+                {/* ----View different user profiles */}
+                <Stack.Screen name="AuthorProfileScreen" component={AuthorProfileScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="AuthorStoriesScreen" component={AuthorStoriesScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="AuthorSingleStoryScreen" component={AuthorSingleStoryScreen} options={{ headerShown: false }} />
 
                 {/* 404/Not Found Screen */}
                 <Stack.Screen name="UnderConstruction" component={UnderConstruction} options={{ headerShown: false }} />

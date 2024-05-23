@@ -1,3 +1,5 @@
+// SCREEN FOR CREATING A STORY FROM THE WRITE SCREEN
+
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
