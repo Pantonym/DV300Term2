@@ -1,10 +1,47 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { rateStory } from '../../services/storiesService';
 
 const StoryScreen = ({ route, navigation }) => {
     const story = route.params.story;
     const author = route.params.authorUsername;
+
+    const [rating, setRating] = useState('');
+
+    const confirmRating = () => {
+        Alert.alert(
+            "Confirm Rating",
+            "Are you sure you want to rate this story? You will not be able to change your rating later.",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Rating cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: handleRating
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
+    const handleRating = async () => {
+        const ratingValue = parseInt(rating, 10);
+        if (ratingValue < 1 || ratingValue > 10 || isNaN(ratingValue)) {
+            Alert.alert('Invalid Rating', 'Please enter a rating between 1 and 10.');
+            return;
+        }
+
+        const result = await rateStory(story.authorID, ratingValue, story.title, story.genre);
+        if (result) {
+            Alert.alert('Success', 'Your rating has been submitted.');
+        } else {
+            Alert.alert('Error', 'You cannot vote on your own story or you have already voted.');
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -34,6 +71,18 @@ const StoryScreen = ({ route, navigation }) => {
                     />
 
                     <Text style={styles.storyContent}>{story.chapters[0].chapterContent}</Text>
+
+                    <TextInput
+                        style={styles.ratingInput}
+                        placeholder="Enter rating (1-10)"
+                        keyboardType="numeric"
+                        value={rating}
+                        onChangeText={setRating}
+                    />
+
+                    <TouchableOpacity style={styles.btnStart} onPress={confirmRating}>
+                        <Text style={styles.btnStartText}>Rate Story</Text>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -76,7 +125,34 @@ const styles = StyleSheet.create({
     storyContent: {
         fontFamily: 'Baskervville',
         fontSize: 18
-    }
+    },
+    ratingInput: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginVertical: 20,
+        alignSelf: 'center',
+        width: '80%',
+        fontFamily: 'Baskervville',
+        fontSize: 18
+    },
+    btnStart: {
+        height: 50,
+        width: 150,
+        backgroundColor: '#9A3E53',
+        borderRadius: 12,
+        justifyContent: 'center',
+        marginTop: 20,
+        alignSelf: 'center'
+    },
+    btnStartText: {
+        color: 'white',
+        fontFamily: 'Baskervville',
+        fontSize: 24,
+        textAlign: 'center'
+    },
 });
 
-export default StoryScreen
+export default StoryScreen;

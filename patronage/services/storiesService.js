@@ -1,5 +1,6 @@
 import { collection, doc, getDoc, query, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // create a new story
 export const handleStoryCreate = async (storyDetails, userID) => {
@@ -354,5 +355,73 @@ export const getAllShortStories = async () => {
     } catch (error) {
         console.error("Error fetching short stories", error);
         return null;
+    }
+};
+
+// rate a story
+export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
+    try {
+        // Get the ID of the logged-in user
+        const userID = await AsyncStorage.getItem('UserID');
+        const selectedGenre = workGenre.toLowerCase();
+
+        const storyRef = doc(db, 'leaderboards', 'shortStories');
+        const storyDoc = await getDoc(storyRef);
+
+        if (userID === authorID) {
+            console.log("User cannot vote on their own story");
+            return false;
+        }
+
+        if (storyDoc.exists()) {
+            const allStories = storyDoc.data();
+            const genreStories = allStories[selectedGenre];
+
+            let storyFound = null;
+            let storyIndex = -1;
+
+            // Find the story to update
+            for (let k = 0; k < genreStories.length; k++) {
+                if (genreStories[k].authorID === authorID && genreStories[k].title === workTitle) {
+                    storyFound = genreStories[k];
+                    storyIndex = k;
+                    break;
+                }
+            }
+
+            if (storyFound) {
+                // Check if the user has already voted
+                const hasVoted = storyFound.chapters[0].ratings.some(rating => rating.voterID === userID);
+
+                if (hasVoted) {
+                    console.log("User has already voted.");
+                    return false;
+                } else {
+                    console.log("User has not yet voted");
+                    storyFound.chapters[0].ratings.push({ "voterID": userID, "voteAmount": voteAmount });
+                    console.log(storyFound.chapters[0].ratings);
+
+                    // Update the genreStories array
+                    genreStories[storyIndex] = storyFound;
+
+                    // Write the updated genreStories back to Firestore
+                    await updateDoc(storyRef, {
+                        [selectedGenre]: genreStories
+                    });
+
+                    console.log("Rating added successfully.");
+                    return true;
+                }
+            } else {
+                console.log("No matching story found to update.");
+                return false;
+            }
+        } else {
+            console.log("No such story!");
+            return false;
+        }
+    } catch (error) {
+        console.error("Error adding rating: ", error);
+        return false;
     }
 };
