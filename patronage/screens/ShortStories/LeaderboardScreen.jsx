@@ -25,10 +25,11 @@ const LeaderboardScreen = ({ route, navigation }) => {
 
                 setStories(top5Stories);
 
-                // Fetch all author usernames for top 5 stories
+                // Fetch all author usernames for the top 5 stories
                 const usernames = await Promise.all(
                     top5Stories.map(story => getAuthorUsername(story.authorID))
                 );
+
                 setAuthorUsernames(usernames);
             } catch (error) {
                 console.error("Error fetching stories: ", error);
@@ -40,12 +41,14 @@ const LeaderboardScreen = ({ route, navigation }) => {
         fetchStories();
     }, [genre]);
 
+    // Calculate the average rating for a story and convert it to a percentage
     const calculateAverageRating = (ratings) => {
         if (ratings.length === 0) return 0;
         const total = ratings.reduce((acc, rating) => acc + rating.voteAmount, 0);
         return (total / ratings.length) * 10; // Convert to percentage
     };
 
+    // Loader
     if (loading) {
         return (
             <View style={[styles.container, styles.loadingContainer]}>
@@ -67,6 +70,10 @@ const LeaderboardScreen = ({ route, navigation }) => {
                     <Text style={styles.header}>Patronage</Text>
                 </View>
 
+                <Text style={styles.titleText}>
+                    Leaderboard for {genre} Short Stories
+                </Text>
+
                 <Text style={styles.noStoriesText}>Not enough eligible stories available for this leaderboard!</Text>
             </SafeAreaView>
         );
@@ -83,6 +90,11 @@ const LeaderboardScreen = ({ route, navigation }) => {
                 <Text style={styles.header}>Patronage</Text>
             </View>
 
+            <Text style={styles.titleText}>
+                Leaderboard for {genre} Short Stories
+            </Text>
+
+            {/* Map the filtered items to display the top 5 stories */}
             <FlatList
                 data={stories}
                 keyExtractor={(item) => item.id}
@@ -103,6 +115,7 @@ const LeaderboardScreen = ({ route, navigation }) => {
                                 </View>
                             </View>
 
+                            {/* Percentage graph background */}
                             <View style={{
                                 height: 20,
                                 backgroundColor: '#B3813A',
@@ -114,6 +127,7 @@ const LeaderboardScreen = ({ route, navigation }) => {
                                 borderBottomRightRadius: 10
                             }}>
 
+                                {/* Percentage Graph */}
                                 <View
                                     style={{
                                         height: 20,
@@ -163,6 +177,14 @@ const styles = StyleSheet.create({
         width: 60,
         marginTop: 15,
     },
+    titleText: {
+        fontFamily: 'Baskervville',
+        fontSize: 32,
+        padding: 20,
+        paddingTop: 0,
+        paddingBottom: 10,
+        textAlign: 'center'
+    },
     storyCard: {
         backgroundColor: '#FFF',
         borderRadius: 8,
@@ -196,7 +218,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         marginTop: 20,
         textAlign: 'center',
-    },
+    }
 });
 
 export default LeaderboardScreen;

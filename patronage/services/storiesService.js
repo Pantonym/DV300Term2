@@ -358,16 +358,17 @@ export const getAllShortStories = async () => {
     }
 };
 
-// rate a story
+// Rate a story
 export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
     try {
-        // Get the ID of the logged-in user
+        // Get the ID of the logged in user
         const userID = await AsyncStorage.getItem('UserID');
         const selectedGenre = workGenre.toLowerCase();
 
         const storyRef = doc(db, 'leaderboards', 'shortStories');
         const storyDoc = await getDoc(storyRef);
 
+        // Test if the user is the author
         if (userID === authorID) {
             console.log("User cannot vote on their own story");
             return false;
@@ -394,12 +395,13 @@ export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
                 const hasVoted = storyFound.chapters[0].ratings.some(rating => rating.voterID === userID);
 
                 if (hasVoted) {
-                    console.log("User has already voted.");
+
                     return false;
+
                 } else {
-                    console.log("User has not yet voted");
+
+                    // Build the new ratings
                     storyFound.chapters[0].ratings.push({ "voterID": userID, "voteAmount": voteAmount });
-                    console.log(storyFound.chapters[0].ratings);
 
                     // Update the genreStories array
                     genreStories[storyIndex] = storyFound;
@@ -411,6 +413,7 @@ export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
 
                     console.log("Rating added successfully.");
                     return true;
+
                 }
             } else {
                 console.log("No matching story found to update.");
@@ -426,16 +429,20 @@ export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
     }
 };
 
-// get leaderboard stories
+// Get leaderboard stories
 export const getLeaderboards = async (genre) => {
     try {
         const storyRef = doc(db, 'leaderboards', 'shortStories');
         const storyDoc = await getDoc(storyRef);
 
         if (storyDoc.exists()) {
+
+            // Only get leaderboard stories from a specific genre
             const allStories = storyDoc.data();
             const genreStories = allStories[genre.toLowerCase()] || [];
+
             return genreStories;
+            
         } else {
             console.log("No such document!");
             return [];

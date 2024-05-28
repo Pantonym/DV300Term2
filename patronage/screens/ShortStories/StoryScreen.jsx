@@ -9,6 +9,7 @@ const StoryScreen = ({ route, navigation }) => {
 
     const [rating, setRating] = useState('');
 
+    // Confirm the submission of the user's rating
     const confirmRating = () => {
         Alert.alert(
             "Confirm Rating",
@@ -28,13 +29,17 @@ const StoryScreen = ({ route, navigation }) => {
         );
     };
 
+    // Handle rating function
     const handleRating = async () => {
         const ratingValue = parseInt(rating, 10);
+
+        // Validation
         if (ratingValue < 1 || ratingValue > 10 || isNaN(ratingValue)) {
             Alert.alert('Invalid Rating', 'Please enter a rating between 1 and 10.');
             return;
         }
 
+        // Submit the data to add the rating
         const result = await rateStory(story.authorID, ratingValue, story.title, story.genre);
         if (result) {
             Alert.alert('Success', 'Your rating has been submitted.');
@@ -50,7 +55,7 @@ const StoryScreen = ({ route, navigation }) => {
             keyboardVerticalOffset={0}>
             <SafeAreaView style={styles.container}>
                 <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Image
                             style={styles.imgBack}
                             source={require("../../assets/images/Arrow.png")} />
