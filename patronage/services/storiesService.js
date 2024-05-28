@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, query, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -423,5 +423,25 @@ export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
     } catch (error) {
         console.error("Error adding rating: ", error);
         return false;
+    }
+};
+
+// get leaderboard stories
+export const getLeaderboards = async (genre) => {
+    try {
+        const storyRef = doc(db, 'leaderboards', 'shortStories');
+        const storyDoc = await getDoc(storyRef);
+
+        if (storyDoc.exists()) {
+            const allStories = storyDoc.data();
+            const genreStories = allStories[genre.toLowerCase()] || [];
+            return genreStories;
+        } else {
+            console.log("No such document!");
+            return [];
+        }
+    } catch (error) {
+        console.error("Error fetching stories: ", error);
+        return [];
     }
 };

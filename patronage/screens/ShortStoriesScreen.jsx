@@ -26,7 +26,7 @@ const ShortStoriesScreen = ({ navigation }) => {
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
-                onPress={() => navigation.navigate('LeaderboardScreen', leaderboard.value)}
+                onPress={() => navigation.navigate('LeaderboardScreen', { genre: leaderboard.value })}
             >
                 <Text style={styles.genreText}>{leaderboard.label}</Text>
             </TouchableOpacity>

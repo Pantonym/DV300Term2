@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { rateStory } from '../../services/storiesService';
 
@@ -44,48 +44,53 @@ const StoryScreen = ({ route, navigation }) => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
-                    <Image
-                        style={styles.imgBack}
-                        source={require("../../assets/images/Arrow.png")} />
-                </TouchableOpacity>
-                <Text style={styles.header}>Patronage</Text>
-            </View>
-
-            <ScrollView>
-                <View>
-                    <Text style={styles.storyTitle}>{story.title}</Text>
-                    <Text style={styles.storyAuthor}>by {author}</Text>
-
-                    <View
-                        style={{
-                            borderBottomColor: 'black',
-                            borderBottomWidth: 2.5,
-                            width: '100%',
-                            alignSelf: 'center',
-                            marginBottom: 20,
-                            marginTop: 10
-                        }}
-                    />
-
-                    <Text style={styles.storyContent}>{story.chapters[0].chapterContent}</Text>
-
-                    <TextInput
-                        style={styles.ratingInput}
-                        placeholder="Enter rating (1-10)"
-                        keyboardType="numeric"
-                        value={rating}
-                        onChangeText={setRating}
-                    />
-
-                    <TouchableOpacity style={styles.btnStart} onPress={confirmRating}>
-                        <Text style={styles.btnStartText}>Rate Story</Text>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={0}>
+            <SafeAreaView style={styles.container}>
+                <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                        <Image
+                            style={styles.imgBack}
+                            source={require("../../assets/images/Arrow.png")} />
                     </TouchableOpacity>
+                    <Text style={styles.header}>Patronage</Text>
                 </View>
-            </ScrollView>
-        </SafeAreaView>
+
+                <ScrollView>
+                    <View>
+                        <Text style={styles.storyTitle}>{story.title}</Text>
+                        <Text style={styles.storyAuthor}>by {author}</Text>
+
+                        <View
+                            style={{
+                                borderBottomColor: 'black',
+                                borderBottomWidth: 2.5,
+                                width: '100%',
+                                alignSelf: 'center',
+                                marginBottom: 20,
+                                marginTop: 10
+                            }}
+                        />
+
+                        <Text style={styles.storyContent}>{story.chapters[0].chapterContent}</Text>
+
+                        <TextInput
+                            style={styles.ratingInput}
+                            placeholder="Enter rating (1-10)"
+                            keyboardType="numeric"
+                            value={rating}
+                            onChangeText={setRating}
+                        />
+
+                        <TouchableOpacity style={styles.btnStart} onPress={confirmRating}>
+                            <Text style={styles.btnStartText}>Rate Story</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        </KeyboardAvoidingView>
     );
 };
 
