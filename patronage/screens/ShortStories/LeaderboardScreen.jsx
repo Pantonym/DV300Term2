@@ -54,26 +54,8 @@ const LeaderboardScreen = ({ route, navigation }) => {
         );
     }
 
-    // Display message when no stories are displayable
-    if (stories.length === 0) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('ShortStoriesScreen')}>
-                        <Image
-                            style={styles.imgBack}
-                            source={require("../../assets/images/Arrow.png")} />
-                    </TouchableOpacity>
-                    <Text style={styles.header}>Patronage</Text>
-                </View>
-
-                <Text style={styles.noStoriesText}>Not enough eligible stories available for this leaderboard!</Text>
-            </SafeAreaView>
-        );
-    }
-
     // Display message when fewer than 5 stories are available
-    if (stories.length > 0 && stories.length < 5) {
+    if (stories.length < 5) {
         return (
             <SafeAreaView style={styles.container}>
                 <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
@@ -121,18 +103,30 @@ const LeaderboardScreen = ({ route, navigation }) => {
                                 </View>
                             </View>
 
-                            <View
-                                style={{
-                                    height: 20,
-                                    backgroundColor: '#9A3E53',
-                                    width: `${calculateAverageRating(item.chapters[0].ratings)}%`,
-                                    alignSelf: 'start',
-                                    marginBottom: 20,
-                                    marginTop: 10,
-                                    borderTopRightRadius: 10,
-                                    borderBottomRightRadius: 10
-                                }}
-                            />
+                            <View style={{
+                                height: 20,
+                                backgroundColor: '#B3813A',
+                                width: '100%',
+                                alignSelf: 'start',
+                                marginBottom: 20,
+                                marginTop: 10,
+                                borderTopRightRadius: 10,
+                                borderBottomRightRadius: 10
+                            }}>
+
+                                <View
+                                    style={{
+                                        height: 20,
+                                        backgroundColor: '#CAA775',
+                                        width: `${calculateAverageRating(item.chapters[0].ratings)}%`,
+                                        alignSelf: 'start',
+                                        borderTopRightRadius: 10,
+                                        borderBottomRightRadius: 10
+                                    }}
+                                />
+
+                            </View>
+
                         </TouchableOpacity>
                     </View>
                 )}
