@@ -7,11 +7,15 @@ const LoginScreen = ({ navigation }) => {
 
     const [email, setEmail] = useState('Glen@gmail.com');
     const [password, setPassword] = useState('Glen1234');
+    const [error, setError] = useState(false)
 
     //  Login Function
-    const login = () => {
-        handleLogin(email, password)
-    }
+    const login = async () => {
+        const bError = await handleLogin(email, password);
+
+        // Display an error if there is one
+        setError(bError);
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -36,6 +40,9 @@ const LoginScreen = ({ navigation }) => {
                     defaultValue={password}
                     secureTextEntry={true}
                 />
+
+                {error ? <Text style={styles.errorText}>Invalid password or email address</Text> : null}
+
 
                 <TouchableOpacity style={styles.button} onPress={login}>
                     <Text style={styles.buttonText}>Submit</Text>
@@ -100,13 +107,20 @@ const styles = StyleSheet.create({
         color: 'black',
         fontFamily: 'Baskervville',
         fontSize: 24
-    }, 
+    },
     pageLinkTextUnderline: {
         textAlign: 'center',
         color: 'black',
         fontFamily: 'Baskervville',
         fontSize: 24,
         textDecorationLine: 'underline'
+    },
+    errorText: {
+        textAlign: 'center',
+        color: 'red',
+        fontFamily: 'Baskervville',
+        fontSize: 24,
+        marginTop: 10
     }
 })
 

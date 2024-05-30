@@ -16,23 +16,23 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Listening ig the user is logged in or out
-    // Always add auth (or the tool you are using)
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-
       if (user) {
         setLoggedIn(true);
-        console.log("There is a user logged in: " + user.email)
+        console.log("There is a user logged in")
       } else {
         setLoggedIn(false);
         console.log("No user logged in.")
       }
+    });
 
-    })
+    return unsubscribe;
 
-    return unsubscribe
+  }, []);
 
-  }, [])
+  if (!fontsLoaded) {
+    return null; // Or some loading indicator while fonts are loading
+  }
 
   return (
     <>

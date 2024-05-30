@@ -4,21 +4,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createUser } from "./accountService";
 
 // Log In
-export const handleLogin = (email, password) => {
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            console.log("Logged In User: " + user.uid);
+export const handleLogin = async (email, password) => {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-            AsyncStorage.setItem('UserEmail', user.email);
-            AsyncStorage.setItem('UserID', user.uid);
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
+        await AsyncStorage.setItem('UserEmail', user.email);
+        await AsyncStorage.setItem('UserID', user.uid);
 
-            console.log("Code: " + errorCode + " ///// Message:" + errorMessage);
-        });
+        return false; // No error
+    } catch (error) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        console.log("Code: " + errorCode + " ///// Message: " + errorMessage);
+
+        return true; // Error occurred
+    }
 };
 
 // Sign Up
@@ -31,12 +33,10 @@ export const handleRegister = (email, password, username) => {
             const userData = {
                 "username": username,
                 "email": email,
-                "userImg": "../assets/icons/ProfileIcon.png",
+                "userImg": "https://firebasestorage.googleapis.com/v0/b/patronage-31cea.appspot.com/o/defaultIcon.png?alt=media&token=dda3538d-50f5-40b0-bb47-e16d5bbfaa07",
                 "awards": [],
                 "works": []
             };
-
-            console.log("USERNAME: ----------------", username);
 
             await createUser(userData, user.uid);
 
