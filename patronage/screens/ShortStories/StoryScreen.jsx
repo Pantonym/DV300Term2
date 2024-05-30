@@ -3,6 +3,10 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { rateStory } from '../../services/storiesService';
 
+// TODO: Show views, votes and how many have voted
+// TODO: If you have already voted, it should say already without having to click on the button
+// TODO: Refine database to use subcollections instead of nested maps and arrays
+
 const StoryScreen = ({ route, navigation }) => {
     const story = route.params.story;
     const author = route.params.authorUsername;

@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator, Alert } from 'react-native'; // Import Alert
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { getUser } from '../services/accountService';
 import { handleSignOut } from '../services/authService';
 
 const ProfileScreen = ({ navigation }) => {
+    // User data
     const [email, setEmail] = useState(null);
     const [userID, setUserID] = useState(null);
     const [userData, setUserData] = useState(null);
+
+    // loading
     const [loading, setLoading] = useState(true);
 
     const getUserEmail = async () => {
@@ -26,12 +30,16 @@ const ProfileScreen = ({ navigation }) => {
         getUserID();
     }, []);
 
-    useEffect(() => {
-        if (userID) {
-            handleGetProfile();
-        }
-    }, [userID]);
+    // When the screen is opened, refresh the data to show changes
+    useFocusEffect(
+        useCallback(() => {
+            if (userID) {
+                handleGetProfile();
+            }
+        }, [userID])
+    );
 
+    // Get data from the user who is logged in
     const handleGetProfile = async () => {
         setLoading(true);
         const data = await getUser(userID);
@@ -39,10 +47,12 @@ const ProfileScreen = ({ navigation }) => {
         setLoading(false);
     };
 
+    // Sign out
     const handleLogout = async () => {
         handleSignOut();
     };
 
+    // Confirm if the user wants to sign out
     const confirmLogout = () => {
         Alert.alert(
             "Confirm Sign Out",
@@ -62,6 +72,7 @@ const ProfileScreen = ({ navigation }) => {
         );
     };
 
+    // Get the color that corresponds to the place the user achieved
     const getCardColor = (place) => {
         switch (place) {
             case 'gold':
@@ -75,6 +86,7 @@ const ProfileScreen = ({ navigation }) => {
         }
     };
 
+    // Map through the awards array to render each award. This is done to ensure any amount of awards can be loaded.
     const renderRewards = () => {
         if (userData && userData.awards) {
             return userData.awards.map((award, index) => (
@@ -87,6 +99,7 @@ const ProfileScreen = ({ navigation }) => {
         return null;
     };
 
+    // Loading
     if (loading) {
         return (
             <View style={[styles.container, styles.loadingContainer]}>
@@ -104,11 +117,12 @@ const ProfileScreen = ({ navigation }) => {
                 <Text style={styles.header}>Patronage</Text>
             </View>
 
+            {/* Render if the user's data has been collected. This stops the program from rendering output before it is ready */}
             {userData && (
                 <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                     <Image
                         style={styles.profileIcon}
-                        source={require('../assets/icons/GlenIcon.jpg')}
+                        source={{ uri: userData.userImg }}
                         resizeMode="cover"
                     />
                     <Text style={styles.username}>{userData.username}</Text>
@@ -168,7 +182,9 @@ const styles = StyleSheet.create({
         height: 125,
         borderRadius: 62.5,
         overflow: 'hidden',
-        marginBottom: 5
+        marginBottom: 5,
+        borderWidth: 3,
+        borderColor: "#332511"
     },
     username: {
         fontSize: 32,

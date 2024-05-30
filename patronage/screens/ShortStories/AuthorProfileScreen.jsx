@@ -5,11 +5,16 @@ import { getUser } from '../../services/accountService';
 const AuthorProfileScreen = ({ route, navigation }) => {
     const { authorID } = route.params;
     const [authorProfile, setAuthorProfile] = useState(null);
+    const [profileImg, setProfileImg] = useState(null);
 
     useEffect(() => {
         const fetchAuthorProfile = async () => {
             const profile = await getUser(authorID);
             setAuthorProfile(profile);
+            if (profile.userImg) {
+                // get the user's profile image link
+                setProfileImg(profile.userImg);
+            }
         };
 
         fetchAuthorProfile();
@@ -67,11 +72,20 @@ const AuthorProfileScreen = ({ route, navigation }) => {
             </View>
 
             <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                <Image
-                    style={styles.profileIcon}
-                    source={require('../../assets/icons/GlenIcon.jpg')}
-                    resizeMode="cover"
-                />
+                {/* If the image does not load, load the preset image. */}
+                {profileImg ? (
+                    <Image
+                        style={styles.profileIcon}
+                        source={{ uri: profileImg }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.profileIcon}
+                        source={require('../../assets/icons/GlenIcon.jpg')}
+                        resizeMode="cover"
+                    />
+                )}
                 <Text style={styles.username}>{authorProfile.username}</Text>
                 <Text style={styles.email}>{authorProfile.email}</Text>
 
