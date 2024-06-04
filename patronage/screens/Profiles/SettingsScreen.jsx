@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { handleImageUpload } from '../../services/bucketService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { changeUsername } from '../../services/accountService';
+import { changePassword } from '../../services/authService';
 
 const SettingsScreen = ({ navigation }) => {
     // When the user wants to select an image
@@ -16,6 +17,10 @@ const SettingsScreen = ({ navigation }) => {
     // When the user is editing the username
     const [isEditingUsername, setIsEditingUsername] = useState(false)
     const [username, setUsername] = useState('')
+
+    // When the user is editing the password
+    const [isEditingPassword, setIsEditingPassword] = useState(false)
+    const [newPassword, setNewPassword] = useState('')
 
     // When data is being uploaded to the db
     const [isUploading, setIsUploading] = useState(false);
@@ -82,6 +87,38 @@ const SettingsScreen = ({ navigation }) => {
 
         try {
             await changeUsername(userID, username);
+            navigation.goBack();
+        } finally {
+            setIsUploading(false);// Disable button usage no matter if the upload was a success or failure.
+        }
+    }
+
+    // Confirm if the user wants to change their password
+    const confirmPasswordChange = () => {
+        Alert.alert(
+            "Confirm Password Change",
+            "Are you sure you want to change your password?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Password change cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: handlePasswordChange
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
+    // Send the new password to the database
+    const handlePasswordChange = async () => {
+        setIsUploading(true); // Disable button usage when the user is uploading data
+
+        try {
+            await changePassword(newPassword);
             navigation.goBack();
         } finally {
             setIsUploading(false);// Disable button usage no matter if the upload was a success or failure.
@@ -189,6 +226,50 @@ const SettingsScreen = ({ navigation }) => {
                         disabled={isUploading}
                     >
                         <Text style={styles.btnCancelText}>Change Username</Text>
+                    </TouchableOpacity>
+                </View >
+            )}
+
+            {/* Edit password */}
+            {isEditingPassword ? (
+                <View>
+                    <TextInput
+                        style={styles.usernameInput}
+                        placeholder='Insert a new password...'
+                        onChangeText={setNewPassword}
+                    />
+
+                    {isUploading ? (
+                        <ActivityIndicator size="large" color="#9A3E53" style={{ marginTop: 10 }} />
+                    ) : (
+                        <TouchableOpacity
+                            style={[
+                                styles.btnAdd,
+                                { opacity: newPassword === '' ? 0.5 : 1 },
+                            ]}
+                            onPress={confirmPasswordChange}
+                            disabled={newPassword === ''}
+                        >
+                            <Text style={styles.btnAddImageText}>Change Password</Text>
+                        </TouchableOpacity>
+                    )}
+
+                    <TouchableOpacity
+                        style={styles.btnCancel}
+                        onPress={() => setIsEditingPassword(false)}
+                        disabled={isUploading}
+                    >
+                        <Text style={styles.btnCancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                <View>
+                    <TouchableOpacity
+                        style={styles.btnCancel}
+                        onPress={() => setIsEditingPassword(true)}
+                        disabled={isUploading}
+                    >
+                        <Text style={styles.btnCancelText}>Change Password</Text>
                     </TouchableOpacity>
                 </View >
             )}

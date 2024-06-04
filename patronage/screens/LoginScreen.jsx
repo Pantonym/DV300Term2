@@ -43,7 +43,6 @@ const LoginScreen = ({ navigation }) => {
 
                 {error ? <Text style={styles.errorText}>Invalid password or email address</Text> : null}
 
-
                 <TouchableOpacity style={styles.button} onPress={login}>
                     <Text style={styles.buttonText}>Submit</Text>
                 </TouchableOpacity>

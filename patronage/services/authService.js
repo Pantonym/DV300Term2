@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updatePassword } from "firebase/auth";
 import { auth } from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createUser } from "./accountService";
@@ -58,3 +58,13 @@ export const handleSignOut = () => {
         console.log('Error when logging out: ' + error);
     });
 };
+
+export const changePassword = (newPassword) => {
+    const user = auth.currentUser;
+
+    updatePassword(user, newPassword).then(() => {
+        console.log('Password Update Successful')
+    }).catch((error) => {
+        console.log('An error occurred: ', error)
+    });
+}
