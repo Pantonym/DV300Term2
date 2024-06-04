@@ -65,9 +65,8 @@ const GenreScreen = ({ route, navigation }) => {
                         <View style={styles.ratingHolder}>
                             <Text style={styles.averageRating}>{story.averageRating.toFixed(1)} / 10</Text>
                             <Ionicons
-                                style={styles.imgStar}
                                 size={25}
-                                color={'white'}
+                                color={'purple'}
                                 name={'star'}
                             />
                         </View>
@@ -180,10 +179,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         fontSize: 18,
         color: 'black',
-    },
-    imgStar: {
-        color: '#F6EEE3',
-    },
+    }
 });
 
 export default GenreScreen;

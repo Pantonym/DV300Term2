@@ -1,17 +1,62 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { rateStory } from '../../services/storiesService';
+import { getAuthorUsername, rateStory } from '../../services/storiesService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-// TODO: Show views, votes and how many have voted
-// TODO: If you have already voted, it should say already without having to click on the button
-// TODO: Refine database to use subcollections instead of nested maps and arrays
+// TODO: 1-10 Stars where you select a star and those before it change color. This will replace the number input to choose a rating out of 10.
+// TODO: Change database to use sub collections instead of nested arrays Future Implementation
 
 const StoryScreen = ({ route, navigation }) => {
     const story = route.params.story;
     const author = route.params.authorUsername;
 
     const [rating, setRating] = useState('');
+    const [views, setViews] = useState();
+    const [username, setUsername] = useState('');
+    const [userID, setUserID] = useState('');
+    const [isAuthor, setIsAuthor] = useState();
+    const [hasVoted, setHasVoted] = useState(false);
+
+    // Loading state
+    const [loading, setLoading] = useState(true);
+
+    // Loader state
+    const [loadingVisible, setLoadingVisible] = useState(false);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const id = await AsyncStorage.getItem('UserID');
+            setUserID(id);
+            if (id) {
+                const usernameReceived = await getAuthorUsername(id);
+                setUsername(usernameReceived);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    useEffect(() => {
+        if (username && userID) {
+            setViews(story.chapters[0].ratings.length);
+            setIsAuthor(author === username);
+
+            // Check if user has already voted
+            let userHasVoted = false;
+            for (let k = 0; k < story.chapters[0].ratings.length; k++) {
+                if (userID === story.chapters[0].ratings[k].voterID) {
+                    userHasVoted = true;
+                    break;
+                }
+            }
+
+            setHasVoted(userHasVoted);
+
+            setLoading(false);
+        }
+    }, [username, userID]);
 
     // Confirm the submission of the user's rating
     const confirmRating = () => {
@@ -43,12 +88,23 @@ const StoryScreen = ({ route, navigation }) => {
             return;
         }
 
-        // Submit the data to add the rating
-        const result = await rateStory(story.authorID, ratingValue, story.title, story.genre);
-        if (result) {
-            Alert.alert('Success', 'Your rating has been submitted.');
-        } else {
-            Alert.alert('Error', 'You cannot vote on your own story or you have already voted.');
+        try {
+            // Show loader
+            setLoadingVisible(true);
+
+            // Submit the data to add the rating
+            const result = await rateStory(story.authorID, ratingValue, story.title, story.genre);
+            if (result) {
+                Alert.alert('Success', 'Your rating has been submitted.');
+            } else {
+                Alert.alert('Error', 'You have already voted on this story.');
+            }
+        } catch (error) {
+            console.error('Error rating the story:', error.message);
+            Alert.alert('Error', 'Failed to rate the story. Please try again later.');
+        } finally {
+            // Hide loader
+            setLoadingVisible(false);
         }
     };
 
@@ -70,7 +126,26 @@ const StoryScreen = ({ route, navigation }) => {
                 <ScrollView>
                     <View>
                         <Text style={styles.storyTitle}>{story.title}</Text>
-                        <Text style={styles.storyAuthor}>by {author}</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('AuthorProfileScreen', { authorID: story.authorID })}>
+                            <Text style={styles.storyAuthor}> by {author}</Text>
+                        </TouchableOpacity>
+
+                        {loading ? (
+                            <ActivityIndicator size="large" color="#9A3E53" />
+                        ) : (
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Text style={styles.storyRatings}>{views} Ratings</Text>
+
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={styles.averageRating}>{story.averageRating.toFixed(1)} / 10</Text>
+                                    <Ionicons
+                                        size={25}
+                                        color={'purple'}
+                                        name={'star'}
+                                    />
+                                </View>
+                            </View>
+                        )}
 
                         <View
                             style={{
@@ -85,21 +160,57 @@ const StoryScreen = ({ route, navigation }) => {
 
                         <Text style={styles.storyContent}>{story.chapters[0].chapterContent}</Text>
 
-                        <TextInput
-                            style={styles.ratingInput}
-                            placeholder="Enter rating (1-10)"
-                            keyboardType="numeric"
-                            value={rating}
-                            onChangeText={setRating}
-                        />
+                        {isAuthor ? (
+                            null
+                        ) : (
+                            <TextInput
+                                style={styles.ratingInput}
+                                placeholder="Enter rating (1-10)"
+                                keyboardType="numeric"
+                                value={rating}
+                                onChangeText={setRating}
+                            />
+                        )}
 
-                        <TouchableOpacity style={styles.btnStart} onPress={confirmRating}>
-                            <Text style={styles.btnStartText}>Rate Story</Text>
-                        </TouchableOpacity>
+                        {/* Displays a disabled button if the viewer is the author of the story */}
+                        {isAuthor ? (
+                            <View>
+                                <TouchableOpacity style={[
+                                    styles.btnStart,
+                                    { opacity: 0.5 },
+                                ]} disabled>
+                                    <Text style={styles.btnStartText}>Rate Story</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.btnStartTextAuthor}>Authors cannot rate their own stories</Text>
+                            </View>
+                        ) : hasVoted ? (
+                            <View>
+                                <TouchableOpacity style={[
+                                    styles.btnStart,
+                                    { opacity: 0.5 },
+                                ]} disabled>
+                                    <Text style={styles.btnStartText}>Rate Story</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.btnStartTextAuthor}>You have already voted</Text>
+                            </View>
+                        ) : (
+                            <TouchableOpacity style={styles.btnStart} onPress={confirmRating} disabled={loadingVisible}>
+                                <Text style={styles.btnStartText}>Rate Story</Text>
+                            </TouchableOpacity>
+                        )}
+
                     </View>
                 </ScrollView>
+
+                {/* Loader overlay */}
+                {loadingVisible && (
+                    <View style={styles.loader}>
+                        <ActivityIndicator size="large" color="#F6EEE3" />
+                    </View>
+                )}
+
             </SafeAreaView>
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingView >
     );
 };
 
@@ -134,7 +245,13 @@ const styles = StyleSheet.create({
     storyAuthor: {
         fontFamily: 'Baskervville',
         fontSize: 26,
-        textAlign: 'center'
+        textAlign: 'center',
+        textDecorationLine: 'underline',
+    },
+    storyRatings: {
+        fontFamily: 'Baskervville',
+        fontSize: 22,
+        textAlign: 'left',
     },
     storyContent: {
         fontFamily: 'Baskervville',
@@ -158,7 +275,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#9A3E53',
         borderRadius: 12,
         justifyContent: 'center',
-        marginTop: 20,
+        marginTop: 5,
         alignSelf: 'center'
     },
     btnStartText: {
@@ -166,6 +283,26 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         fontSize: 24,
         textAlign: 'center'
+    },
+    btnStartTextAuthor: {
+        color: 'black',
+        fontFamily: 'Baskervville',
+        fontSize: 24,
+        textAlign: 'center'
+    },
+    loader: {
+        ...StyleSheet.absoluteFill,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    averageRating: {
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        color: 'black',
+    },
+    imgStar: {
+        color: '#F6EEE3',
     },
 });
 
