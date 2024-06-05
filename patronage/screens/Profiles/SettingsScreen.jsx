@@ -12,6 +12,7 @@ const SettingsScreen = ({ navigation }) => {
 
     // UseStates for data
     const [userID, setUserID] = useState(null);
+    const [userEmail, setUserEmail] = useState(null);
     const [image, setImage] = useState(null);
 
     // When the user is editing the username
@@ -30,7 +31,13 @@ const SettingsScreen = ({ navigation }) => {
         setUserID(userID);
     };
 
+    const getUserEmail = async () => {
+        const email = await AsyncStorage.getItem('UserEmail');
+        setUserEmail(email);
+    };
+
     useEffect(() => {
+        getUserEmail();
         getUserID();
     }, []);
 
@@ -116,7 +123,6 @@ const SettingsScreen = ({ navigation }) => {
     // Send the new password to the database
     const handlePasswordChange = async () => {
         setIsUploading(true); // Disable button usage when the user is uploading data
-
         try {
             await changePassword(newPassword);
             navigation.goBack();
@@ -127,15 +133,29 @@ const SettingsScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')} disabled={isUploading}>
-                    <Image
-                        style={styles.imgBack}
-                        source={require("../../assets/images/Arrow.png")}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.header}>Patronage</Text>
-            </View>
+            {userEmail === "greatquill.patronage@gmail.com" ? (
+                <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('AdminProfileScreen')} disabled={isUploading}>
+                        <Image
+                            style={styles.imgBack}
+                            source={require("../../assets/images/Arrow.png")}
+                        />
+                    </TouchableOpacity>
+
+                    <Text style={styles.header}>Patronage</Text>
+                </View>
+            ) : (
+                <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')} disabled={isUploading}>
+                        <Image
+                            style={styles.imgBack}
+                            source={require("../../assets/images/Arrow.png")}
+                        />
+                    </TouchableOpacity>
+
+                    <Text style={styles.header}>Patronage</Text>
+                </View>
+            )}
 
             <Text style={styles.titleText}>Settings</Text>
 

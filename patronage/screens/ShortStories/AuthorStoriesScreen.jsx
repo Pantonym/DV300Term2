@@ -5,7 +5,7 @@ import { fetchUserStories, getAuthorUsername } from '../../services/storiesServi
 const AuthorStoriesScreen = ({ route, navigation }) => {
     const userID = route.params;
     const [stories, setStories] = useState([]);
-    const [username, setUsername] = useState([]);
+    const [username, setUsername] = useState('');
 
     const fetchUsername = async () => {
         if (userID) {
@@ -23,7 +23,7 @@ const AuthorStoriesScreen = ({ route, navigation }) => {
 
     useEffect(() => {
         fetchUsername();
-    })
+    }, []);
 
     useEffect(() => {
         fetchStories();
@@ -54,32 +54,30 @@ const AuthorStoriesScreen = ({ route, navigation }) => {
             </Text>
 
             <ScrollView>
-                {stories.map((story, index) => (
-
-                    story.completed ? (
-                        <TouchableOpacity
-                            key={index}
-                            style={styles.storyContainer}
-                            onPress={() => navigation.navigate('AuthorSingleStoryScreen', story)}>
-
-
-                            <View style={styles.storyItemContainer}>
-                                <View>
-                                    <Text style={styles.storyTitle}>{story.title}</Text>
-                                    <Text style={styles.storyGenre}>{story.genre}</Text>
-                                    <Text style={styles.storyDescription}>{truncateText(story.description, 100)}</Text>
+                {stories.length === 0 ? (
+                    <Text style={styles.noStoriesText}>No stories to display</Text>
+                ) : (
+                    stories.map((story, index) => (
+                        story.completed ? (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.storyContainer}
+                                onPress={() => navigation.navigate('AuthorSingleStoryScreen', story)}>
+                                <View style={styles.storyItemContainer}>
+                                    <View>
+                                        <Text style={styles.storyTitle}>{story.title}</Text>
+                                        <Text style={styles.storyGenre}>{story.genre}</Text>
+                                        <Text style={styles.storyDescription}>{truncateText(story.description, 100)}</Text>
+                                    </View>
                                 </View>
-
-                            </View>
-
-                        </TouchableOpacity>
-                    ) : null
-
-                ))}
+                            </TouchableOpacity>
+                        ) : null
+                    ))
+                )}
             </ScrollView>
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -112,6 +110,13 @@ const styles = StyleSheet.create({
         paddingTop: 0,
         paddingBottom: 10,
         textAlign: 'center'
+    },
+    noStoriesText: {
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        color: '#666',
+        textAlign: 'center',
+        marginTop: 20
     },
     storyContainer: {
         marginVertical: 10,
@@ -187,4 +192,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default AuthorStoriesScreen
+export default AuthorStoriesScreen;

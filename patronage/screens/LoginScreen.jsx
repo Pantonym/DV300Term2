@@ -5,16 +5,27 @@ import { handleLogin } from '../services/authService';
 
 const LoginScreen = ({ navigation }) => {
 
-    const [email, setEmail] = useState('Glen@gmail.com');
-    const [password, setPassword] = useState('Glen1234');
+    // User Login:
+    // const [email, setEmail] = useState('Glen@gmail.com');
+    // const [password, setPassword] = useState('Glen1234');
+    // Admin Login:
+    const [email, setEmail] = useState('GreatQuill.patronage@gmail.com');
+    const [password, setPassword] = useState('Quill1234');
     const [error, setError] = useState(false)
 
     //  Login Function
     const login = async () => {
-        const bError = await handleLogin(email, password);
+        if (email === "GreatQuill.patronage@gmail.com") {
+            const bError = await handleLogin(email, password);
 
-        // Display an error if there is one
-        setError(bError);
+            // Display an error if there is one
+            setError(bError);
+        } else {
+            const bError = await handleLogin(email, password);
+
+            // Display an error if there is one
+            setError(bError);
+        }
     };
 
     return (

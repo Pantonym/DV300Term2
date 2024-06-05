@@ -6,6 +6,7 @@ import { useFonts } from 'expo-font';
 import UserStack from './components/stacks/UserStack';
 import RegisterStack from './components/stacks/RegisterStack';
 import { CurrentRouteProvider } from './context/CurrentRouteContext';
+import AdminStack from './components/stacks/AdminStack';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -14,11 +15,17 @@ export default function App() {
   });
 
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setLoggedIn(true);
+
+        if (user.email === "greatquill.patronage@gmail.com") {
+          setIsAdmin(true)
+        }
+
         console.log("There is a user logged in")
       } else {
         setLoggedIn(false);
@@ -38,7 +45,13 @@ export default function App() {
     <>
       {loggedIn ? (
         <CurrentRouteProvider>
-          <UserStack />
+
+          {isAdmin ? (
+            <AdminStack />
+          ) : (
+            <UserStack />
+          )}
+
         </CurrentRouteProvider>
       ) : (
         <RegisterStack />

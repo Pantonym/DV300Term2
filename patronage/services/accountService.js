@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Get user from an ID
@@ -70,3 +70,18 @@ export const changeUsername = async (userID, newUsername) => {
         console.log("No such document!");
     }
 }
+
+export const getAllUsers = async () => {
+    try {
+        const usersCollectionRef = collection(db, "users");
+        const querySnapshot = await getDocs(usersCollectionRef);
+        const users = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        return users;
+    } catch (error) {
+        console.error("Error getting users:", error);
+        throw new Error("Failed to get users");
+    }
+};
