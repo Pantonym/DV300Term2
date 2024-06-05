@@ -441,6 +441,14 @@ export const getLeaderboards = async (genre) => {
             const allStories = storyDoc.data();
             const genreStories = allStories[genre.toLowerCase()] || [];
 
+            // Calculate the average rating for each story
+            genreStories.forEach(story => {
+                const ratings = story.chapters[0].ratings || [];
+                const totalRating = ratings.reduce((sum, rating) => sum + rating.voteAmount, 0);
+                const averageRating = ratings.length > 0 ? totalRating / ratings.length : 0;
+                story.averageRating = averageRating;
+            });
+
             return genreStories;
             
         } else {

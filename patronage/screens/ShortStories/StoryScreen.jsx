@@ -5,7 +5,7 @@ import { getAuthorUsername, rateStory } from '../../services/storiesService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-// TODO: 1-10 Stars where you select a star and those before it change color. This will replace the number input to choose a rating out of 10.
+// TODO: 1-10 Stars where you select a star and those before it change color to match. This will replace the number input to choose a rating out of 10.
 // TODO: Change database to use sub collections instead of nested arrays Future Implementation
 
 const StoryScreen = ({ route, navigation }) => {
