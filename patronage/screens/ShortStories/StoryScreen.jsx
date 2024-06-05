@@ -16,6 +16,7 @@ const StoryScreen = ({ route, navigation }) => {
     const [username, setUsername] = useState('');
     const [userID, setUserID] = useState('');
     const [isAuthor, setIsAuthor] = useState();
+    const [isAdmin, setIsAdmin] = useState();
     const [hasVoted, setHasVoted] = useState(false);
 
     // Loading state for initial loading
@@ -27,7 +28,11 @@ const StoryScreen = ({ route, navigation }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             const id = await AsyncStorage.getItem('UserID');
+            const email = await AsyncStorage.getItem('UserEmail');
+
             setUserID(id);
+            setIsAdmin(email === "greatquill.patronage@gmail.com")
+
             if (id) {
                 const usernameReceived = await getAuthorUsername(id);
                 setUsername(usernameReceived);
@@ -180,7 +185,7 @@ const StoryScreen = ({ route, navigation }) => {
 
                         <Text style={styles.storyContent}>{story.chapters[0].chapterContent}</Text>
 
-                        {isAuthor ? (
+                        {isAuthor || isAdmin ? (
                             null
                         ) : (
                             <View style={styles.starsContainer}>
@@ -198,6 +203,16 @@ const StoryScreen = ({ route, navigation }) => {
                                     <Text style={styles.btnStartText}>Rate Story</Text>
                                 </TouchableOpacity>
                                 <Text style={styles.btnStartTextAuthor}>Authors cannot rate their own stories</Text>
+                            </View>
+                        ) : isAdmin ? (
+                            <View>
+                                <TouchableOpacity style={[
+                                    styles.btnStart,
+                                    { opacity: 0.5 },
+                                ]} disabled>
+                                    <Text style={styles.btnStartText}>Rate Story</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.btnStartTextAuthor}>The Great Quill Does Not Meddle</Text>
                             </View>
                         ) : hasVoted ? (
                             <View>
@@ -304,7 +319,8 @@ const styles = StyleSheet.create({
         color: 'black',
         fontFamily: 'Baskervville',
         fontSize: 24,
-        textAlign: 'center'
+        textAlign: 'center',
+        marginTop: 15
     },
     loader: {
         ...StyleSheet.absoluteFill,

@@ -1,11 +1,25 @@
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ActivityIndicator, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ActivityIndicator, ScrollView, TextInput } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { getUser } from '../../services/accountService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
+import { arrGenres } from '../../context/genres';
 
 const AuthorProfileScreen = ({ route, navigation }) => {
     const { authorID } = route.params;
     const [authorProfile, setAuthorProfile] = useState(null);
     const [profileImg, setProfileImg] = useState(null);
+    const [selectedGenre, setSelectedGenre] = useState('Adventure');
+    const [selectedYear, setSelectedYear] = useState('2024')
+
+    // Genre data
+    const genres = arrGenres;
+
+    const years = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'];
+
+    // Admin useStates
+    const [isAdmin, setIsAdmin] = useState();
+    const [isAddingReward, setIsAddingReward] = useState(false);
 
     useEffect(() => {
         const fetchAuthorProfile = async () => {
@@ -19,6 +33,15 @@ const AuthorProfileScreen = ({ route, navigation }) => {
 
         fetchAuthorProfile();
     }, [authorID]);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const email = await AsyncStorage.getItem('UserEmail');
+            setIsAdmin(email === "greatquill.patronage@gmail.com")
+        };
+
+        fetchUserData();
+    }, []);
 
     if (!authorProfile) {
         return (
@@ -40,6 +63,18 @@ const AuthorProfileScreen = ({ route, navigation }) => {
                 return '#FFFFFF';
         }
     };
+
+    const handleGenreChange = (itemValue, itemIndex) => {
+        setSelectedGenre(itemValue);
+    };
+
+    const handleYearChange = (itemValue, itemIndex) => {
+        setSelectedYear(itemValue);
+    };
+
+    const addReward = () => {
+        setIsAddingReward(true)
+    }
 
     const renderRewards = () => {
         if (authorProfile && authorProfile.awards && authorProfile.awards.length > 0) {
@@ -82,12 +117,48 @@ const AuthorProfileScreen = ({ route, navigation }) => {
                 ) : (
                     <Image
                         style={styles.profileIcon}
-                        source={require('../../assets/icons/GlenIcon.jpg')}
+                        source={require('../../assets/icons/ProfileIcon.png')}
                         resizeMode="cover"
                     />
                 )}
+
                 <Text style={styles.username}>{authorProfile.username}</Text>
                 <Text style={styles.email}>{authorProfile.email}</Text>
+
+                {isAdmin === true && isAddingReward === false ? (
+                    <TouchableOpacity style={styles.rewardBtn} onPress={addReward}>
+                        <Text style={styles.rewardBtnText}>Add Reward</Text>
+                    </TouchableOpacity>
+                ) : isAdmin === true && isAddingReward === true ? (
+                    <View>
+                        <Text style={styles.inputLabelPicker}>Choose a Genre</Text>
+                        <Picker
+                            selectedValue={selectedGenre}
+                            style={styles.picker}
+                            onValueChange={handleGenreChange}
+                        >
+                            {genres.map((genre) => (
+                                <Picker.Item key={genre.value} label={genre.label} value={genre.value} />
+                            ))}
+                        </Picker>
+
+                        <Text style={styles.inputLabelPicker}>Choose a Year</Text>
+                        <Picker
+                            selectedValue={selectedYear}
+                            style={styles.picker}
+                            onValueChange={handleYearChange}
+                        >
+                            {years.map((year, index) => (
+                                <Picker.Item key={index} label={year} value={year} />
+                            ))}
+                        </Picker>
+
+                        <TouchableOpacity style={styles.rewardBtnCancel} onPress={() => setIsAddingReward(false)}>
+                            <Text style={styles.rewardBtnText}>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                ) : null}
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carousel}>
                     {renderRewards()}
@@ -176,6 +247,34 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontFamily: 'Baskervville',
         marginBottom: 5
+    },
+    rewardBtn: {
+        backgroundColor: '#9A3E53',
+        padding: 15,
+        borderRadius: 25,
+        marginTop: 15
+    },
+    rewardBtnText: {
+        color: 'white',
+        fontSize: 22,
+        fontFamily: 'Baskervville'
+    },
+    inputLabelPicker: {
+        fontFamily: 'Baskervville',
+        fontSize: 24,
+        marginBottom: 10,
+        backgroundColor: '#F6EEE3',
+        zIndex: 9,
+        paddingTop: 20
+    },
+    picker: {
+        marginTop: -80
+    },
+    rewardBtnCancel: {
+        backgroundColor: '#9A3E53',
+        padding: 15,
+        borderRadius: 25,
+        marginTop: -40
     }
 });
 

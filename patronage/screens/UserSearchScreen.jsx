@@ -34,7 +34,7 @@ const UserSearchScreen = ({ navigation }) => {
         setFilteredData(filtered);
     };
 
-    const navigateToStoryScreen = (item) => {
+    const navigateToProfileScreen = (item) => {
         navigation.navigate('AuthorProfileScreen', {
             authorID: item.id
         });
@@ -77,7 +77,7 @@ const UserSearchScreen = ({ navigation }) => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <TouchableOpacity
-                        onPress={() => navigateToStoryScreen(item)}
+                        onPress={() => navigateToProfileScreen(item)}
                     >
                         <View style={styles.item}>
                             <Text style={styles.itemText}>{item.email}</Text>
