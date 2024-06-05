@@ -19,10 +19,10 @@ const StoryScreen = ({ route, navigation }) => {
     const [isAuthor, setIsAuthor] = useState();
     const [hasVoted, setHasVoted] = useState(false);
 
-    // Loading state
+    // Loading state for initial loading
     const [loading, setLoading] = useState(true);
 
-    // Loader state
+    // Loader state for having submitted a rating
     const [loadingVisible, setLoadingVisible] = useState(false);
 
     useEffect(() => {
@@ -47,6 +47,7 @@ const StoryScreen = ({ route, navigation }) => {
             let userHasVoted = false;
             for (let k = 0; k < story.chapters[0].ratings.length; k++) {
                 if (userID === story.chapters[0].ratings[k].voterID) {
+                    setRating(story.chapters[0].ratings[k].voteAmount)
                     userHasVoted = true;
                     break;
                 }
@@ -108,6 +109,26 @@ const StoryScreen = ({ route, navigation }) => {
         }
     };
 
+    // Render stars to select the amount out of 10
+    const renderStars = () => {
+        let stars = [];
+        for (let i = 1; i <= 10; i++) {
+            stars.push(
+                <View key={i} style={styles.starContainer}>
+                    <TouchableOpacity onPress={() => setRating(i)} disabled={isAuthor || hasVoted || loadingVisible}>
+                        <Ionicons
+                            name={i <= rating ? "star" : "star-outline"}
+                            size={32}
+                            color={i <= rating ? "#FFD700" : "#D3D3D3"}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.starAmount}>{i}</Text>
+                </View>
+            );
+        }
+        return stars;
+    };
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -163,13 +184,9 @@ const StoryScreen = ({ route, navigation }) => {
                         {isAuthor ? (
                             null
                         ) : (
-                            <TextInput
-                                style={styles.ratingInput}
-                                placeholder="Enter rating (1-10)"
-                                keyboardType="numeric"
-                                value={rating}
-                                onChangeText={setRating}
-                            />
+                            <View style={styles.starsContainer}>
+                                {renderStars()}
+                            </View>
                         )}
 
                         {/* Displays a disabled button if the viewer is the author of the story */}
@@ -301,9 +318,21 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'black',
     },
-    imgStar: {
-        color: '#F6EEE3',
+    starsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginVertical: 20,
     },
+    starContainer: {
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    starAmount: {
+        fontFamily: 'Baskervville',
+        fontSize: 16,
+        alignSelf: 'center',
+    }
+
 });
 
 export default StoryScreen;
