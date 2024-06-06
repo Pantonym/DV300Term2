@@ -15,18 +15,21 @@ const WriteScreen = ({ navigation }) => {
                     Write
                 </Text>
 
+                {/* Write a short story */}
                 <View style={styles.card}>
                     <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('WriteEditorScreen')}>
                         <Text style={styles.cardText}>Short Stories</Text>
                     </TouchableOpacity>
                 </View>
 
+                {/* Future implementation */}
                 <View style={styles.card}>
                     <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('UnderConstruction')}>
                         <Text style={styles.cardText}>Coming Soon...</Text>
                     </TouchableOpacity>
                 </View>
 
+                {/* Future implementation */}
                 <View style={styles.card}>
                     <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('UnderConstruction')}>
                         <Text style={styles.cardText}>Coming Soon...</Text>

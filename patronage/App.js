@@ -23,7 +23,13 @@ export default function App() {
         setLoggedIn(true);
 
         if (user.email === "greatquill.patronage@gmail.com") {
+          // If the user is an admin
           setIsAdmin(true)
+        } else {
+          // If the user is not an admin. 
+          // This line is required as if a user logs in to an admin account, logs out and then logs into a normal account, 
+          // the isAdmin is not set back to false and as such they will have access to admin navigation.
+          setIsAdmin(false)
         }
 
         console.log("There is a user logged in")

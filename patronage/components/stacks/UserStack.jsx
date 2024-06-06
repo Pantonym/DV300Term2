@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react'
-
 import { StatusBar } from 'expo-status-bar';
-
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useCurrentRoute } from '../../context/CurrentRouteContext';
 
 // Screens:
 import HomeScreen from '../../screens/HomeScreen';
@@ -11,11 +10,6 @@ import ShortStoriesScreen from '../../screens/ShortStoriesScreen';
 import UnderConstruction from '../../screens/UnderConstruction';
 import SearchScreen from '../../screens/SearchScreen';
 import ProfileScreen from '../../screens/ProfileScreen';
-
-// Components:
-import NavbarComponent from '../navbar/NavbarComponent';
-
-import { useCurrentRoute } from '../../context/CurrentRouteContext';
 import GenreScreen from '../../screens/ShortStories/GenreScreen';
 import LeaderboardScreen from '../../screens/ShortStories/LeaderboardScreen';
 import WriteScreen from '../../screens/WriteScreen';
@@ -27,6 +21,11 @@ import StoryScreen from '../../screens/ShortStories/StoryScreen';
 import AuthorProfileScreen from '../../screens/ShortStories/AuthorProfileScreen';
 import AuthorSingleStoryScreen from '../../screens/ShortStories/AuthorSingleStoryScreen';
 import AuthorStoriesScreen from '../../screens/ShortStories/AuthorStoriesScreen';
+
+// Components:
+import NavbarComponent from '../navbar/NavbarComponent';
+
+// USER STACK
 
 const Stack = createNativeStackNavigator();
 

@@ -5,25 +5,41 @@ import { getAuthorUsername, getShortStoriesByGenre } from '../../services/storie
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const GenreScreen = ({ route, navigation }) => {
+    // Parameters
+    // --For display reasons (It should be displayed oin a correct grammatical way)
     const activeGenre = route.params;
+    // --For database reasons (it is lowercase in the database)
     const activeGenreParam = activeGenre.toLowerCase();
+
+    // All stories information
     const [stories, setStories] = useState([]);
-    const [loading, setLoading] = useState(true);
+    // Collect author usernames to display on the cards as they are saved as id's in the database
     const [authorUsernames, setAuthorUsernames] = useState([]);
 
+    // Display loader
+    const [loading, setLoading] = useState(true);
+
+    // Change what is displayed when a different genre is selected. This will rerender the data with the new genre as a filter
     useEffect(() => {
+        // Function to fetch the stories
         const fetchStories = async () => {
+            // Activate loader
             setLoading(true);
+
             try {
+                // Get the data
                 const data = await getShortStoriesByGenre(activeGenreParam);
                 if (data) {
+                    // Map the stories
                     const stories = data.flatMap(story => story || []);
+                    // --Set the stories
                     setStories(stories);
 
+                    // Map the usernames 
                     const usernames = await Promise.all(
                         stories.map(story => getAuthorUsername(story.authorID))
                     );
-
+                    // Set the usernames
                     setAuthorUsernames(usernames);
 
                 } else {
@@ -34,14 +50,17 @@ const GenreScreen = ({ route, navigation }) => {
                 console.error('Error fetching stories:', error);
                 setStories([]);
             } finally {
+                // Deactivate loading
                 setLoading(false);
             }
         };
 
+        // Activate the function
         fetchStories();
     }, [activeGenreParam]);
 
     const renderStories = () => {
+        // Loader
         if (loading) {
             return (
                 <View style={[styles.storyCard, { alignItems: 'center' }]}>
@@ -50,8 +69,10 @@ const GenreScreen = ({ route, navigation }) => {
             );
         }
 
+        // Map each story in a card
         return stories.map((story, index) => (
             <View key={index} style={styles.storyCard}>
+                {/* Navigate to the story screen and send the story's information as well as who the author is */}
                 <TouchableOpacity onPress={() => navigation.navigate('StoryScreen', { story, authorUsername: authorUsernames[index] })}>
                     <View style={styles.topHolder}>
                         <View style={styles.titleHolder}>
@@ -62,7 +83,9 @@ const GenreScreen = ({ route, navigation }) => {
                             </TouchableOpacity>
                         </View>
 
+                        {/* Display the average rating out of 10 */}
                         <View style={styles.ratingHolder}>
+                            {/* Average Rating is created and added to the story in the service file */}
                             <Text style={styles.averageRating}>{story.averageRating.toFixed(1)} / 10</Text>
                             <Ionicons
                                 size={25}
@@ -99,9 +122,11 @@ const GenreScreen = ({ route, navigation }) => {
                 </TouchableOpacity>
                 <Text style={styles.header}>Patronage</Text>
             </View>
+
             <View>
                 <Text style={styles.genreTitle}>{activeGenre}</Text>
             </View>
+            
             <ScrollView contentContainerStyle={styles.storiesContainer}>
                 {renderStories()}
             </ScrollView>

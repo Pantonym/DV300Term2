@@ -4,11 +4,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAllUsers } from '../services/accountService';
 
 const UserSearchScreen = ({ navigation }) => {
+    // Search query
     const [searchQuery, setSearchQuery] = useState('');
+    // --Filtered data
     const [filteredData, setFilteredData] = useState([]);
+
+    // User information
     const [users, setUsers] = useState([]);
+
+    // Loader
     const [loading, setLoading] = useState(true);
 
+    // Get information
     useEffect(() => {
         // Fetch users from Firestore when the component mounts
         fetchUsers();
@@ -26,6 +33,7 @@ const UserSearchScreen = ({ navigation }) => {
         }
     };
 
+    // Search function
     const handleSearch = (text) => {
         setSearchQuery(text);
         const filtered = users.filter(item =>
@@ -34,12 +42,14 @@ const UserSearchScreen = ({ navigation }) => {
         setFilteredData(filtered);
     };
 
+    // Navigate to the user's profile screen
     const navigateToProfileScreen = (item) => {
         navigation.navigate('AuthorProfileScreen', {
             authorID: item.id
         });
     };
 
+    // Loader
     if (loading) {
         return (
             <View style={[styles.container, styles.loadingContainer]}>
@@ -63,6 +73,7 @@ const UserSearchScreen = ({ navigation }) => {
                 </Text>
             </View>
 
+            {/* Search Input */}
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.input}
@@ -72,6 +83,7 @@ const UserSearchScreen = ({ navigation }) => {
                 />
             </View>
 
+            {/* generate a list of users and filter when the search is activated */}
             <FlatList
                 data={searchQuery ? filteredData : users}
                 keyExtractor={(item) => item.id}

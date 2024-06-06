@@ -3,10 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { fetchUserStories, getAuthorUsername } from '../../services/storiesService';
 
 const AuthorStoriesScreen = ({ route, navigation }) => {
+    // Parameters
     const userID = route.params;
-    const [stories, setStories] = useState([]);
-    const [username, setUsername] = useState('');
 
+    // Story and user data
+    const [stories, setStories] = useState([]);
+    // --Display a placeholder until the username loads
+    const [username, setUsername] = useState('Quill Disciple');
+
+    // Fetch relevant information and set it to the states
     const fetchUsername = async () => {
         if (userID) {
             const usernameReceived = await getAuthorUsername(userID);
@@ -25,14 +30,21 @@ const AuthorStoriesScreen = ({ route, navigation }) => {
         fetchUsername();
     }, []);
 
+    // Refetch the stories if the user changes
     useEffect(() => {
         fetchStories();
     }, [userID]);
 
+    // Truncate text to decrease the length of the description displayed (the entire description doesn't need to be displayed as this is on a profile and not the genreScreen)
     const truncateText = (text, length) => {
+        // Don't truncate if it is short enough
         if (text.length <= length) return text;
+
+        // truncate the text and add an ellipses at the last word (i.e., where the last space is)
         const truncated = text.substring(0, length);
         const lastSpaceIndex = truncated.lastIndexOf(' ');
+
+        // Return the shorter text
         return truncated.substring(0, lastSpaceIndex) + '...';
     };
 
@@ -54,9 +66,11 @@ const AuthorStoriesScreen = ({ route, navigation }) => {
             </Text>
 
             <ScrollView>
+                {/* If there are no stories, display a text to inform the user */}
                 {stories.length === 0 ? (
                     <Text style={styles.noStoriesText}>No stories to display</Text>
                 ) : (
+                    // map through the stories to display them all, but only if they are completed
                     stories.map((story, index) => (
                         story.completed ? (
                             <TouchableOpacity
@@ -67,10 +81,13 @@ const AuthorStoriesScreen = ({ route, navigation }) => {
                                     <View>
                                         <Text style={styles.storyTitle}>{story.title}</Text>
                                         <Text style={styles.storyGenre}>{story.genre}</Text>
+                                        {/* truncate to 100 */}
                                         <Text style={styles.storyDescription}>{truncateText(story.description, 100)}</Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>
+
+                            // Display nothing if the story is completed
                         ) : null
                     ))
                 )}

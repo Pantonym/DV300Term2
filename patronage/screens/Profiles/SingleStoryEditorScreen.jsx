@@ -48,7 +48,10 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
         var newGenre = selectedGenre;
 
         await updateStory(userID, storyTitle, newContent, newTitle, newDescription, newGenre);
+
+        // Remove editing inputs
         setIsEditing(false);
+        // Refresh the story to display the new information
         refreshStories();
         navigation.goBack();
     };
@@ -91,6 +94,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                     {/* When the user is editing, display the following */}
                     {isEditing ? (
                         <View>
+                            {/* Edit title */}
                             <Text style={styles.inputLabel}>Title: </Text>
                             <TextInput
                                 style={styles.titleTextInput}
@@ -98,6 +102,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                                 onChangeText={setTitle}
                             />
 
+                            {/* Edit description */}
                             <Text style={styles.inputLabel}>Description: </Text>
                             <TextInput
                                 style={styles.storyDescriptionInput}
@@ -106,6 +111,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                                 multiline
                             />
 
+                            {/* Edit genre */}
                             <View>
                                 <Text style={styles.inputLabelPicker}>Choose a Genre</Text>
                                 <Picker
@@ -119,6 +125,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                                 </Picker>
                             </View>
 
+                            {/* Edit content */}
                             <Text style={styles.inputLabelContent}>Content: </Text>
                             <TextInput
                                 style={styles.storyContentInput}
@@ -127,6 +134,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                                 multiline
                             />
 
+                            {/* Buttons to save and cancel the editing */}
                             <View style={{ flexDirection: 'row', justifyContent: 'center', }}>
                                 <TouchableOpacity style={styles.btnEdit} onPress={handleCancel}>
                                     <Text style={styles.btnEditText}>Cancel</Text>
@@ -156,6 +164,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
                                 {chapterContent}
                             </Text>
 
+                            {/* Button to display editing content */}
                             <TouchableOpacity style={styles.btnEdit} onPress={() => setIsEditing(true)} >
                                 <Text style={styles.btnEditText}>Edit</Text>
                             </TouchableOpacity>

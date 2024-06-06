@@ -1,17 +1,14 @@
 import React, { useEffect } from 'react'
-
 import { StatusBar } from 'expo-status-bar';
-
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useCurrentRoute } from '../../context/CurrentRouteContext';
 
 // Screens:
 import HomeScreen from '../../screens/HomeScreen';
 import ShortStoriesScreen from '../../screens/ShortStoriesScreen';
 import UnderConstruction from '../../screens/UnderConstruction';
 import SearchScreen from '../../screens/SearchScreen';
-
-import { useCurrentRoute } from '../../context/CurrentRouteContext';
 import GenreScreen from '../../screens/ShortStories/GenreScreen';
 import LeaderboardScreen from '../../screens/ShortStories/LeaderboardScreen';
 import PersonalStoriesScreen from '../../screens/Profiles/PersonalStoriesScreen';
@@ -21,9 +18,13 @@ import StoryScreen from '../../screens/ShortStories/StoryScreen';
 import AuthorProfileScreen from '../../screens/ShortStories/AuthorProfileScreen';
 import AuthorSingleStoryScreen from '../../screens/ShortStories/AuthorSingleStoryScreen';
 import AuthorStoriesScreen from '../../screens/ShortStories/AuthorStoriesScreen';
-import AdminNavbarComponent from '../navbar/AdminNavbarComponent';
 import UserSearchScreen from '../../screens/UserSearchScreen';
 import AdminProfileScreen from '../../screens/AdminProfileScreen';
+
+// Components
+import AdminNavbarComponent from '../navbar/AdminNavbarComponent';
+
+// ADMIN STACK
 
 const Stack = createNativeStackNavigator();
 
@@ -66,7 +67,7 @@ const AdminStack = () => {
                 <Stack.Screen name="GenreScreen" component={GenreScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="LeaderboardScreen" component={LeaderboardScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="StoryScreen" component={StoryScreen} options={{ headerShown: false }} />
-                
+
                 {/* ----View different user profiles */}
                 <Stack.Screen name="AuthorProfileScreen" component={AuthorProfileScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="AuthorStoriesScreen" component={AuthorStoriesScreen} options={{ headerShown: false }} />

@@ -12,9 +12,10 @@ const ProfileScreen = ({ navigation }) => {
     const [userID, setUserID] = useState(null);
     const [userData, setUserData] = useState(null);
 
-    // loading
+    // loader
     const [loading, setLoading] = useState(true);
 
+    // Get user data
     const getUserEmail = async () => {
         const userEmail = await AsyncStorage.getItem('UserEmail');
         setEmail(userEmail);
@@ -99,7 +100,7 @@ const ProfileScreen = ({ navigation }) => {
         return null;
     };
 
-    // Loading
+    // Loader
     if (loading) {
         return (
             <View style={[styles.container, styles.loadingContainer]}>
@@ -128,18 +129,22 @@ const ProfileScreen = ({ navigation }) => {
                     <Text style={styles.username}>{userData.username}</Text>
                     <Text style={styles.email}>{userData.email}</Text>
 
+                    {/* Awards the user has */}
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carousel}>
                         {renderRewards()}
                     </ScrollView>
 
+                    {/* Go to your stories to edit, publish unpublish or delete them */}
                     <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('PersonalStoriesScreen')}>
                         <Text style={styles.profileButtonText}>Stories</Text>
                     </TouchableOpacity>
 
+                    {/* Go to the settings screen to edit your information */}
                     <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('SettingsScreen')}>
                         <Text style={styles.profileButtonText}>Settings</Text>
                     </TouchableOpacity>
 
+                    {/* Log out */}
                     <TouchableOpacity style={styles.profileButton} onPress={confirmLogout}>
                         <Text style={styles.profileButtonText}>Log Out</Text>
                     </TouchableOpacity>

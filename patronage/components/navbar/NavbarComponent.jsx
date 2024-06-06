@@ -5,6 +5,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useCurrentRoute } from '../../context/CurrentRouteContext';
 
+// NAVBAR FOR USERS
+
 // Gets the width of the window, then creates four equal tabs from the width to control where the indicator will go.
 const { width } = Dimensions.get('window');
 const tabWidth = width / 4;  // Assuming 4 tabs

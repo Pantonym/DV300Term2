@@ -2,9 +2,6 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, up
 import { auth } from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createUser } from "./accountService";
-// ADMIN LOGIN:
-// GreatQuill.patronage@gmail.com
-// Quill1234
 
 // Log In
 export const handleLogin = async (email, password) => {

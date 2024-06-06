@@ -5,27 +5,25 @@ import { handleLogin } from '../services/authService';
 
 const LoginScreen = ({ navigation }) => {
 
-    // User Login:
-    // const [email, setEmail] = useState('Glen@gmail.com');
-    // const [password, setPassword] = useState('Glen1234');
-    // Admin Login:
-    const [email, setEmail] = useState('GreatQuill.patronage@gmail.com');
-    const [password, setPassword] = useState('Quill1234');
+    // User Input Information States
+    // --For logins, once a build is made to launch the app, the admin login info must be deleted and the useState must be set to ''
+    // --In addition, admin email must be changed fro security reasons as the password will be visible on GitHub
+    // ----User Login:
+    const [email, setEmail] = useState('Glen@gmail.com');
+    const [password, setPassword] = useState('Glen1234');
+    // ----Admin Login:
+    // const [email, setEmail] = useState('GreatQuill.patronage@gmail.com');
+    // const [password, setPassword] = useState('Quill1234');
+
+    // Error State
     const [error, setError] = useState(false)
 
     //  Login Function
     const login = async () => {
-        if (email === "GreatQuill.patronage@gmail.com") {
-            const bError = await handleLogin(email, password);
+        const bError = await handleLogin(email, password);
 
-            // Display an error if there is one
-            setError(bError);
-        } else {
-            const bError = await handleLogin(email, password);
-
-            // Display an error if there is one
-            setError(bError);
-        }
+        // --Display an error if there is one
+        setError(bError);
     };
 
     return (
@@ -33,6 +31,7 @@ const LoginScreen = ({ navigation }) => {
             <View>
                 <Text style={styles.title}>Log In</Text>
 
+                {/* Email Input */}
                 <Text style={styles.subtitle}>Email</Text>
                 <TextInput
                     style={styles.inputField}
@@ -43,6 +42,7 @@ const LoginScreen = ({ navigation }) => {
                     inputMode='email'
                 />
 
+                {/* Password Input */}
                 <Text style={styles.subtitle}>Password</Text>
                 <TextInput
                     style={styles.inputField}
@@ -52,12 +52,15 @@ const LoginScreen = ({ navigation }) => {
                     secureTextEntry={true}
                 />
 
+                {/* Error text that only displays of there is an error */}
                 {error ? <Text style={styles.errorText}>Invalid password or email address</Text> : null}
 
+                {/* Submit the entered data */}
                 <TouchableOpacity style={styles.button} onPress={login}>
                     <Text style={styles.buttonText}>Submit</Text>
                 </TouchableOpacity>
 
+                {/* Change to register screen */}
                 <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('RegisterScreen')}>
                     <Text style={styles.pageLinkText}>Don't Have an Account? </Text>
                     <Text style={styles.pageLinkTextUnderline}>Register Here! </Text>

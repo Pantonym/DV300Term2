@@ -4,10 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { handleRegister } from '../services/authService';
 
 const RegisterScreen = ({ navigation }) => {
+    // User Input Information States
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
 
+    // Register a user
     const register = () => {
         handleRegister(email, password, username);
     };
@@ -17,6 +19,7 @@ const RegisterScreen = ({ navigation }) => {
             <View>
                 <Text style={styles.title}>Register</Text>
 
+                {/* Username Input */}
                 <Text style={styles.subtitle}>Username</Text>
                 <TextInput
                     style={styles.inputField}
@@ -25,6 +28,7 @@ const RegisterScreen = ({ navigation }) => {
                     defaultValue={username}
                 />
 
+                {/* Email Input */}
                 <Text style={styles.subtitle}>Email</Text>
                 <TextInput
                     style={styles.inputField}
@@ -35,6 +39,7 @@ const RegisterScreen = ({ navigation }) => {
                     inputMode='email'
                 />
 
+                {/* Password Input */}
                 <Text style={styles.subtitle}>Password</Text>
                 <TextInput
                     style={styles.inputField}
@@ -44,10 +49,14 @@ const RegisterScreen = ({ navigation }) => {
                     secureTextEntry={true}
                 />
 
+                {/* Note: There is no input for user profile image to reduce the work load of registering. The user will be able to change their profile image later. */}
+
+                {/* Submit Data BUtton */}
                 <TouchableOpacity style={styles.button} onPress={register}>
                     <Text style={styles.buttonText}>Submit</Text>
                 </TouchableOpacity>
 
+                {/* Change to Login Screen */}
                 <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('LoginScreen')}>
                     <Text style={styles.pageLinkText}>Already Have an Account? </Text>
                     <Text style={styles.pageLinkTextUnderline}>Log In Here! </Text>

@@ -5,14 +5,16 @@ import { arrGenres } from '../context/genres';
 
 const ShortStoriesScreen = ({ navigation }) => {
 
+    // Genres Data
     const genres = arrGenres;
 
-    // Dynamically render an amount of items in the carousel depending on how many genres there are
+    // Dynamically render an amount of items in the ScrollView depending on how many genres there are
     const renderGenres = () => {
         return genres.map((genre, index) => (
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
+                // Navigate to the genre screen for this specific genre
                 onPress={() => navigation.navigate('GenreScreen', genre.value)}
             >
                 <Text style={styles.genreText}>{genre.label}</Text>
@@ -20,12 +22,13 @@ const ShortStoriesScreen = ({ navigation }) => {
         ));
     };
 
-    // Dynamically render an amount of items in the carousel depending on how many genres there are
+    // Dynamically render an amount of items in the ScrollView depending on how many genres there are
     const renderLeaderboards = () => {
         return genres.map((leaderboard, index) => (
             <TouchableOpacity
                 key={index}
                 style={styles.genreCard}
+                // Navigate to the leaderboards screen for this specific genre
                 onPress={() => navigation.navigate('LeaderboardScreen', { genre: leaderboard.value })}
             >
                 <Text style={styles.genreText}>{leaderboard.label}</Text>

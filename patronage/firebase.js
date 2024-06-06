@@ -22,6 +22,8 @@ export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const storage = getStorage(app)
 
+// TODO: Change database to use sub collections instead of nested arrays Future Implementation
+
 // TODO: Persistence using asyncstorage and InitializeAuth. This has proven difficult because of hot reloading causing the app to attempt multiple inits.
 // firebase file suitable for persistence:
 

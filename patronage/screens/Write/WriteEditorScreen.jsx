@@ -10,10 +10,10 @@ import { CommonActions } from '@react-navigation/native';
 import { arrGenres } from '../../context/genres';
 
 const WriteEditorScreen = ({ navigation }) => {
-
     // Logged in user details
     const [userID, setUserID] = useState('');
 
+    // Get logged in user details
     const getUserID = async () => {
         const userID = await AsyncStorage.getItem('UserID');
         setUserID(userID);
@@ -23,7 +23,7 @@ const WriteEditorScreen = ({ navigation }) => {
         getUserID();
     }, []);
 
-    // Variables the user enters.
+    // Variables the user enters
     const [selectedGenre, setSelectedGenre] = useState('Adventure');
     const [storyTitle, setStoryTitle] = useState('');
     const [storyDesc, setStoryDesc] = useState('');
@@ -131,6 +131,7 @@ const WriteEditorScreen = ({ navigation }) => {
                             </Text>
                         </View>
 
+                        {/* Select a genre */}
                         <View>
                             <Text style={styles.inputLabelPicker}>Choose a Genre</Text>
                             <Picker
@@ -145,6 +146,7 @@ const WriteEditorScreen = ({ navigation }) => {
                             </Picker>
                         </View>
 
+                        {/* Change Title */}
                         <View>
                             <Text style={styles.inputLabel}>Enter a Title</Text>
                             <TextInput
@@ -156,6 +158,7 @@ const WriteEditorScreen = ({ navigation }) => {
                             />
                         </View>
 
+                        {/* Change Description */}
                         <View>
                             <Text style={styles.inputLabel}>Enter a Description</Text>
                             <TextInput
@@ -165,9 +168,11 @@ const WriteEditorScreen = ({ navigation }) => {
                                 onChangeText={handleDescriptionChange}
                                 value={storyDesc}
                                 editable={!loading}
+                                maxLength={250}
                             />
                         </View>
 
+                        {/*Show the story content input and hide these inputs */}
                         <View style={{ width: '100%', alignItems: 'center' }}>
                             <TouchableOpacity style={styles.btnStart} onPress={() => setShowLargeTextInput(true)} disabled={loading}>
                                 <Text style={styles.btnStartText}>Start!</Text>
@@ -176,6 +181,7 @@ const WriteEditorScreen = ({ navigation }) => {
                     </ScrollView>
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        {/* Display an error message with smaller input */}
                         {errorMessage ? (
                             <View style={{ width: '100%' }}>
                                 <View style={styles.errorContainer}>
@@ -191,6 +197,7 @@ const WriteEditorScreen = ({ navigation }) => {
                                 />
                             </View>
                         ) : (
+                            // Display the content input
                             <TextInput
                                 style={styles.largeTextInput}
                                 multiline={true}

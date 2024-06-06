@@ -4,17 +4,25 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAllShortStories, getAuthorUsername } from '../services/storiesService';
 
 const SearchScreen = ({ navigation }) => {
+    // Search query
     const [searchQuery, setSearchQuery] = useState('');
+    // --Filtered data
     const [filteredData, setFilteredData] = useState([]);
+
+    // All data
     const [shortStories, setShortStories] = useState([]);
+    // --Get the usernames of the authors
     const [authorUsernames, setAuthorUsernames] = useState([]);
+
+    // Loader
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch short stories from Firestore when the component mounts
+        // Fetch short stories from Firestore when the component mounts. UseEffects with no dependencies only trigger once.
         fetchShortStories();
     }, []);
 
+    // Gather all information for the stories
     const fetchShortStories = async () => {
         try {
             const storiesData = await getAllShortStories();
@@ -35,6 +43,7 @@ const SearchScreen = ({ navigation }) => {
         }
     };
 
+    // Handle search functionality
     const handleSearch = (text) => {
         setSearchQuery(text);
         const filtered = shortStories.filter(item =>
@@ -43,6 +52,7 @@ const SearchScreen = ({ navigation }) => {
         setFilteredData(filtered);
     };
 
+    // Navigate to the story screen with this story's information
     const navigateToStoryScreen = (item) => {
         navigation.navigate('StoryScreen', {
             story: item,
@@ -50,6 +60,7 @@ const SearchScreen = ({ navigation }) => {
         });
     };
 
+    // Loader
     if (loading) {
         return (
             <View style={[styles.container, styles.loadingContainer]}>
@@ -73,6 +84,7 @@ const SearchScreen = ({ navigation }) => {
                 </Text>
             </View>
 
+            {/* Search input */}
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.input}
@@ -82,6 +94,7 @@ const SearchScreen = ({ navigation }) => {
                 />
             </View>
 
+            {/* Display search results */}
             <FlatList
                 data={searchQuery ? filteredData : shortStories}
                 keyExtractor={(item) => item.title}

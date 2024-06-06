@@ -2,7 +2,9 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ScrollVi
 import React from 'react'
 
 const AuthorSingleStoryScreen = ({ route, navigation }) => {
+    // Parameters
     const story = route.params;
+
     return (
         <SafeAreaView style={styles.container}>
 
@@ -32,8 +34,15 @@ const AuthorSingleStoryScreen = ({ route, navigation }) => {
                         }}
                     />
 
+                    {/* Render the story content from the parameters */}
                     <Text style={styles.storyContent}>
                         {story.chapters[0].chapterContent}
+                    </Text>
+
+                    {/* Displays a disclaimer. This is needed because a story may be from a previous competition, 
+                    and therefore is displayed as one of the user's stories, but cannot be voted on as it isn't a part of a competition now. */}
+                    <Text style={styles.disclaimer}>
+                        To vote for this story, first verify its competition entry status on the search screen.
                     </Text>
                 </View>
             </ScrollView>
@@ -78,6 +87,14 @@ const styles = StyleSheet.create({
         fontSize: 18,
         padding: 20,
         textAlign: 'left'
+    },
+    disclaimer: {
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        padding: 20,
+        paddingTop: 10,
+        color: 'red',
+        textAlign: 'center'
     }
 });
 

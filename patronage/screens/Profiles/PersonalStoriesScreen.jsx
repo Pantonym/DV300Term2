@@ -5,9 +5,13 @@ import { deleteStory, fetchUserStories, publishStory, unPublishStory } from '../
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const PersonalStoriesScreen = ({ navigation }) => {
+    // User information
     const [userID, setUserID] = useState(null);
+
+    // All stories information
     const [stories, setStories] = useState([]);
 
+    // Gather the data
     const getUserID = async () => {
         const userID = await AsyncStorage.getItem('UserID');
         setUserID(userID);
@@ -28,21 +32,25 @@ const PersonalStoriesScreen = ({ navigation }) => {
         fetchStories();
     }, [userID]);
 
+    // Delete a story and refresh the list
     const handleDelete = async (title) => {
         await deleteStory(userID, title);
         fetchStories();
     }
 
+    // Publish a story and refresh the list 
     const handlePublish = async (title) => {
         await publishStory(userID, title);
         fetchStories();
     }
 
+    // Unpublish a story and refresh the list
     const handleUnPublish = async (title) => {
         await unPublishStory(userID, title);
         fetchStories();
     }
 
+    // Confirm that the user wants to publish a story
     const confirmPublish = (clickedTitle) => {
         Alert.alert(
             "Confirm Publish",
@@ -62,6 +70,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
         );
     };
 
+    // Confirm that the user wants to unpublish a story
     const confirmUnPublish = (clickedTitle) => {
         Alert.alert(
             "Confirm Unpublish",
@@ -81,6 +90,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
         );
     };
 
+    // Confirm that the user wants to delete a story
     const confirmDelete = (clickedTitle) => {
         Alert.alert(
             "Confirm Delete",
@@ -100,6 +110,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
         );
     };
 
+    // Truncate the text
     const truncateText = (text, length) => {
         if (text.length <= length) return text;
         const truncated = text.substring(0, length);
@@ -125,10 +136,12 @@ const PersonalStoriesScreen = ({ navigation }) => {
             </Text>
 
             <ScrollView>
+                {/* Map all of the stories */}
                 {stories.map((story, index) => (
                     <TouchableOpacity
                         key={index}
                         style={styles.storyContainer}
+                        // Go to the single story screen with this story's information
                         onPress={() => navigation.navigate('SingleStoryEditorScreen', { story, refreshStories: fetchStories })}>
 
                         <View style={styles.storyItemContainer}>

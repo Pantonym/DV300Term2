@@ -9,9 +9,12 @@ const LeaderboardScreen = ({ route, navigation }) => {
     const [loading, setLoading] = useState(true);
     const [authorUsernames, setAuthorUsernames] = useState([]);
 
+    // Fetch all the stories whenever the genre changes.
     useEffect(() => {
+        // Fetch the stories
         const fetchStories = async () => {
             try {
+                // Only fetch from a certain genre
                 const genreStories = await getLeaderboards(genre);
 
                 // Filter stories by those with 5 or more ratings
@@ -22,28 +25,31 @@ const LeaderboardScreen = ({ route, navigation }) => {
 
                 // Take only the top 5 stories
                 const top5Stories = filteredStories.slice(0, 5);
-
                 setStories(top5Stories);
 
                 // Fetch all author usernames for the top 5 stories
                 const usernames = await Promise.all(
                     top5Stories.map(story => getAuthorUsername(story.authorID))
                 );
-
                 setAuthorUsernames(usernames);
             } catch (error) {
                 console.error("Error fetching stories: ", error);
             } finally {
+                // Hide loader
                 setLoading(false);
             }
         };
 
+        // Call the function
         fetchStories();
     }, [genre]);
 
     // Calculate the average rating for a story and convert it to a percentage
     const calculateAverageRating = (ratings) => {
+        // Display 0 if there are no ratings
         if (ratings.length === 0) return 0;
+
+        // reduces a collection of values to a single value
         const total = ratings.reduce((acc, rating) => acc + rating.voteAmount, 0);
         return (total / ratings.length) * 10; // Convert to percentage
     };
@@ -79,6 +85,7 @@ const LeaderboardScreen = ({ route, navigation }) => {
         );
     }
 
+    // Return more data if enough users have entered the leaderboard
     return (
         <SafeAreaView style={styles.container}>
             <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
@@ -100,11 +107,13 @@ const LeaderboardScreen = ({ route, navigation }) => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item, index }) => (
                     <View key={index} style={styles.storyCard}>
+                        {/* Moves to the individual story's screen */}
                         <TouchableOpacity onPress={() => navigation.navigate('StoryScreen', { story: item, authorUsername: authorUsernames[index] })}>
                             <View style={styles.topHolder}>
                                 <View style={styles.titleHolder}>
                                     <Text style={styles.storyTitle}>{item.title}</Text>
 
+                                    {/* Move to the author's profile screen sending their ID as a parameter */}
                                     <TouchableOpacity onPress={() => navigation.navigate('AuthorProfileScreen', { authorID: item.authorID })}>
                                         <Text style={styles.authorUsername}> by {authorUsernames[index]}</Text>
                                     </TouchableOpacity>
@@ -127,7 +136,7 @@ const LeaderboardScreen = ({ route, navigation }) => {
                                 borderBottomRightRadius: 10
                             }}>
 
-                                {/* Percentage Graph */}
+                                {/* Percentage Graph foreground */}
                                 <View
                                     style={{
                                         height: 20,

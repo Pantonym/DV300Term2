@@ -133,6 +133,7 @@ const SettingsScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            {/* Admin back image */}
             {userEmail === "greatquill.patronage@gmail.com" ? (
                 <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                     <TouchableOpacity onPress={() => navigation.navigate('AdminProfileScreen')} disabled={isUploading}>
@@ -145,6 +146,7 @@ const SettingsScreen = ({ navigation }) => {
                     <Text style={styles.header}>Patronage</Text>
                 </View>
             ) : (
+                // Normal back image
                 <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                     <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')} disabled={isUploading}>
                         <Image
