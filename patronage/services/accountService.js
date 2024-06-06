@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Get user from an ID
@@ -59,10 +59,10 @@ export const changeUsername = async (userID, newUsername) => {
         const userData = docSnap.data();
         var username = userData.username;
 
-        // Add the new story to the works array
+        // Add the new username
         username = newUsername;
 
-        // Update the user's document in Firestore with the new works array
+        // Update the user's document in Firestore with the new username
         await setDoc(docRef, { ...userData, username });
 
         console.log("Profile Changed Successfully");
@@ -85,3 +85,42 @@ export const getAllUsers = async () => {
         throw new Error("Failed to get users");
     }
 };
+
+export const addAward = async (userID, selectedGenre, selectedPlace, selectedYear) => {
+    const docRef = doc(db, "users", userID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        var data = docSnap.data();
+
+        data.awards.push({
+            "genre": selectedGenre,
+            "place": selectedPlace,
+            "year": selectedYear
+        })
+
+        await updateDoc(docRef, data);
+
+    } else {
+        console.log("No such document!");
+    }
+}
+
+export const removeReward = async (userID, award) => {
+    const docRef = doc(db, "users", userID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        var data = docSnap.data();
+
+        // Filter out the award that matches the one sent through params
+        const updatedAwards = data.awards.filter(
+            a => !(a.genre === award.genre && a.year === award.year && a.place === award.place)
+        );
+
+        await updateDoc(docRef, { awards: updatedAwards });
+
+    } else {
+        console.log("No such document!");
+    }
+}

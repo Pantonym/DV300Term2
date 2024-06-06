@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ActivityIndicator, ScrollView, TextInput } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ActivityIndicator, ScrollView, TextInput, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { getUser } from '../../services/accountService';
+import { addAward, getUser, removeReward } from '../../services/accountService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { arrGenres } from '../../context/genres';
@@ -9,13 +9,14 @@ const AuthorProfileScreen = ({ route, navigation }) => {
     const { authorID } = route.params;
     const [authorProfile, setAuthorProfile] = useState(null);
     const [profileImg, setProfileImg] = useState(null);
-    const [selectedGenre, setSelectedGenre] = useState('Adventure');
+    const [selectedGenre, setSelectedGenre] = useState('Sci-Fi');
     const [selectedYear, setSelectedYear] = useState('2024')
+    const [selectedPlace, setSelectedPlace] = useState('gold')
 
-    // Genre data
+    // Awards data
     const genres = arrGenres;
-
     const years = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'];
+    const places = ['bronze', 'silver', 'gold'];
 
     // Admin useStates
     const [isAdmin, setIsAdmin] = useState();
@@ -68,12 +69,51 @@ const AuthorProfileScreen = ({ route, navigation }) => {
         setSelectedGenre(itemValue);
     };
 
+    const handlePlaceChange = (itemValue, itemIndex) => {
+        setSelectedPlace(itemValue);
+    };
+
     const handleYearChange = (itemValue, itemIndex) => {
         setSelectedYear(itemValue);
     };
 
-    const addReward = () => {
-        setIsAddingReward(true)
+    const addReward = async () => {
+        try {
+            await addAward(authorID, selectedGenre, selectedPlace, selectedYear);
+            Alert.alert("Award successfully added")
+        } catch (error) {
+            Alert.alert("Error adding award")
+        }
+
+    }
+
+    const confirmRemoveReward = (award) => {
+        Alert.alert(
+            "Confirm Remove Award",
+            "Are you sure you want to remove the award?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Reward removing cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: () => handleRewardRemove(award)
+                }
+            ],
+            { cancelable: false }
+        );
+    }
+
+    const handleRewardRemove = async (award) => {
+        try {
+            await removeReward(authorID, award)
+            Alert.alert("Award successfully removed")
+        } catch (error) {
+            Alert.alert("Error removing award")
+        }
+
     }
 
     const renderRewards = () => {
@@ -83,6 +123,13 @@ const AuthorProfileScreen = ({ route, navigation }) => {
                 <View key={index} style={[styles.rewardCard, { backgroundColor: getCardColor(award.place) }]}>
                     <Text style={styles.rewardText}>{award.genre}</Text>
                     <Text style={styles.rewardText}>{award.year}</Text>
+
+                    {isAdmin ? (
+                        <TouchableOpacity style={styles.removeBtn} onPress={() => confirmRemoveReward(award)}>
+                            <Text style={styles.removeBtnText}>Remove Reward</Text>
+                        </TouchableOpacity>
+                    ) : null}
+
                 </View>
             ));
 
@@ -97,78 +144,98 @@ const AuthorProfileScreen = ({ route, navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('ShortStoriesScreen')}>
-                    <Image
-                        style={styles.imgBack}
-                        source={require("../../assets/images/Arrow.png")} />
-                </TouchableOpacity>
-                <Text style={styles.header}>Patronage</Text>
-            </View>
-
-            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                {/* If the image does not load, load the preset image. */}
-                {profileImg ? (
-                    <Image
-                        style={styles.profileIcon}
-                        source={{ uri: profileImg }}
-                        resizeMode="cover"
-                    />
-                ) : (
-                    <Image
-                        style={styles.profileIcon}
-                        source={require('../../assets/icons/ProfileIcon.png')}
-                        resizeMode="cover"
-                    />
-                )}
-
-                <Text style={styles.username}>{authorProfile.username}</Text>
-                <Text style={styles.email}>{authorProfile.email}</Text>
-
-                {isAdmin === true && isAddingReward === false ? (
-                    <TouchableOpacity style={styles.rewardBtn} onPress={addReward}>
-                        <Text style={styles.rewardBtnText}>Add Reward</Text>
+            <ScrollView>
+                <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('ShortStoriesScreen')}>
+                        <Image
+                            style={styles.imgBack}
+                            source={require("../../assets/images/Arrow.png")} />
                     </TouchableOpacity>
-                ) : isAdmin === true && isAddingReward === true ? (
-                    <View>
-                        <Text style={styles.inputLabelPicker}>Choose a Genre</Text>
-                        <Picker
-                            selectedValue={selectedGenre}
-                            style={styles.picker}
-                            onValueChange={handleGenreChange}
-                        >
-                            {genres.map((genre) => (
-                                <Picker.Item key={genre.value} label={genre.label} value={genre.value} />
-                            ))}
-                        </Picker>
+                    <Text style={styles.header}>Patronage</Text>
+                </View>
 
-                        <Text style={styles.inputLabelPicker}>Choose a Year</Text>
-                        <Picker
-                            selectedValue={selectedYear}
-                            style={styles.picker}
-                            onValueChange={handleYearChange}
-                        >
-                            {years.map((year, index) => (
-                                <Picker.Item key={index} label={year} value={year} />
-                            ))}
-                        </Picker>
+                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                    {/* If the image does not load, load the preset image. */}
+                    {profileImg ? (
+                        <Image
+                            style={styles.profileIcon}
+                            source={{ uri: profileImg }}
+                            resizeMode="cover"
+                        />
+                    ) : (
+                        <Image
+                            style={styles.profileIcon}
+                            source={require('../../assets/icons/ProfileIcon.png')}
+                            resizeMode="cover"
+                        />
+                    )}
 
-                        <TouchableOpacity style={styles.rewardBtnCancel} onPress={() => setIsAddingReward(false)}>
-                            <Text style={styles.rewardBtnText}>Cancel</Text>
+                    <Text style={styles.username}>{authorProfile.username}</Text>
+                    <Text style={styles.email}>{authorProfile.email}</Text>
+
+                    {isAdmin === true && isAddingReward === false ? (
+                        <TouchableOpacity style={styles.rewardBtn} onPress={() => setIsAddingReward(true)}>
+                            <Text style={styles.rewardBtnText}>Add Reward</Text>
                         </TouchableOpacity>
-                    </View>
+                    ) : isAdmin === true && isAddingReward === true ? (
+                        <View>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Picker
+                                    selectedValue={selectedGenre}
+                                    style={styles.picker}
+                                    onValueChange={handleGenreChange}
+                                >
+                                    {genres.map((genre) => (
+                                        <Picker.Item key={genre.value} label={genre.label} value={genre.value} />
+                                    ))}
+                                </Picker>
+                                <Picker
+                                    selectedValue={selectedPlace}
+                                    style={styles.picker}
+                                    onValueChange={handlePlaceChange}
+                                >
+                                    {places.map((places, index) => (
+                                        <Picker.Item key={index} label={places} value={places} />
+                                    ))}
+                                </Picker>
 
-                ) : null}
+                            </View>
 
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carousel}>
-                    {renderRewards()}
-                </ScrollView>
+                            <View style={{ alignItems: 'center' }}>
+                                <Picker
+                                    selectedValue={selectedYear}
+                                    style={styles.picker}
+                                    onValueChange={handleYearChange}
+                                >
+                                    {years.map((year, index) => (
+                                        <Picker.Item key={index} label={year} value={year} />
+                                    ))}
+                                </Picker>
+                            </View>
 
-                <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('AuthorStoriesScreen', authorID)}>
-                    <Text style={styles.profileButtonText}>View Published Stories</Text>
-                </TouchableOpacity>
+                            <View style={{ alignItems: 'center' }}>
+                                <TouchableOpacity style={styles.rewardBtnConfirm} onPress={addReward}>
+                                    <Text style={styles.rewardBtnText}>Confirm</Text>
+                                </TouchableOpacity>
 
-            </View>
+                                <TouchableOpacity style={styles.rewardBtnCancel} onPress={() => setIsAddingReward(false)}>
+                                    <Text style={styles.rewardBtnTextDark}>Cancel</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                    ) : null}
+
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carousel}>
+                        {renderRewards()}
+                    </ScrollView>
+
+                    <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('AuthorStoriesScreen', authorID)}>
+                        <Text style={styles.profileButtonText}>View Published Stories</Text>
+                    </TouchableOpacity>
+
+                </View>
+            </ScrollView>
         </SafeAreaView>
     )
 }
@@ -259,22 +326,59 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontFamily: 'Baskervville'
     },
+    rewardBtnTextDark: {
+        color: 'black',
+        fontSize: 22,
+        fontFamily: 'Baskervville'
+    },
+    picker: {
+        width: 200
+    },
     inputLabelPicker: {
         fontFamily: 'Baskervville',
         fontSize: 24,
         marginBottom: 10,
-        backgroundColor: '#F6EEE3',
         zIndex: 9,
         paddingTop: 20
     },
-    picker: {
-        marginTop: -80
+    inputLabelPickerPlace: {
+        fontFamily: 'Baskervville',
+        fontSize: 24,
+        marginBottom: 10,
+        zIndex: 9,
+        paddingTop: 20
     },
-    rewardBtnCancel: {
+    inputLabelPickerYear: {
+        fontFamily: 'Baskervville',
+        fontSize: 24,
+        marginBottom: 10,
+        zIndex: 9,
+        paddingTop: 20
+    },
+    rewardBtnConfirm: {
         backgroundColor: '#9A3E53',
         padding: 15,
         borderRadius: 25,
-        marginTop: -40
+        paddingHorizontal: 15,
+        paddingVertical: 10
+    },
+    rewardBtnCancel: {
+        backgroundColor: 'none',
+        padding: 15,
+        borderRadius: 25
+    },
+    removeBtn: {
+        backgroundColor: 'none',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 25,
+        marginTop: 15
+    },
+    removeBtnText: {
+        color: 'black',
+        fontSize: 16,
+        fontFamily: 'Baskervville',
+        textDecorationLine: 'underline'
     }
 });
 
