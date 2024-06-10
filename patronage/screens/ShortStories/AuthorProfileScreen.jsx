@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ActivityIndicator, ScrollView, TextInput, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { addAward, getUser, removeReward } from '../../services/accountService';
+import { FollowAuthor, addAward, getUser, removeReward, unFollowAuthor } from '../../services/accountService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { arrGenres } from '../../context/genres';
@@ -12,6 +12,9 @@ const AuthorProfileScreen = ({ route, navigation }) => {
     // User Information
     const [authorProfile, setAuthorProfile] = useState(null);
     const [profileImg, setProfileImg] = useState(null);
+    const [userID, setUserID] = useState(null);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [followedAuthors, setFollowedAuthors] = useState([]);;
 
     // Rerender information
     const [reRender, setReRender] = useState(false)
@@ -30,6 +33,15 @@ const AuthorProfileScreen = ({ route, navigation }) => {
     const [selectedYear, setSelectedYear] = useState('2024')
     const [selectedPlace, setSelectedPlace] = useState('gold')
 
+    // Get user ID
+    const getUserID = async () => {
+        const userID = await AsyncStorage.getItem('UserID');
+        setUserID(userID);
+    };
+
+    useEffect(() => {
+        getUserID();
+    }, []);
 
     // The information is rerendered to display the new award, or remove it if it has been deleted.
     useEffect(() => {
@@ -39,6 +51,21 @@ const AuthorProfileScreen = ({ route, navigation }) => {
             if (profile.userImg) {
                 // get the user's profile image link
                 setProfileImg(profile.userImg);
+            }
+
+            // Get the author's follows
+            if (profile.followedAuthors) {
+                const authors = await Promise.all(profile.followedAuthors.map(async authorID => {
+                    const authorData = await getUser(authorID);
+                    return { ...authorData, id: authorID };
+                }));
+                setFollowedAuthors(authors);
+            }
+
+            // Check if the user is already following the author
+            const userProfile = await getUser(userID);
+            if (userProfile.followedAuthors && userProfile.followedAuthors.includes(authorID)) {
+                setIsFollowing(true);
             }
         };
 
@@ -140,6 +167,22 @@ const AuthorProfileScreen = ({ route, navigation }) => {
         }
 
     }
+
+    const handleFollow = async () => {
+        if (authorID === userID) {
+            Alert.alert("You cannot follow yourself!");
+        } else {
+            if (isFollowing) {
+                await unFollowAuthor(authorID, userID);
+                setIsFollowing(false);
+                Alert.alert("Author unfollowed successfully");
+            } else {
+                await FollowAuthor(authorID, userID);
+                setIsFollowing(true);
+                Alert.alert("Author followed successfully");
+            }
+        }
+    };
 
     // Render the awards that the user has
     const renderRewards = () => {
@@ -262,14 +305,25 @@ const AuthorProfileScreen = ({ route, navigation }) => {
                         {renderRewards()}
                     </ScrollView>
 
+                    <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('FollowedAuthorsScreen', { authors: followedAuthors })}>
+                        <Text style={styles.profileButtonText}>Followed Authors ({followedAuthors.length})</Text>
+                    </TouchableOpacity>
+
                     {/* Button to go to the user's stories, sending their ID to find them */}
                     <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('AuthorStoriesScreen', authorID)}>
                         <Text style={styles.profileButtonText}>View Published Stories</Text>
                     </TouchableOpacity>
 
+                    {/* Button to follow the user */}
+                    <TouchableOpacity style={styles.profileButton} onPress={handleFollow}>
+                        <Text style={styles.profileButtonText}>
+                            {isFollowing ? "Unfollow Author" : "Follow Author"}
+                        </Text>
+                    </TouchableOpacity>
+
                 </View>
             </ScrollView>
-        </SafeAreaView>
+        </SafeAreaView >
     )
 }
 

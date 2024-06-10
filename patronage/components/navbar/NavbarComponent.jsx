@@ -53,6 +53,7 @@ const NavbarComponent = () => {
             case 'SettingsScreen':
             case 'PersonalStoriesScreen':
             case 'SingleStoryEditorScreen':
+            case 'FollowedAuthorsScreen':
                 newIndex = 3;
                 break;
             default:
@@ -98,7 +99,7 @@ const NavbarComponent = () => {
                     style={styles.navImage}
                     size={35}
                     color={'white'}
-                    name={getIconName('person', ['ProfileScreen', 'SettingsScreen', 'PersonalStoriesScreen', 'SingleStoryEditorScreen'])}
+                    name={getIconName('person', ['ProfileScreen', 'SettingsScreen', 'PersonalStoriesScreen', 'SingleStoryEditorScreen', 'FollowedAuthorsScreen'])}
                     onPress={() => navigation.navigate('ProfileScreen')}
                 />
 

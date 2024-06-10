@@ -52,6 +52,7 @@ const AdminNavbarComponent = () => {
             case 'SettingsScreen':
             case 'PersonalStoriesScreen':
             case 'SingleStoryEditorScreen':
+            case 'FollowedAuthorsScreen':
                 newIndex = 3;
                 break;
             default:
@@ -97,7 +98,7 @@ const AdminNavbarComponent = () => {
                     style={styles.navImage}
                     size={35}
                     color={'white'}
-                    name={getIconName('person', ['AdminProfileScreen', 'SettingsScreen', 'PersonalStoriesScreen', 'SingleStoryEditorScreen'])}
+                    name={getIconName('person', ['AdminProfileScreen', 'SettingsScreen', 'PersonalStoriesScreen', 'SingleStoryEditorScreen', 'FollowedAuthorsScreen'])}
                     onPress={() => navigation.navigate('AdminProfileScreen')}
                 />
 

@@ -21,6 +21,7 @@ import StoryScreen from '../../screens/ShortStories/StoryScreen';
 import AuthorProfileScreen from '../../screens/ShortStories/AuthorProfileScreen';
 import AuthorSingleStoryScreen from '../../screens/ShortStories/AuthorSingleStoryScreen';
 import AuthorStoriesScreen from '../../screens/ShortStories/AuthorStoriesScreen';
+import FollowedAuthorsScreen from '../../screens/Profiles/FollowedAuthorsScreen';
 
 // Components:
 import NavbarComponent from '../navbar/NavbarComponent';
@@ -59,6 +60,7 @@ const UserStack = () => {
                 <Stack.Screen name="PersonalStoriesScreen" component={PersonalStoriesScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="SingleStoryEditorScreen" component={SingleStoryEditorScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="FollowedAuthorsScreen" component={FollowedAuthorsScreen} options={{ headerShown: false }} />
 
                 {/* --Writing User Flow */}
                 <Stack.Screen name="WriteScreen" component={WriteScreen} options={{ headerShown: false }} />

@@ -124,3 +124,50 @@ export const removeReward = async (userID, award) => {
         console.log("No such document!");
     }
 }
+
+// Follow Author
+export const FollowAuthor = async (authorID, userID) => {
+    const docRef = doc(db, "users", userID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        const userData = docSnap.data();
+        let followedAuthors = userData.followedAuthors || [];
+
+        if (!followedAuthors.includes(authorID)) {
+            followedAuthors.push(authorID);
+            await setDoc(docRef, { ...userData, followedAuthors });
+            console.log("Author followed successfully");
+        } else {
+            console.log("Author is already followed");
+        }
+    } else {
+        console.log("No such document!");
+    }
+}
+
+// Unfollow Author
+export const unFollowAuthor = async (authorID, userID) => {
+    const docRef = doc(db, "users", userID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        const userData = docSnap.data();
+        let followedAuthors = userData.followedAuthors || [];
+
+        if (followedAuthors.includes(authorID)) {
+            followedAuthors = followedAuthors.filter(id => id !== authorID);
+            await setDoc(docRef, { ...userData, followedAuthors });
+            console.log("Author unfollowed successfully");
+        } else {
+            console.log("Author is not followed");
+        }
+    } else {
+        console.log("No such document!");
+    }
+}
+
+// Favourite a Story
+export const FavouriteStory = async (storyID, userID) => {
+    console.log('Favourited Story with ID: ', storyID)
+}

@@ -6,11 +6,16 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getUser } from '../services/accountService';
 import { handleSignOut } from '../services/authService';
 
+// TODO: Extra Functionality favourited stories
+// TODO: Follow Writers
+
 const ProfileScreen = ({ navigation }) => {
     // User data
     const [email, setEmail] = useState(null);
     const [userID, setUserID] = useState(null);
     const [userData, setUserData] = useState(null);
+    const [followedAuthorsCount, setFollowedAuthorsCount] = useState(0);
+    const [followedAuthors, setFollowedAuthors] = useState([]);
 
     // loader
     const [loading, setLoading] = useState(true);
@@ -45,6 +50,13 @@ const ProfileScreen = ({ navigation }) => {
         setLoading(true);
         const data = await getUser(userID);
         setUserData(data);
+        if (data.followedAuthors) {
+            const authors = await Promise.all(data.followedAuthors.map(async authorID => {
+                const authorData = await getUser(authorID);
+                return { ...authorData, id: authorID };
+            }));
+            setFollowedAuthors(authors);
+        }
         setLoading(false);
     };
 
@@ -133,6 +145,11 @@ const ProfileScreen = ({ navigation }) => {
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carousel}>
                         {renderRewards()}
                     </ScrollView>
+
+                    {/* Go to your follows */}
+                    <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('FollowedAuthorsScreen', { authors: followedAuthors })}>
+                        <Text style={styles.profileButtonText}>Followed Authors ({followedAuthors.length})</Text>
+                    </TouchableOpacity>
 
                     {/* Go to your stories to edit, publish unpublish or delete them */}
                     <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('PersonalStoriesScreen')}>

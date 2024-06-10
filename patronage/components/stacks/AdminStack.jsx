@@ -20,6 +20,7 @@ import AuthorSingleStoryScreen from '../../screens/ShortStories/AuthorSingleStor
 import AuthorStoriesScreen from '../../screens/ShortStories/AuthorStoriesScreen';
 import UserSearchScreen from '../../screens/UserSearchScreen';
 import AdminProfileScreen from '../../screens/AdminProfileScreen';
+import FollowedAuthorsScreen from '../../screens/Profiles/FollowedAuthorsScreen';
 
 // Components
 import AdminNavbarComponent from '../navbar/AdminNavbarComponent';
@@ -58,6 +59,7 @@ const AdminStack = () => {
                 <Stack.Screen name="PersonalStoriesScreen" component={PersonalStoriesScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="SingleStoryEditorScreen" component={SingleStoryEditorScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="FollowedAuthorsScreen" component={FollowedAuthorsScreen} options={{ headerShown: false }} />
 
                 {/* User Search Screen */}
                 <Stack.Screen name="UserSearchScreen" component={UserSearchScreen} options={{ headerShown: false }} />
