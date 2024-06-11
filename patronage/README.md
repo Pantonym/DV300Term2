@@ -147,6 +147,7 @@ The following installations are required if you do not clone the repository:
 10. npm install @react-native-picker/picker
 11. npm install @react-native-async-storage/async-storage
 12. npm install expo-image-picker
+13. npm install react-native-uuid
 
 <!-- Main Features and Functionality -->
 ## Features and Functionality

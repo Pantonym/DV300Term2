@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getAuthorUsername, rateStory } from '../../services/storiesService';
+import { getAuthorUsername, getShortStoryID, rateStory } from '../../services/storiesService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { FavouriteStory, UnFavouriteStory, getUser } from '../../services/accountService';
 
 // TODO: Extra functionality: user can edit the rating they gave
 
@@ -18,12 +19,15 @@ const StoryScreen = ({ route, navigation }) => {
     // Story Information
     const [views, setViews] = useState();
     const [username, setUsername] = useState('');
+    const [voteAmount, setVoteAmount] = useState(0);
 
     // Active User Information
     const [userID, setUserID] = useState('');
     const [isAuthor, setIsAuthor] = useState();
     const [isAdmin, setIsAdmin] = useState();
     const [hasVoted, setHasVoted] = useState(false);
+    const [favoriteStatus, setFavoriteStatus] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     // Loading state for initial loading
     const [loading, setLoading] = useState(true);
@@ -89,10 +93,37 @@ const StoryScreen = ({ route, navigation }) => {
             // Trigger the function to render stars
             reRenderStars()
 
+            const fetchData = async () => {
+                const storyID = story.id;
+                await checkIfUserHasFavorited(storyID, userID);
+            };
+
+            fetchData();
+
             // Stop loading
             setLoading(false);
         }
     }, [username, userID]);
+
+    // Function to check favourite status
+    const checkIfUserHasFavorited = async (storyID, userID) => {
+        try {
+            const user = await getUser(userID);
+
+            if (user && user.favouriteStories) {
+                // Check if the storyID is in the user's favouriteStories array
+                const userHasFavorited = user.favouriteStories.includes(storyID);
+
+                // Update the state to reflect the favoriting status
+                setFavoriteStatus(userHasFavorited);
+            } else {
+                setErrorMessage("Unable to retrieve user data or no favorite stories found.");
+            }
+        } catch (error) {
+            console.error("Error checking favorite status: ", error);
+            setErrorMessage("An error occurred while checking favorite status.");
+        }
+    };
 
     // Confirm the submission of the user's rating
     const confirmRating = () => {
@@ -189,6 +220,20 @@ const StoryScreen = ({ route, navigation }) => {
         return starsRender;
     };
 
+    const handleFavourite = async (authorID, storyTitle) => {
+        const storyID = await getShortStoryID(authorID, storyTitle);
+
+        await FavouriteStory(storyID, userID);
+        setFavoriteStatus(true)
+    }
+
+    const handleUnFavourite = async (authorID, storyTitle) => {
+        const storyID = await getShortStoryID(authorID, storyTitle);
+
+        await UnFavouriteStory(storyID, userID);
+        setFavoriteStatus(false)
+    }
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -220,12 +265,16 @@ const StoryScreen = ({ route, navigation }) => {
                                 <Text style={styles.storyRatings}>{views} Ratings</Text>
 
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={styles.averageRating}>{story.averageRating.toFixed(1)} / 10</Text>
-                                    <Ionicons
-                                        size={25}
-                                        color={'purple'}
-                                        name={'star'}
-                                    />
+                                    {story.averageRating !== undefined && (
+                                        <View>
+                                            <Text style={styles.averageRating}>{story.averageRating.toFixed(1)} / 10</Text>
+                                            <Ionicons
+                                                size={25}
+                                                color={'purple'}
+                                                name={'star'}
+                                            />
+                                        </View>
+                                    )}
                                 </View>
                             </View>
                         )}
@@ -284,10 +333,23 @@ const StoryScreen = ({ route, navigation }) => {
                                 <Text style={styles.btnStartTextAuthor}>You have already voted</Text>
                             </View>
                         ) : (
-                            <TouchableOpacity style={styles.btnStart} onPress={confirmRating} disabled={loadingVisible}>
-                                <Text style={styles.btnStartText}>Rate Story</Text>
+                            <View>
+                                <TouchableOpacity style={styles.btnStart} onPress={confirmRating} disabled={loadingVisible}>
+                                    <Text style={styles.btnStartText}>Rate Story</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+
+                        {favoriteStatus ? (
+                            <TouchableOpacity style={styles.btnFave} onPress={() => handleUnFavourite(story.authorID, story.title)} disabled={loadingVisible}>
+                                <Text style={styles.btnStartText}>Unfavourite Story</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity style={styles.btnFave} onPress={() => handleFavourite(story.authorID, story.title)} disabled={loadingVisible}>
+                                <Text style={styles.btnStartText}>Favourite Story</Text>
                             </TouchableOpacity>
                         )}
+
 
                     </View>
                 </ScrollView>
@@ -366,6 +428,15 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         marginTop: 5,
+        alignSelf: 'center'
+    },
+    btnFave: {
+        height: 50,
+        width: 230,
+        backgroundColor: '#9A3E53',
+        borderRadius: 12,
+        justifyContent: 'center',
+        marginTop: 15,
         alignSelf: 'center'
     },
     btnStartText: {

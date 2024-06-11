@@ -5,17 +5,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { getUser } from '../services/accountService';
 import { handleSignOut } from '../services/authService';
+import { getShortStoryByID } from '../services/storiesService';
 
 // TODO: Extra Functionality favourited stories
-// TODO: Follow Writers
 
 const ProfileScreen = ({ navigation }) => {
     // User data
     const [email, setEmail] = useState(null);
     const [userID, setUserID] = useState(null);
     const [userData, setUserData] = useState(null);
-    const [followedAuthorsCount, setFollowedAuthorsCount] = useState(0);
     const [followedAuthors, setFollowedAuthors] = useState([]);
+    const [faves, setFaves] = useState([]);
 
     // loader
     const [loading, setLoading] = useState(true);
@@ -50,6 +50,7 @@ const ProfileScreen = ({ navigation }) => {
         setLoading(true);
         const data = await getUser(userID);
         setUserData(data);
+        
         if (data.followedAuthors) {
             const authors = await Promise.all(data.followedAuthors.map(async authorID => {
                 const authorData = await getUser(authorID);
@@ -57,6 +58,15 @@ const ProfileScreen = ({ navigation }) => {
             }));
             setFollowedAuthors(authors);
         }
+
+        if (data.favouriteStories) {
+            const faveStories = await Promise.all(data.favouriteStories.map(async storyID => {
+                const storyData = await getShortStoryByID(storyID);
+                return { ...storyData, id: storyID };
+            }));
+            setFaves(faveStories);
+        }
+
         setLoading(false);
     };
 
@@ -123,50 +133,57 @@ const ProfileScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
-                    <Image style={styles.imgBack} source={require("../assets/images/Arrow.png")} />
-                </TouchableOpacity>
-                <Text style={styles.header}>Patronage</Text>
-            </View>
-
-            {/* Render if the user's data has been collected. This stops the program from rendering output before it is ready */}
-            {userData && (
-                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                    <Image
-                        style={styles.profileIcon}
-                        source={{ uri: userData.userImg }}
-                        resizeMode="cover"
-                    />
-                    <Text style={styles.username}>{userData.username}</Text>
-                    <Text style={styles.email}>{userData.email}</Text>
-
-                    {/* Awards the user has */}
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carousel}>
-                        {renderRewards()}
-                    </ScrollView>
-
-                    {/* Go to your follows */}
-                    <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('FollowedAuthorsScreen', { authors: followedAuthors })}>
-                        <Text style={styles.profileButtonText}>Followed Authors ({followedAuthors.length})</Text>
+            <ScrollView>
+                <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                        <Image style={styles.imgBack} source={require("../assets/images/Arrow.png")} />
                     </TouchableOpacity>
-
-                    {/* Go to your stories to edit, publish unpublish or delete them */}
-                    <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('PersonalStoriesScreen')}>
-                        <Text style={styles.profileButtonText}>Stories</Text>
-                    </TouchableOpacity>
-
-                    {/* Go to the settings screen to edit your information */}
-                    <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('SettingsScreen')}>
-                        <Text style={styles.profileButtonText}>Settings</Text>
-                    </TouchableOpacity>
-
-                    {/* Log out */}
-                    <TouchableOpacity style={styles.profileButton} onPress={confirmLogout}>
-                        <Text style={styles.profileButtonText}>Log Out</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.header}>Patronage</Text>
                 </View>
-            )}
+
+                {/* Render if the user's data has been collected. This stops the program from rendering output before it is ready */}
+                {userData && (
+                    <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                        <Image
+                            style={styles.profileIcon}
+                            source={{ uri: userData.userImg }}
+                            resizeMode="cover"
+                        />
+                        <Text style={styles.username}>{userData.username}</Text>
+                        <Text style={styles.email}>{userData.email}</Text>
+
+                        {/* Awards the user has */}
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carousel}>
+                            {renderRewards()}
+                        </ScrollView>
+
+                        {/* Go to your follows */}
+                        <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('FollowedAuthorsScreen', { authors: followedAuthors })}>
+                            <Text style={styles.profileButtonText}>Followed Authors ({followedAuthors.length})</Text>
+                        </TouchableOpacity>
+
+                        {/* Go to favourited stories */}
+                        <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('FavouriteStoriesScreen', { favoriteStories: faves })}>
+                            <Text style={styles.profileButtonText}>Favourite Stories ({faves.length})</Text>
+                        </TouchableOpacity>
+
+                        {/* Go to your stories to edit, publish unpublish or delete them */}
+                        <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('PersonalStoriesScreen')}>
+                            <Text style={styles.profileButtonText}>Stories</Text>
+                        </TouchableOpacity>
+
+                        {/* Go to the settings screen to edit your information */}
+                        <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('SettingsScreen')}>
+                            <Text style={styles.profileButtonText}>Settings</Text>
+                        </TouchableOpacity>
+
+                        {/* Log out */}
+                        <TouchableOpacity style={styles.profileButton} onPress={confirmLogout}>
+                            <Text style={styles.profileButtonText}>Log Out</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </ScrollView>
         </SafeAreaView>
     );
 };

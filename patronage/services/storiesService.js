@@ -1,7 +1,8 @@
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// TODO: Can't make two stories of the same name
 // create a new story
 export const handleStoryCreate = async (storyDetails, userID) => {
     try {
@@ -109,6 +110,7 @@ export const publishStory = async (userID, storyTitle) => {
 
                     // build the leaderboard item
                     leaderboardItem = {
+                        "id": works[k].id,
                         "authorID": userID,
                         "genre": works[k].genre,
                         "description": works[k].description,
@@ -450,7 +452,7 @@ export const getLeaderboards = async (genre) => {
             });
 
             return genreStories;
-            
+
         } else {
             console.log("No such document!");
             return [];
@@ -458,5 +460,62 @@ export const getLeaderboards = async (genre) => {
     } catch (error) {
         console.error("Error fetching stories: ", error);
         return [];
+    }
+};
+
+// Get a single story's ID
+export const getShortStoryID = async (authorID, storyTitle) => {
+    try {
+        const storiesRef = doc(db, 'leaderboards', 'shortStories');
+        const docSnap = await getDoc(storiesRef);
+
+        if (docSnap.exists()) {
+            const allStories = docSnap.data();
+            for (const genre in allStories) {
+                const stories = allStories[genre];
+                for (const story of stories) {
+                    if (story.authorID === authorID && story.title === storyTitle) {
+                        return story.id;
+                    }
+                }
+            }
+
+            console.error("No matching story found.");
+            return null;
+        } else {
+            console.error("No document found.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching storyID: ", error);
+        return null;
+    }
+};
+
+// Get a single story by its ID
+export const getShortStoryByID = async (storyID) => {
+    try {
+        const storiesRef = doc(db, 'leaderboards', 'shortStories');
+        const docSnap = await getDoc(storiesRef);
+
+        if (docSnap.exists()) {
+            const allStories = docSnap.data();
+            for (const genre in allStories) {
+                const stories = allStories[genre];
+                for (const story of stories) {
+                    if (story.id === storyID) {
+                        return story;
+                    }
+                }
+            }
+            console.error("No matching story found.");
+            return null;
+        } else {
+            console.error("No such document!");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching story: ", error);
+        return null;
     }
 };

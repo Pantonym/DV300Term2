@@ -169,5 +169,42 @@ export const unFollowAuthor = async (authorID, userID) => {
 
 // Favourite a Story
 export const FavouriteStory = async (storyID, userID) => {
-    console.log('Favourited Story with ID: ', storyID)
+    const docRef = doc(db, "users", userID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        const userData = docSnap.data();
+        let favouriteStories = userData.favouriteStories || [];
+
+        if (!favouriteStories.includes(storyID)) {
+            favouriteStories.push(storyID);
+            await setDoc(docRef, { ...userData, favouriteStories });
+            console.log("Story favourited successfully");
+        } else {
+            console.log("Story is already favourited");
+        }
+    } else {
+        console.log("No such document!");
+    }
+}
+
+// Unfavourite a story
+export const UnFavouriteStory = async (storyID, userID) => {
+    const docRef = doc(db, "users", userID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        const userData = docSnap.data();
+        let favouriteStories = userData.favouriteStories || [];
+
+        if (favouriteStories.includes(storyID)) {
+            favouriteStories = favouriteStories.filter(id => id !== storyID);
+            await setDoc(docRef, { ...userData, favouriteStories });
+            console.log("Story unfavourited successfully");
+        } else {
+            console.log("Story is not favourited");
+        }
+    } else {
+        console.log("No such document!");
+    }
 }

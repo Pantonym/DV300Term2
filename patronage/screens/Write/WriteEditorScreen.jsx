@@ -5,9 +5,10 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { handleStoryCreate } from '../../services/storiesService';
+import { fetchUserStories, handleStoryCreate } from '../../services/storiesService';
 import { CommonActions } from '@react-navigation/native';
 import { arrGenres } from '../../context/genres';
+import uuid from 'react-native-uuid';
 
 const WriteEditorScreen = ({ navigation }) => {
     // Logged in user details
@@ -70,25 +71,39 @@ const WriteEditorScreen = ({ navigation }) => {
             // Empty the error message as it has been resolved (if an error was made)
             setErrorMessage('');
 
-            // Generate the data that will be sent to the database
-            const storyDetails = {
-                completed: false,
-                genre: selectedGenre,
-                title: storyTitle,
-                description: storyDesc,
-                chapters: [
-                    {
-                        chapterTitle: storyTitle,
-                        chapterContent: storyContent,
-                        // Comments and ratings are included for easier changing later
-                        comments: [],
-                        ratings: []
-                    }
-                ]
-            }
-
-            // Attempt to create the story
             try {
+                // Fetch user's existing stories to check for duplicate titles
+                const userStories = await fetchUserStories(userID);
+
+                const duplicateStory = userStories.find(story => story.title === storyTitle);
+
+                if (duplicateStory) {
+                    setErrorMessage('You already have a story with this title. Please choose a different title.');
+                    setLoading(false);
+                    return;
+                }
+
+                // Generate a unique storyID
+                const storyID = uuid.v4();
+
+                // Generate the data that will be sent to the database
+                const storyDetails = {
+                    id: storyID,
+                    completed: false,
+                    genre: selectedGenre,
+                    title: storyTitle,
+                    description: storyDesc,
+                    chapters: [
+                        {
+                            chapterTitle: storyTitle,
+                            chapterContent: storyContent,
+                            // Comments and ratings are included for easier changing later
+                            comments: [],
+                            ratings: []
+                        }
+                    ]
+                }
+
                 await handleStoryCreate(storyDetails, userID);
 
                 // Reset the navigation stack to remove the ability to swipe back
@@ -98,13 +113,16 @@ const WriteEditorScreen = ({ navigation }) => {
                         routes: [{ name: 'PersonalStoriesScreen' }],
                     })
                 );
+
             } catch (error) {
                 // If there's an error creating the story
                 setErrorMessage('An error occurred while submitting your story. Please try again.');
+                console.log(error)
             } finally {
                 // remove the loading no matter if there's an error or not.
                 setLoading(false);
             }
+
         }
     }
 
