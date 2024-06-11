@@ -5,7 +5,7 @@ import { getAuthorUsername } from '../../services/storiesService';
 
 const FavouriteStoriesScreen = ({ route, navigation }) => {
     // Collect the stories
-    const { favoriteStories } = route.params || [];
+    const { favouriteStories } = route.params || [];
 
     // Collect author usernames to display on the cards as they are saved as id's in the database
     const [authorUsernames, setAuthorUsernames] = useState([]);
@@ -16,7 +16,7 @@ const FavouriteStoriesScreen = ({ route, navigation }) => {
             try {
                 // Map the usernames 
                 const usernames = await Promise.all(
-                    favoriteStories.map(favoriteStory => getAuthorUsername(favoriteStory.authorID))
+                    favouriteStories.map(favouriteStory => getAuthorUsername(favouriteStory.authorID))
                 );
 
                 // Set the usernames
@@ -33,7 +33,7 @@ const FavouriteStoriesScreen = ({ route, navigation }) => {
 
     const renderStories = () => {
         // Map each story in a card
-        return favoriteStories.map((story, index) => (
+        return favouriteStories.map((story, index) => (
             <View key={index} style={styles.storyCard}>
                 {/* Navigate to the story screen and send the story's information as well as who the author is */}
                 <TouchableOpacity onPress={() => navigation.navigate('StoryScreen', { story, authorUsername: authorUsernames[index] })}>
@@ -70,7 +70,7 @@ const FavouriteStoriesScreen = ({ route, navigation }) => {
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image style={styles.imgBack} source={require("../../assets/images/Arrow.png")} />
                 </TouchableOpacity>
-                <Text style={styles.header}>Favorites</Text>
+                <Text style={styles.header}>favourites</Text>
             </View>
             <Text style={styles.titleText}>Favourite Stories:</Text>
 

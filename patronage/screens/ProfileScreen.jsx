@@ -7,8 +7,6 @@ import { getUser } from '../services/accountService';
 import { handleSignOut } from '../services/authService';
 import { getShortStoryByID } from '../services/storiesService';
 
-// TODO: Extra Functionality favourited stories
-
 const ProfileScreen = ({ navigation }) => {
     // User data
     const [email, setEmail] = useState(null);
@@ -163,7 +161,7 @@ const ProfileScreen = ({ navigation }) => {
                         </TouchableOpacity>
 
                         {/* Go to favourited stories */}
-                        <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('FavouriteStoriesScreen', { favoriteStories: faves })}>
+                        <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('FavouriteStoriesScreen', { favouriteStories: faves })}>
                             <Text style={styles.profileButtonText}>Favourite Stories ({faves.length})</Text>
                         </TouchableOpacity>
 

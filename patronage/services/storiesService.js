@@ -1,8 +1,7 @@
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, where } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// TODO: Can't make two stories of the same name
 // create a new story
 export const handleStoryCreate = async (storyDetails, userID) => {
     try {
@@ -517,5 +516,73 @@ export const getShortStoryByID = async (storyID) => {
     } catch (error) {
         console.error("Error fetching story: ", error);
         return null;
+    }
+};
+
+// Add comment function
+export const addComment = async (storyID, chapterIndex, comment) => {
+    try {
+        const storiesRef = doc(db, 'leaderboards', 'shortStories');
+        const docSnap = await getDoc(storiesRef);
+
+        if (docSnap.exists()) {
+            const allStories = docSnap.data();
+            for (const genre in allStories) {
+                const stories = allStories[genre];
+                for (let story of stories) {
+                    if (story.id === storyID) {
+                        // Add the comment to the specified chapter (future proofing for other story types with more than one chapter)
+                        story.chapters[chapterIndex].comments.push(comment);
+
+                        // Update the Firestore document
+                        await updateDoc(storiesRef, { [genre]: allStories[genre] });
+
+                        return true;
+                    }
+                }
+            }
+            console.error("No matching story found.");
+            return false;
+        } else {
+            console.error("No such document!");
+            return false;
+        }
+    } catch (error) {
+        console.error("Error adding comment:", error);
+        return false;
+    }
+};
+
+// Delete your own comment from a story
+export const deleteComment = async (storyID, chapterIndex, commentIndex) => {
+    try {
+        const storiesRef = doc(db, 'leaderboards', 'shortStories');
+        const docSnap = await getDoc(storiesRef);
+
+        if (docSnap.exists()) {
+            const allStories = docSnap.data();
+            for (const genre in allStories) {
+                const stories = allStories[genre];
+                for (let story of stories) {
+                    if (story.id === storyID) {
+                        // Remove the comment from the specified chapter
+                        story.chapters[chapterIndex].comments.splice(commentIndex, 1);
+
+                        // Update the Firestore document
+                        await updateDoc(storiesRef, { [genre]: allStories[genre] });
+
+                        return true;
+                    }
+                }
+            }
+            console.error("No matching story found.");
+            return false;
+        } else {
+            console.error("No such document!");
+            return false;
+        }
+    } catch (error) {
+        console.error("Error deleting comment:", error);
+        return false;
     }
 };

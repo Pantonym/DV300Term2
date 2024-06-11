@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getAuthorUsername, getShortStoryID, rateStory } from '../../services/storiesService';
+import { addComment, deleteComment, getAuthorUsername, getShortStoryID, rateStory } from '../../services/storiesService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FavouriteStory, UnFavouriteStory, getUser } from '../../services/accountService';
-
-// TODO: Extra functionality: user can edit the rating they gave
 
 const StoryScreen = ({ route, navigation }) => {
     // Parameters
@@ -15,6 +13,7 @@ const StoryScreen = ({ route, navigation }) => {
 
     // User Input Information
     const [rating, setRating] = useState('');
+    const [commentContent, setCommentContent] = useState('');
 
     // Story Information
     const [views, setViews] = useState();
@@ -26,7 +25,7 @@ const StoryScreen = ({ route, navigation }) => {
     const [isAuthor, setIsAuthor] = useState();
     const [isAdmin, setIsAdmin] = useState();
     const [hasVoted, setHasVoted] = useState(false);
-    const [favoriteStatus, setFavoriteStatus] = useState(false);
+    const [favouriteStatus, setFavouriteStatus] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
     // Loading state for initial loading
@@ -37,6 +36,9 @@ const StoryScreen = ({ route, navigation }) => {
 
     // Re Render data
     const [reRender, setReRender] = useState(false);
+
+    // Comment visibility
+    const [commentsCollapsed, setCommentsCollapsed] = useState(true);
 
     // Fetch user data when the screen becomes active.
     useEffect(() => {
@@ -95,7 +97,7 @@ const StoryScreen = ({ route, navigation }) => {
 
             const fetchData = async () => {
                 const storyID = story.id;
-                await checkIfUserHasFavorited(storyID, userID);
+                await checkIfUserHasFavourited(storyID, userID);
             };
 
             fetchData();
@@ -106,22 +108,22 @@ const StoryScreen = ({ route, navigation }) => {
     }, [username, userID]);
 
     // Function to check favourite status
-    const checkIfUserHasFavorited = async (storyID, userID) => {
+    const checkIfUserHasFavourited = async (storyID, userID) => {
         try {
             const user = await getUser(userID);
 
             if (user && user.favouriteStories) {
                 // Check if the storyID is in the user's favouriteStories array
-                const userHasFavorited = user.favouriteStories.includes(storyID);
+                const userHasfavourited = user.favouriteStories.includes(storyID);
 
-                // Update the state to reflect the favoriting status
-                setFavoriteStatus(userHasFavorited);
+                // Update the state to reflect the favouriting status
+                setFavouriteStatus(userHasfavourited);
             } else {
-                setErrorMessage("Unable to retrieve user data or no favorite stories found.");
+                setErrorMessage("Unable to retrieve user data or no favourite stories found.");
             }
         } catch (error) {
-            console.error("Error checking favorite status: ", error);
-            setErrorMessage("An error occurred while checking favorite status.");
+            console.error("Error checking favourite status: ", error);
+            setErrorMessage("An error occurred while checking favourite status.");
         }
     };
 
@@ -182,6 +184,62 @@ const StoryScreen = ({ route, navigation }) => {
         }
     };
 
+    // Add a comment
+    const handleAddComment = async () => {
+        if (isAdmin) {
+            Alert.alert('Permission Denied', 'Admins cannot leave comments.');
+            return;
+        }
+
+        if (commentContent.trim() === '') {
+            Alert.alert('Invalid Comment', 'Comment cannot be empty.');
+            return;
+        }
+
+        const comment = {
+            commenterID: userID,
+            commenterUsername: username,
+            commentContent: commentContent.trim(),
+        };
+
+        try {
+            setLoadingVisible(true);
+            const result = await addComment(story.id, 0, comment);
+            if (result) {
+                Alert.alert('Success', 'Your comment has been added.');
+                story.chapters[0].comments.push(comment);
+                setCommentContent(''); // Clear the comment input
+            } else {
+                Alert.alert('Error', 'Failed to add your comment. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error adding comment:', error);
+            Alert.alert('Error', 'Failed to add your comment. Please try again.');
+        } finally {
+            setLoadingVisible(false);
+        }
+    };
+
+    // Remove your own comment
+    const handleDeleteComment = async (commentIndex) => {
+        try {
+            setLoadingVisible(true);
+            const result = await deleteComment(story.id, 0, commentIndex); // Assuming chapterIndex is 0
+            if (result) {
+                Alert.alert('Success', 'Your comment has been deleted.');
+                story.chapters[0].comments.splice(commentIndex, 1);
+                setReRender(!reRender); // Trigger re-render to update comments
+            } else {
+                Alert.alert('Error', 'Failed to delete your comment. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+            Alert.alert('Error', 'Failed to delete your comment. Please try again.');
+        } finally {
+            setLoadingVisible(false);
+        }
+    };
+
     // Rerender the stars based on what the user has voted. This also calls to render the stars on screen load.
     const reRenderStars = () => {
         let stars = [];
@@ -221,18 +279,26 @@ const StoryScreen = ({ route, navigation }) => {
     };
 
     const handleFavourite = async (authorID, storyTitle) => {
+        setLoadingVisible(true);
         const storyID = await getShortStoryID(authorID, storyTitle);
 
         await FavouriteStory(storyID, userID);
-        setFavoriteStatus(true)
+        setFavouriteStatus(true)
+        setLoadingVisible(false);
     }
 
     const handleUnFavourite = async (authorID, storyTitle) => {
+        setLoadingVisible(true);
         const storyID = await getShortStoryID(authorID, storyTitle);
 
         await UnFavouriteStory(storyID, userID);
-        setFavoriteStatus(false)
+        setFavouriteStatus(false)
+        setLoadingVisible(false);
     }
+
+    const toggleComments = () => {
+        setCommentsCollapsed(!commentsCollapsed);
+    };
 
     return (
         <KeyboardAvoidingView
@@ -340,17 +406,69 @@ const StoryScreen = ({ route, navigation }) => {
                             </View>
                         )}
 
-                        {favoriteStatus ? (
-                            <TouchableOpacity style={styles.btnFave} onPress={() => handleUnFavourite(story.authorID, story.title)} disabled={loadingVisible}>
-                                <Text style={styles.btnStartText}>Unfavourite Story</Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <TouchableOpacity style={styles.btnFave} onPress={() => handleFavourite(story.authorID, story.title)} disabled={loadingVisible}>
-                                <Text style={styles.btnStartText}>Favourite Story</Text>
-                            </TouchableOpacity>
+                        {!isAdmin ? (
+                            <View>
+                                {
+                                    favouriteStatus ? (
+                                        <TouchableOpacity style={styles.btnFave} onPress={() => handleUnFavourite(story.authorID, story.title)} disabled={loadingVisible}>
+                                            <Text style={styles.btnStartText}>Unfavourite Story</Text>
+                                        </TouchableOpacity>
+                                    ) : (
+                                        <TouchableOpacity style={styles.btnFave} onPress={() => handleFavourite(story.authorID, story.title)} disabled={loadingVisible}>
+                                            <Text style={styles.btnStartText}>Favourite Story</Text>
+                                        </TouchableOpacity>
+                                    )}
+                            </View>
+                        ) : null}
+
+                    </View>
+
+                    {/* Comments */}
+                    <View>
+                        <TouchableOpacity onPress={toggleComments} style={styles.commentToggle}>
+                            <Text style={styles.sectionTitle}>
+                                {commentsCollapsed ? 'Show Comments' : 'Hide Comments'}
+                            </Text>
+                            <Ionicons
+                                name={commentsCollapsed ? 'chevron-down' : 'chevron-up'}
+                                size={24}
+                                color="black"
+                                style={{ marginLeft: 15 }}
+                            />
+                        </TouchableOpacity>
+
+                        {!commentsCollapsed && (
+                            <View>
+                                {story.chapters[0].comments.map((comment, index) => (
+                                    <View key={index} style={styles.commentContainer}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Text style={styles.commentAuthor}>{comment.commenterUsername}</Text>
+                                            {(comment.commenterID === userID || isAdmin) && (
+                                                <TouchableOpacity onPress={() => handleDeleteComment(index)}>
+                                                    <Ionicons name="trash-bin" size={24} color="red" />
+                                                </TouchableOpacity>
+                                            )}
+                                        </View>
+                                        <Text style={styles.commentContent}>{comment.commentContent}</Text>
+                                    </View>
+                                ))}
+
+                                {/* Admins cannot leave comments */}
+                                {!isAdmin && (
+                                    <>
+                                        <TextInput
+                                            style={styles.commentInput}
+                                            placeholder="Add a comment..."
+                                            value={commentContent}
+                                            onChangeText={setCommentContent}
+                                        />
+                                        <TouchableOpacity style={styles.btnComment} onPress={handleAddComment}>
+                                            <Text style={styles.btnCommentText}>Submit Comment</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                )}
+                            </View>
                         )}
-
-
                     </View>
                 </ScrollView>
 
@@ -453,6 +571,7 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     loader: {
+        // Fill the screen completely
         ...StyleSheet.absoluteFill,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         alignItems: 'center',
@@ -476,6 +595,55 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         fontSize: 16,
         alignSelf: 'center',
+    },
+    commentContainer: {
+        marginVertical: 10,
+        padding: 10,
+        backgroundColor: '#FFF',
+        borderRadius: 10,
+    },
+    commentAuthor: {
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    commentContent: {
+        fontFamily: 'Baskervville',
+        fontSize: 16,
+    },
+    commentInput: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginVertical: 10,
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+    },
+    btnComment: {
+        height: 50,
+        backgroundColor: '#9A3E53',
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    btnCommentText: {
+        color: 'white',
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+    },
+    sectionTitle: {
+        fontFamily: 'Baskervville',
+        fontSize: 24,
+        marginVertical: 10,
+    },
+    commentToggle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10
     }
 
 });
