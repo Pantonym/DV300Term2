@@ -259,3 +259,35 @@ Distributed under the MIT License. See `LICENSE` for more information.
 * [Link](https://worldvectorlogo.com/logo/react-native-1) (React Native Logo)
 * [Link](https://worldvectorlogo.com/logo/expo-go-app) (Expo Go Logo)
 * [Link](https://firebase.google.com/brand-guidelines) (Firebase)
+
+Features and functions:
+1. Authentication Screens (Log In/Register)
+   1. Extra: Admin Log In/Out
+2. Competition Screens
+   1. All Competitions & Entering
+   2. Judging/Voting (scores/voting)
+   3. Competition Result (Leaderboards + awards)
+
+Project Planning:
+1. Writers/Voters (added admins as extra functionality)
+
+Specifications:
+icon & splash
+1. App Icon
+2. Splash Screen
+
+authentication
+1. Register an account
+2. Log in with email/username & password, as well as log out
+3. Persistence
+4. role based accounts
+
+Competition screens
+1. host at least noe competition
+2. users can see all competitions that can be entered
+3. upload content of the competition if the app hosts it
+4. Monitors if entries are open or closed (always open)
+5. if the app hosts it, the user should be able to vote
+6. view results of a competition
+7. TODO: competition automatic updates
+8. winners should be awarded in some way

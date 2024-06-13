@@ -2,12 +2,26 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList, ActivityIndi
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getLeaderboards, getAuthorUsername } from '../../services/storiesService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LeaderboardScreen = ({ route, navigation }) => {
     const { genre } = route.params;
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [authorUsernames, setAuthorUsernames] = useState([]);
+
+    // Admin useStates
+    const [isAdmin, setIsAdmin] = useState();
+
+    // Get the logged in user email, as well as test if it is the admin's email.
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const email = await AsyncStorage.getItem('UserEmail');
+            setIsAdmin(email === "greatquill.patronage@gmail.com")
+        };
+
+        fetchUserData();
+    }, []);
 
     // Fetch all the stories whenever the genre changes.
     useEffect(() => {
@@ -53,6 +67,10 @@ const LeaderboardScreen = ({ route, navigation }) => {
         const total = ratings.reduce((acc, rating) => acc + rating.voteAmount, 0);
         return (total / ratings.length) * 10; // Convert to percentage
     };
+
+    const endCompetition = async (genre) => {
+        console.log('Competition Ended for', genre)
+    }
 
     // Loader
     if (loading) {
@@ -154,6 +172,12 @@ const LeaderboardScreen = ({ route, navigation }) => {
                     </View>
                 )}
             />
+
+            {isAdmin ? (
+                <TouchableOpacity style={styles.button} onPress={() => endCompetition(genre)}>
+                    <Text style={styles.buttonText}> End Competition</Text>
+                </TouchableOpacity>
+            ) : null}
         </SafeAreaView>
     );
 };
@@ -227,6 +251,19 @@ const styles = StyleSheet.create({
         fontFamily: 'Baskervville',
         marginTop: 20,
         textAlign: 'center',
+    },
+    button: {
+        backgroundColor: "#CAA775",
+        textAlign: 'center',
+        padding: 10,
+        marginVertical: 30,
+        borderRadius: 12
+    },
+    buttonText: {
+        textAlign: 'center',
+        color: 'white',
+        fontFamily: 'Baskervville',
+        fontSize: 24
     }
 });
 
