@@ -6,6 +6,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getUser } from '../services/accountService';
 import { handleSignOut } from '../services/authService';
 import { getShortStoryByID } from '../services/storiesService';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const ProfileScreen = ({ navigation }) => {
     // User data
@@ -46,25 +48,51 @@ const ProfileScreen = ({ navigation }) => {
     // Get data from the user who is logged in
     const handleGetProfile = async () => {
         setLoading(true);
-        const data = await getUser(userID);
-        setUserData(data);
-        
-        if (data.followedAuthors) {
-            const authors = await Promise.all(data.followedAuthors.map(async authorID => {
-                const authorData = await getUser(authorID);
-                return { ...authorData, id: authorID };
-            }));
-            setFollowedAuthors(authors);
-        }
+        try {
+            const data = await getUser(userID);
+            setUserData(data);
 
-        if (data.favouriteStories) {
-            const faveStories = await Promise.all(data.favouriteStories.map(async storyID => {
-                const storyData = await getShortStoryByID(storyID);
-                return { ...storyData, id: storyID };
-            }));
-            setFaves(faveStories);
-        }
+            if (data.followedAuthors) {
+                const authors = await Promise.all(data.followedAuthors.map(async authorID => {
+                    const authorData = await getUser(authorID);
+                    return { ...authorData, id: authorID };
+                }));
+                setFollowedAuthors(authors);
+            }
 
+            if (data.favouriteStories) {
+                const validStories = [];
+                const invalidStoryIDs = [];
+
+                for (const storyID of data.favouriteStories) {
+                    const storyData = await getShortStoryByID(storyID);
+
+                    if (storyData) {
+                        validStories.push({ ...storyData, id: storyID });
+                    } else {
+                        console.log('Story not found:', storyID);
+                        invalidStoryIDs.push(storyID);
+
+                        // Immediately remove the invalid story from the user's favourite stories
+                        const userRef = doc(db, 'users', userID);
+                        await updateDoc(userRef, {
+                            favouriteStories: data.favouriteStories.filter(id => id !== storyID)
+                        });
+
+                        // Update the data object to reflect the change
+                        data.favouriteStories = data.favouriteStories.filter(id => id !== storyID);
+                    }
+                }
+
+                if (invalidStoryIDs.length > 0) {
+                    console.log('Removed invalid stories:', invalidStoryIDs.join(', '));
+                }
+
+                setFaves(validStories);
+            }
+        } catch (error) {
+            console.error('Error fetching profile data:', error);
+        }
         setLoading(false);
     };
 

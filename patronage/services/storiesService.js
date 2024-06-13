@@ -1,6 +1,7 @@
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addAward } from "./accountService";
 
 // create a new story
 export const handleStoryCreate = async (storyDetails, userID) => {
@@ -584,5 +585,59 @@ export const deleteComment = async (storyID, chapterIndex, commentIndex) => {
     } catch (error) {
         console.error("Error deleting comment:", error);
         return false;
+    }
+};
+
+// Function to end the competition, remove stories, move top 3 to previousLeaders, and add awards to relevant users
+export const endCompetition = async (genre) => {
+    try {
+        const storyRef = doc(db, 'leaderboards', 'shortStories');
+        const storyDoc = await getDoc(storyRef);
+
+        if (storyDoc.exists()) {
+            const allStories = storyDoc.data();
+            const normalizedGenre = genre.trim().toLowerCase();
+            const genreStories = allStories[normalizedGenre] || [];
+
+            // Sort stories by average rating descending
+            genreStories.sort((a, b) => b.averageRating - a.averageRating);
+
+            // Get the top 3 stories
+            const top3Stories = genreStories.slice(0, 3);
+
+            // Get the current year
+            const year = new Date().getFullYear();
+
+            // Add the top 3 stories to the previousLeaders collection
+            for (let i = 0; i < top3Stories.length; i++) {
+                const story = top3Stories[i];
+                const place = i === 0 ? 'gold' : i === 1 ? 'silver' : 'bronze';
+
+                // Add story to previousLeaders collection under genre/year
+                const previousLeaderRef = doc(db, `previousLeaders/${normalizedGenre}/${year.toString()}/${story.id}`);
+                await setDoc(previousLeaderRef, {
+                    ...story,
+                    place,
+                    year
+                });
+
+                // Add award to the user
+                await addAward(story.authorID, genre, place, year.toString());
+            }
+
+            // Set the genre stories to an empty array
+            console.log(allStories[normalizedGenre]);
+            allStories[normalizedGenre] = [];
+            console.log(allStories[normalizedGenre]);
+
+            // Update the leaderboards collection
+            await updateDoc(storyRef, allStories);
+
+            console.log(`Competition ended for ${genre}. Top 3 stories moved to previousLeaders and awards assigned.`);
+        } else {
+            console.log("No such document!");
+        }
+    } catch (error) {
+        console.error("Error ending competition: ", error);
     }
 };

@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getLeaderboards, getAuthorUsername } from '../../services/storiesService';
+import { getLeaderboards, getAuthorUsername, endCompetition } from '../../services/storiesService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LeaderboardScreen = ({ route, navigation }) => {
@@ -68,8 +68,10 @@ const LeaderboardScreen = ({ route, navigation }) => {
         return (total / ratings.length) * 10; // Convert to percentage
     };
 
-    const endCompetition = async (genre) => {
-        console.log('Competition Ended for', genre)
+    const handleEndCompetition = async (genre) => {    
+        // Call endCompetition and navigate to ShortStoriesScreen
+        await endCompetition(genre);
+        navigation.navigate('ShortStoriesScreen');
     }
 
     // Loader
@@ -99,6 +101,13 @@ const LeaderboardScreen = ({ route, navigation }) => {
                 </Text>
 
                 <Text style={styles.noStoriesText}>Not enough eligible stories available for this leaderboard!</Text>
+
+                {/* FOR TESTING ONLY - REPUBLISH ORIGINAL ADAM'S MYSTERY STORY */}
+                {isAdmin ? (
+                    <TouchableOpacity style={styles.button} onPress={() => handleEndCompetition(genre)}>
+                        <Text style={styles.buttonText}> End Competition</Text>
+                    </TouchableOpacity>
+                ) : null}
             </SafeAreaView>
         );
     }
@@ -174,7 +183,7 @@ const LeaderboardScreen = ({ route, navigation }) => {
             />
 
             {isAdmin ? (
-                <TouchableOpacity style={styles.button} onPress={() => endCompetition(genre)}>
+                <TouchableOpacity style={styles.button} onPress={() => handleEndCompetition(genre)}>
                     <Text style={styles.buttonText}> End Competition</Text>
                 </TouchableOpacity>
             ) : null}

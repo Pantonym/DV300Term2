@@ -289,5 +289,9 @@ Competition screens
 4. Monitors if entries are open or closed (always open)
 5. if the app hosts it, the user should be able to vote
 6. view results of a competition
-7. TODO: competition automatic updates
+7. competition automatic updates/admins end competition
 8. winners should be awarded in some way
+
+Advanced functionality:
+1. admin account - chosen to ease ending of competitions as well
+2. 
