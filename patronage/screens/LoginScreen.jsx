@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { handleLogin } from '../services/authService';
 
-// TODO: Home screen is removed for current build and is replaced byt he short stories screen, but explain the db is set up to future proof.
+// TODO: Home screen is removed for current build and is replaced by the short stories screen, but explain the db is set up to future proof.
 // In addition, the writing screen is removed and replaced by the write editor screen.
 
 const LoginScreen = ({ navigation }) => {

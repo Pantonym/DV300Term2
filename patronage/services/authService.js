@@ -53,12 +53,15 @@ export const handleRegister = (email, password, username) => {
         });
 };
 
-export const handleSignOut = () => {
-    signOut(auth).then(() => {
+export const handleSignOut = async () => {
+    try {
+        await signOut(auth);
+        await AsyncStorage.removeItem('UserEmail');
+        await AsyncStorage.removeItem('UserID');
         console.log('logged out');
-    }).catch((error) => {
+    } catch (error) {
         console.log('Error when logging out: ' + error);
-    });
+    }
 };
 
 export const changePassword = (newPassword) => {

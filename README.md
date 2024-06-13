@@ -72,7 +72,7 @@
 <!-- Mockup -->
 <!-- TODO: ADD MOCKUP -->
 ### Mockup
-<img src="spynet/src/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
+<img src="patronage/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
 
 <!--PROJECT DESCRIPTION-->
 ### Project Description
@@ -89,8 +89,7 @@ Patronage is a competition management mobile application where users can write s
 * Uses components to render the front end.
 * Used for cross-platform development.
 <p>React Native was used to build the front end.</p>
-<!-- TODO: React Native logo -->
-<img src="spynet/src/assets/readmeAssets/" alt="TS_Logo" style="width: 300px; height: auto;" />
+<img src="patronage/assets/readmeAssets/react_native.svg" alt="ReactNative_Logo" style="width: auto; height: 200px;" />
 
 <!-- Expo -->
 #### Expo
@@ -98,7 +97,7 @@ Patronage is a competition management mobile application where users can write s
 * Allows apps to be created for multiple platforms, even including web.
 * Used as a cross-platform framework, as well as for testing through ExpoGo.
 <p>Expo was used to test the website, as well as allow it to be cross-platform</p>
-<img src="spynet/src/assets/readmeAssets/" alt="AJAX-Logo" style="width: 400px; height: 225px;"/>
+<img src="patronage/assets/readmeAssets/expo_go.svg" alt="ExpoGo_Logo" style="width: auto; height: 200px;"/>
 
 <!-- Firebase/Firestore -->
 #### Firebase/Firestore
@@ -107,7 +106,7 @@ Patronage is a competition management mobile application where users can write s
 * Is a NoSQL database.
 * Firebase was used for text-based data and Firestore was used for images.
 <p>Firebase/Firestore was used to implement backend functionality to implement CRUD functionality to the application.</p>
-<img src="spynet/src/assets/readmeAssets/" alt="Bootstrap-Logo" style="width: 400px; height: auto;"/>
+<img src="patronage/assets/readmeAssets/firebaseLogo.svg" alt="Firebase_Logo" style="width: 250px; height: auto;"/>
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -176,26 +175,26 @@ Discuss Theme
 ### Development Documents
 <!-- Moodboard -->
 * Moodboard
-<img src="spynet/src/assets/readmeAssets/" alt="Moodboard" style="height: 600px">
+<img src="patronage/assets/readmeAssets/" alt="Moodboard" style="height: 600px">
 
 <!-- Iconography -->
 * Iconography
-<img src="spynet/src/assets/readmeAssets/" alt="Iconography" style="height: 200px">
+<img src="patronage/assets/readmeAssets/" alt="Iconography" style="height: 200px">
 
 <!-- Colour Palette -->
 * Colour Palette
-<img src="spynet/src/assets/readmeAssets/" alt="Colour Palette" style="height: 100px">
+<img src="patronage/assets/readmeAssets/" alt="Colour Palette" style="height: 100px">
 
 <!-- Data Planning - ERD -->
 * Data Planning - ERD
-<img src="spynet/src/assets/readmeAssets/" alt="Data Planning - ERD" style="height: 300px">
+<img src="patronage/assets/readmeAssets/" alt="Data Planning - ERD" style="height: 300px">
 
 <!-- Wireframes -->
 * Wireframes
 Name Page
-<img src="spynet/src/assets/readmeAssets/" alt="Login" style="width: 600px"/>
+<img src="patronage/assets/readmeAssets/" alt="Login" style="width: 600px"/>
 Name Page
-<img src="spynet/src/assets/readmeAssets/" alt="Dashboard" style="width: 600px"/>
+<img src="patronage/assets/readmeAssets/" alt="Dashboard" style="width: 600px"/>
 
 <!-- Highlights -->
 #### Highlights
@@ -226,10 +225,10 @@ Name Page
 ## Final Outcome
 <!-- MOCKUPS -->
 ### Mockups
-<img src="spynet/src/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
-<img src="spynet/src/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
-<img src="spynet/src/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
-<img src="spynet/src/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
+<img src="patronage/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
+<img src="patronage/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
+<img src="patronage/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
+<img src="patronage/assets/readmeAssets/" alt="Mockup" style="height: 600px"/>
 
 <br>
 
@@ -257,6 +256,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 * [W3Schools](https://www.w3schools.com)
 
 ## References
-* Link (Title)
-* Link (Title)
-* Link (Title)
+* [Link](https://worldvectorlogo.com/logo/react-native-1) (React Native Logo)
+* [Link](https://worldvectorlogo.com/logo/expo-go-app) (Expo Go Logo)
+* [Link](https://firebase.google.com/brand-guidelines) (Firebase)

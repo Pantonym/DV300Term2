@@ -44,7 +44,7 @@ export default function App() {
   }, []);
 
   if (!fontsLoaded) {
-    return null; // Or some loading indicator while fonts are loading
+    return null;
   }
 
   return (
