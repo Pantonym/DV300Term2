@@ -41,11 +41,11 @@ const ShortStoriesScreen = ({ navigation }) => {
             <View>
 
                 <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                    {/* <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
                         <Image
                             style={styles.imgBack}
                             source={require("../assets/images/Arrow.png")} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <Text style={styles.header}>
                         Patronage

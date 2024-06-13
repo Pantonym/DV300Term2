@@ -138,11 +138,11 @@ const WriteEditorScreen = ({ navigation }) => {
                 {!showLargeTextInput ? (
                     <ScrollView>
                         <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                            <TouchableOpacity onPress={() => navigation.navigate('WriteScreen')} disabled={loading}>
+                            {/* <TouchableOpacity onPress={() => navigation.navigate('WriteScreen')} disabled={loading}>
                                 <Image
                                     style={styles.imgBack}
                                     source={require("../../assets/images/Arrow.png")} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
 
                             <Text style={styles.header}>
                                 Patronage

@@ -319,29 +319,50 @@ const StoryScreen = ({ route, navigation }) => {
                     <View>
                         <Text style={styles.storyTitle}>{story.title}</Text>
                         {/* Navigate to the author's profile */}
-                        <TouchableOpacity onPress={() => navigation.navigate('AuthorProfileScreen', { authorID: story.authorID })}>
-                            <Text style={styles.storyAuthor}> by {author}</Text>
-                        </TouchableOpacity>
+                        {isAuthor ? (
+                            <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
+                                <Text style={styles.storyAuthor}> by You</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity onPress={() => navigation.navigate('AuthorProfileScreen', { authorID: story.authorID })}>
+                                <Text style={styles.storyAuthor}> by {author}</Text>
+                            </TouchableOpacity>
+                        )}
 
                         {/* Loader for the rating out of 10 as well as total ratings */}
                         {loading ? (
                             <ActivityIndicator size="large" color="#9A3E53" />
                         ) : (
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={styles.storyRatings}>{views} Ratings</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }}>
+                                {story.averageRating !== undefined && (
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text style={styles.storyRatings}>{story.averageRating.toFixed(1)} / 10</Text>
+                                        <Text style={styles.storyRatingsAmount}>({views} Ratings)</Text>
+                                    </View>
+                                )}
 
-                                <View style={{ flexDirection: 'row' }}>
-                                    {story.averageRating !== undefined && (
-                                        <View>
-                                            <Text style={styles.averageRating}>{story.averageRating.toFixed(1)} / 10</Text>
-                                            <Ionicons
-                                                size={25}
-                                                color={'purple'}
-                                                name={'star'}
-                                            />
-                                        </View>
-                                    )}
-                                </View>
+                                {!isAdmin ? (
+                                    <View>
+                                        {
+                                            favouriteStatus ? (
+                                                <TouchableOpacity onPress={() => handleUnFavourite(story.authorID, story.title)} disabled={loadingVisible}>
+                                                    <Ionicons
+                                                        size={35}
+                                                        color={'purple'}
+                                                        name={'bookmark'}
+                                                    />
+                                                </TouchableOpacity>
+                                            ) : (
+                                                <TouchableOpacity onPress={() => handleFavourite(story.authorID, story.title)} disabled={loadingVisible}>
+                                                    <Ionicons
+                                                        size={35}
+                                                        color={'purple'}
+                                                        name={'bookmark-outline'}
+                                                    />
+                                                </TouchableOpacity>
+                                            )}
+                                    </View>
+                                ) : null}
                             </View>
                         )}
 
@@ -358,68 +379,28 @@ const StoryScreen = ({ route, navigation }) => {
 
                         <Text style={styles.storyContent}>{story.chapters[0].chapterContent}</Text>
 
-                        {/* Hide stars if the user is an admin or an author */}
-                        {isAuthor || isAdmin ? (
-                            null
-                        ) : (
-                            <View style={styles.starsContainer}>
-                                {renderStars()}
-                            </View>
-                        )}
-
                         {/* Displays a disabled button if the viewer is the author of the story or an admin */}
                         {isAuthor ? (
-                            <View>
-                                <TouchableOpacity style={[
-                                    styles.btnStart,
-                                    { opacity: 0.5 },
-                                ]} disabled>
-                                    <Text style={styles.btnStartText}>Rate Story</Text>
-                                </TouchableOpacity>
-                                <Text style={styles.btnStartTextAuthor}>Authors cannot rate their own stories</Text>
-                            </View>
+                            null
                         ) : isAdmin ? (
-                            <View>
-                                <TouchableOpacity style={[
-                                    styles.btnStart,
-                                    { opacity: 0.5 },
-                                ]} disabled>
-                                    <Text style={styles.btnStartText}>Rate Story</Text>
-                                </TouchableOpacity>
-                                <Text style={styles.btnStartTextAuthor}>The Great Quill Does Not Meddle</Text>
-                            </View>
+                            null
                         ) : hasVoted ? (
                             <View>
-                                <TouchableOpacity style={[
-                                    styles.btnStart,
-                                    { opacity: 0.5 },
-                                ]} disabled>
-                                    <Text style={styles.btnStartText}>Rate Story</Text>
-                                </TouchableOpacity>
                                 <Text style={styles.btnStartTextAuthor}>You have already voted</Text>
+                                <View style={styles.starsContainer}>
+                                    {renderStars()}
+                                </View>
                             </View>
                         ) : (
                             <View>
+                                <View style={styles.starsContainer}>
+                                    {renderStars()}
+                                </View>
                                 <TouchableOpacity style={styles.btnStart} onPress={confirmRating} disabled={loadingVisible}>
                                     <Text style={styles.btnStartText}>Rate Story</Text>
                                 </TouchableOpacity>
                             </View>
                         )}
-
-                        {!isAdmin ? (
-                            <View>
-                                {
-                                    favouriteStatus ? (
-                                        <TouchableOpacity style={styles.btnFave} onPress={() => handleUnFavourite(story.authorID, story.title)} disabled={loadingVisible}>
-                                            <Text style={styles.btnStartText}>Unfavourite Story</Text>
-                                        </TouchableOpacity>
-                                    ) : (
-                                        <TouchableOpacity style={styles.btnFave} onPress={() => handleFavourite(story.authorID, story.title)} disabled={loadingVisible}>
-                                            <Text style={styles.btnStartText}>Favourite Story</Text>
-                                        </TouchableOpacity>
-                                    )}
-                            </View>
-                        ) : null}
 
                     </View>
 
@@ -521,7 +502,14 @@ const styles = StyleSheet.create({
     storyRatings: {
         fontFamily: 'Baskervville',
         fontSize: 22,
-        textAlign: 'left',
+        marginRight: 10,
+        lineHeight: 30
+    },
+    storyRatingsAmount: {
+        fontFamily: 'Baskervville',
+        fontSize: 18,
+        textAlign: 'center',
+        lineHeight: 35
     },
     storyContent: {
         fontFamily: 'Baskervville',
@@ -546,15 +534,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         marginTop: 5,
-        alignSelf: 'center'
-    },
-    btnFave: {
-        height: 50,
-        width: 230,
-        backgroundColor: '#9A3E53',
-        borderRadius: 12,
-        justifyContent: 'center',
-        marginTop: 15,
         alignSelf: 'center'
     },
     btnStartText: {

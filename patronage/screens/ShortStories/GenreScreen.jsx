@@ -115,7 +115,7 @@ const GenreScreen = ({ route, navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+                <TouchableOpacity onPress={() => navigation.navigate('ShortStoriesScreen')}>
                     <Image
                         style={styles.imgBack}
                         source={require("../../assets/images/Arrow.png")} />

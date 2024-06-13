@@ -72,13 +72,6 @@ const SearchScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
-                    <Image
-                        style={styles.imgBack}
-                        source={require("../assets/images/Arrow.png")}
-                    />
-                </TouchableOpacity>
-
                 <Text style={styles.header}>
                     Patronage
                 </Text>

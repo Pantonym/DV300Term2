@@ -30,7 +30,7 @@ const AdminNavbarComponent = () => {
         let newIndex;
         switch (currentRoute) {
             // All pages that match these names will have the index be set to 0
-            case 'HomeScreen':
+            // case 'HomeScreen':
             case 'ShortStoriesScreen':
             case 'GenreScreen':
             case 'LeaderboardScreen':
@@ -74,8 +74,10 @@ const AdminNavbarComponent = () => {
                     style={styles.navImage}
                     size={35}
                     color={'white'}
-                    name={getIconName('book', ['HomeScreen', 'ShortStoriesScreen', 'GenreScreen', 'LeaderboardScreen', 'StoryScreen'])}
-                    onPress={() => navigation.navigate('HomeScreen')}
+                    // name={getIconName('book', ['HomeScreen', 'ShortStoriesScreen', 'GenreScreen', 'LeaderboardScreen', 'StoryScreen'])}
+                    // onPress={() => navigation.navigate('HomeScreen')}
+                    name={getIconName('book', ['ShortStoriesScreen', 'GenreScreen', 'LeaderboardScreen', 'StoryScreen'])}
+                    onPress={() => navigation.navigate('ShortStoriesScreen')}
                 />
 
                 <Ionicons

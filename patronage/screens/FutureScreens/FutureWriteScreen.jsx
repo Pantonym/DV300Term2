@@ -1,9 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-const HomeScreen = ({ navigation }) => {
-
+const FutureWriteScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View>
@@ -13,32 +12,29 @@ const HomeScreen = ({ navigation }) => {
                 </Text>
 
                 <Text style={styles.titleText}>
-                    Read
+                    Write
                 </Text>
 
-                {/* ScrollView to future proof adding more story types */}
-                <ScrollView>
-                    {/* Short Stories Card */}
-                    <View style={styles.card}>
-                        <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('ShortStoriesScreen')}>
-                            <Text style={styles.cardText}>Short Stories</Text>
-                        </TouchableOpacity>
-                    </View>
+                {/* Write a short story */}
+                <View style={styles.card}>
+                    <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('WriteEditorScreen')}>
+                        <Text style={styles.cardText}>Short Stories</Text>
+                    </TouchableOpacity>
+                </View>
 
-                    {/* Future Implementation Card */}
-                    <View style={styles.card}>
-                        <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('UnderConstruction')}>
-                            <Text style={styles.cardText}>Coming Soon...</Text>
-                        </TouchableOpacity>
-                    </View>
+                {/* Future implementation */}
+                <View style={styles.card}>
+                    <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('UnderConstruction')}>
+                        <Text style={styles.cardText}>Coming Soon...</Text>
+                    </TouchableOpacity>
+                </View>
 
-                    {/* Future Implementation Card */}
-                    <View style={styles.card}>
-                        <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('UnderConstruction')}>
-                            <Text style={styles.cardText}>Coming Soon...</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
+                {/* Future implementation */}
+                <View style={styles.card}>
+                    <TouchableOpacity style={styles.pageLink} onPress={() => navigation.navigate('UnderConstruction')}>
+                        <Text style={styles.cardText}>Coming Soon...</Text>
+                    </TouchableOpacity>
+                </View>
 
             </View>
         </SafeAreaView>
@@ -93,4 +89,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default HomeScreen
+export default FutureWriteScreen

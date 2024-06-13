@@ -133,9 +133,6 @@ const ProfileScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <ScrollView>
                 <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
-                        <Image style={styles.imgBack} source={require("../assets/images/Arrow.png")} />
-                    </TouchableOpacity>
                     <Text style={styles.header}>Patronage</Text>
                 </View>
 

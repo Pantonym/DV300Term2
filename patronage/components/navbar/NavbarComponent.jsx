@@ -30,7 +30,7 @@ const NavbarComponent = () => {
         let newIndex;
         switch (currentRoute) {
             // All pages that match these names will have the index be set to 0
-            case 'HomeScreen':
+            // case 'HomeScreen':
             case 'ShortStoriesScreen':
             case 'GenreScreen':
             case 'LeaderboardScreen':
@@ -41,7 +41,7 @@ const NavbarComponent = () => {
                 newIndex = 0;
                 break;
             // All pages that match these names will have the index be set to 1
-            case 'WriteScreen':
+            // case 'WriteScreen':
             case 'WriteEditorScreen':
                 newIndex = 1;
                 break;
@@ -71,21 +71,26 @@ const NavbarComponent = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.navbar}>
 
+                {/* TODO: FIX Hoe icon not active on startup */}
                 {/* The item sends several pages through as params because in each of them this icon should be active as they are sub pages */}
                 <Ionicons
                     style={styles.navImage}
                     size={35}
                     color={'white'}
-                    name={getIconName('book', ['HomeScreen', 'ShortStoriesScreen', 'GenreScreen', 'LeaderboardScreen', 'StoryScreen', 'AuthorProfileScreen', 'AuthorStoriesScreen', 'AuthorSingleStoryScreen'])}
-                    onPress={() => navigation.navigate('HomeScreen')}
+                    // name={getIconName('book', ['HomeScreen', 'ShortStoriesScreen', 'GenreScreen', 'LeaderboardScreen', 'StoryScreen', 'AuthorProfileScreen', 'AuthorStoriesScreen', 'AuthorSingleStoryScreen'])}
+                    // onPress={() => navigation.navigate('HomeScreen')}
+                    name={getIconName('book', ['ShortStoriesScreen', 'GenreScreen', 'LeaderboardScreen', 'StoryScreen', 'AuthorProfileScreen', 'AuthorStoriesScreen', 'AuthorSingleStoryScreen'])}
+                    onPress={() => navigation.navigate('ShortStoriesScreen')}
                 />
 
                 <Ionicons
                     style={styles.navImage}
                     size={35}
                     color={'white'}
-                    name={getIconName('brush', ['WriteScreen', 'WriteEditorScreen'])}
-                    onPress={() => navigation.navigate('WriteScreen')}
+                    // name={getIconName('brush', ['WriteScreen', 'WriteEditorScreen'])}
+                    name={getIconName('brush', ['WriteEditorScreen'])}
+                    // onPress={() => navigation.navigate('WriteScreen')}
+                    onPress={() => navigation.navigate('WriteEditorScreen')}
                 />
 
                 <Ionicons

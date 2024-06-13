@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useCurrentRoute } from '../../context/CurrentRouteContext';
 
 // Screens:
-import HomeScreen from '../../screens/HomeScreen';
+// import HomeScreen from '../../screens/HomeScreen';
 import ShortStoriesScreen from '../../screens/ShortStoriesScreen';
 import UnderConstruction from '../../screens/UnderConstruction';
 import SearchScreen from '../../screens/SearchScreen';
@@ -49,7 +49,8 @@ const AdminStack = () => {
             <StatusBar style='auto' />
             <Stack.Navigator initialRouteName="HomeScreen">
                 {/* Index Screen */}
-                <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+                {/* <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} /> */}
+                <Stack.Screen name="ShortStoriesScreen" component={ShortStoriesScreen} options={{ headerShown: false }} />
 
                 {/* Search Screen */}
                 <Stack.Screen name="SearchScreen" component={SearchScreen} options={{ headerShown: false }} />
@@ -65,7 +66,7 @@ const AdminStack = () => {
                 <Stack.Screen name="UserSearchScreen" component={UserSearchScreen} options={{ headerShown: false }} />
 
                 {/* --Reading User Flow */}
-                <Stack.Screen name="ShortStoriesScreen" component={ShortStoriesScreen} options={{ headerShown: false }} />
+                {/* <Stack.Screen name="ShortStoriesScreen" component={ShortStoriesScreen} options={{ headerShown: false }} /> */}
                 <Stack.Screen name="GenreScreen" component={GenreScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="LeaderboardScreen" component={LeaderboardScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="StoryScreen" component={StoryScreen} options={{ headerShown: false }} />
