@@ -101,13 +101,6 @@ const LeaderboardScreen = ({ route, navigation }) => {
                 </Text>
 
                 <Text style={styles.noStoriesText}>Not enough eligible stories available for this leaderboard!</Text>
-
-                {/* FOR TESTING ONLY - REPUBLISH ORIGINAL ADAM'S MYSTERY STORY */}
-                {isAdmin ? (
-                    <TouchableOpacity style={styles.button} onPress={() => handleEndCompetition(genre)}>
-                        <Text style={styles.buttonText}> End Competition</Text>
-                    </TouchableOpacity>
-                ) : null}
             </SafeAreaView>
         );
     }

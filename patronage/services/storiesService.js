@@ -626,9 +626,7 @@ export const endCompetition = async (genre) => {
             }
 
             // Set the genre stories to an empty array
-            console.log(allStories[normalizedGenre]);
             allStories[normalizedGenre] = [];
-            console.log(allStories[normalizedGenre]);
 
             // Update the leaderboards collection
             await updateDoc(storyRef, allStories);
