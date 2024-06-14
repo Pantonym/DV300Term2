@@ -71,7 +71,7 @@
 
 <!-- Mockup -->
 ### Featured Mockup
-<img src="patronage/assets/readmeAssets/mockups/IntroMockup.jpg" alt="IntroMockup" style="height: 600px"/>
+<img src="patronage/assets/readmeAssets/mockups/IntroMockup.jpg" alt="IntroMockup" style="width: 800px"/>
 
 <!--PROJECT DESCRIPTION-->
 ### Project Description
@@ -411,7 +411,7 @@ if (docSnap.exists()) {
 * This was chosen as it eased the ending of competitions, moving away from an automated system to an administrator-controlled one. I have already shown how the user is tested ti see if they are an admin, but in addition to that the administrator has a different navbar to reflect different functionalities (search for users, etc).
 </br>
 
-   2. <b>Favourite Stories</b>
+    ii. <b>Favourite Stories</b>
 * A user can add a story to their favourites list for the duration of a leaderboard/competition. It adds the story ID to an array on the user's account, and then the Profile Page will loop through it to fetch each story by its ID, sending it to the Favourite Stories Page to display. 
 * In addition, if a competition ends and a story is no longer accessible, the page automatically removes the undefined item from the user's favourites list.
 ```
@@ -442,11 +442,11 @@ setFaves(validStories);
   * The undefined item is immediately removed without importing a function to ensure it is properly removed. This causes one of the inly exceptions to storing database-accessing functions in a service file.
 </br>
 
-   3. <b>Follow Authors</b>
+   iii. <b>Follow Authors</b>
 * The followed authors array is populated like the favourite stories array - an id is added to the array, and on the profile page it is called, a useState is populated and sent to the Followed Authors Screen for display
 </br>
 
-   4. <b>Search Stories/Users</b>
+   iv. <b>Search Stories/Users</b>
 * Users can search through stories, and admins can search through stories and users. Both searches function similarly, so only one will be shown:
 ```
 // Handle search functionality
@@ -460,7 +460,7 @@ setFaves(validStories);
 ```
 </br>
 
-   5. <b>Upload profile icon/change it and other profile data</b>
+   v. <b>Upload profile icon/change it and other profile data</b>
 * Authentication data is updated with Firestore functions:
 ```
 updatePassword(user, newPassword).then(() => ...
@@ -542,7 +542,7 @@ Patronage was designed to evoke the feelings of the old system of patronage - wh
 
   * User Journeys
   1. Full
-<img src="patronage/assets/readmeAssets/userJourneys/UserJourneyLarge.jpg" alt="Data Planning - User Journeys - Large" style="height: 600px">
+<img src="patronage/assets/readmeAssets/userJourneys/UserJourneyLarge.jpg" alt="Data Planning - User Journeys - Large" style="width: 800px">
 
   2. Excerpt 1
 <img src="patronage/assets/readmeAssets/userJourneys/UserJourneySmall1.jpg" alt="Data Planning - Object Mapping - User Journeys - Small1" style="height: 600px">
