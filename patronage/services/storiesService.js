@@ -599,11 +599,14 @@ export const endCompetition = async (genre) => {
             const normalizedGenre = genre.trim().toLowerCase();
             const genreStories = allStories[normalizedGenre] || [];
 
-            // Sort stories by average rating descending
-            genreStories.sort((a, b) => b.averageRating - a.averageRating);
+            // Filter stories by those with 5 or more ratings
+            const filteredStories = genreStories.filter(story => story.chapters[0].ratings.length >= 5);
+
+            // Sort filtered stories by average rating percentage descending
+            filteredStories.sort((a, b) => b.averageRating - a.averageRating);
 
             // Get the top 3 stories
-            const top3Stories = genreStories.slice(0, 3);
+            const top3Stories = filteredStories.slice(0, 3);
 
             // Get the current year
             const year = new Date().getFullYear();
