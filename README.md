@@ -161,7 +161,8 @@ The following installations are required if you do not clone the repository:
 2. Authentication Screens
 * Users are able to log in and out using Firebase Authentication:
 ```const userCredential = await signInWithEmailAndPassword(auth, email, password);
-await signOut(auth)```
+await signOut(auth)
+```
 </br>
 
 * They are also able to create new accounts:
