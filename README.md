@@ -167,42 +167,50 @@ await signOut(auth)
 </br>
 
 * They are also able to create new accounts:
-`createUserWithEmailAndPassword(auth, email, password)`
+```
+createUserWithEmailAndPassword(auth, email, password)
+```
 </br>
 
 * Persistence was implemented using AsyncStorage:
-`const authInstance = initializeAuth(app, {`
-`    persistence: getReactNativePersistence(AsyncStorage)`
-`});`
+```
+const authInstance = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage)
+});
+```
 </br>
 
 * Extra Functionality - Administrator User:
   * There is only one administrator account, so the following check was used to see ig the user is an admin:
-`const [isAdmin, setIsAdmin] = useState();`
-`useEffect(() => {`
-` const fetchUserData = async () => {`
-`   const email = await AsyncStorage.getItem('UserEmail');`
-`   setIsAdmin(email === "greatquill.patronage@gmail.com")`
-` };`
-` fetchUserData();`
-`}, []);`
+```
+const [isAdmin, setIsAdmin] = useState();
+useEffect(() => {
+ const fetchUserData = async () => {
+   const email = await AsyncStorage.getItem('UserEmail');
+   setIsAdmin(email === "greatquill.patronage@gmail.com")
+ };
+ fetchUserData();
+}, []);
+```
 </br>
 
 3. Competitions
    1. <b>Upload an entry</b>
 * Showcase all competitions the user can enter (genres within the story ype of Short Stories) - This was completed thorough a .map function that displayed all genres of the Short Stories collection. It is important to note that the database has already been future-proofed for added story types (poems, novels, etc), but to enhance the user experience for the current build, the user can only access short stories (writing and reading):
-`const renderGenres = () => {`
-`  return genres.map((genre, index) => (`
-`    <TouchableOpacity`
-`      key={index}`
-`      style={styles.genreCard}`
-`      // Navigate to the genre screen for this specific genre`
-`      onPress={() => navigation.navigate('GenreScreen', genre.value)}`
-`      >`
-`        <Text style={styles.genreText}>{genre.label}</Text>`
-`    </TouchableOpacity>`
-`  ));`
-`};`
+```
+const renderGenres = () => {
+  return genres.map((genre, index) => (
+    <TouchableOpacity
+      key={index}
+      style={styles.genreCard}
+      // Navigate to the genre screen for this specific genre
+      onPress={() => navigation.navigate('GenreScreen', genre.value)}
+      >
+        <Text style={styles.genreText}>{genre.label}</Text>
+    </TouchableOpacity>
+  ));
+};
+```
   * The same logic is used to display all leaderboards for the same genres.
 </br>
 
@@ -213,112 +221,124 @@ await signOut(auth)
 </br>
 
 * Generate a leaderboard item:
-`// Find the index of the story the user clicked on`
-` for (let k = 0; k < works.length; k++) {`
-`    if (works[k].title == storyTitle) {`
-`    // Set that work's completed value to true`
-`      works[k].completed = true`
-`    // build the leaderboard item`
-`      leaderboardItem = {`
-`      "id": works[k].id,`
-`      "authorID": userID,`
-`      "genre": works[k].genre,`
-`      "description": works[k].description,`
-`      "title": works[k].title,`
-`      "chapters": [{`
-`        "chapterTitle": works[k].title,`
-`        "chapterContent": works[k].chapters[0].chapterContent,`
-`        "comments": [],`
-`        "ratings": []`
-`      }]`
-`    }`
-`    chosenGenre = works[k].genre;`
-`    chosenGenre = chosenGenre.toLowerCase();`
-`  }`
-`}`
+```
+// Find the index of the story the user clicked on
+ for (let k = 0; k < works.length; k++) {
+    if (works[k].title == storyTitle) {
+    // Set that work's completed value to true
+      works[k].completed = true
+    // build the leaderboard item
+      leaderboardItem = {
+      "id": works[k].id,
+      "authorID": userID,
+      "genre": works[k].genre,
+      "description": works[k].description,
+      "title": works[k].title,
+      "chapters": [{
+        "chapterTitle": works[k].title,
+        "chapterContent": works[k].chapters[0].chapterContent,
+        "comments": [],
+        "ratings": []
+      }]
+    }
+    chosenGenre = works[k].genre;
+    chosenGenre = chosenGenre.toLowerCase();
+  }
+}
+```
 </br>
 
 * Save the data to the Leaderboards collection:
-`// Push the new leaderboard item to the genreData array`
-`genreData.push(leaderboardItem);`
-`  // Update the genreData in Firestore`
-`  await updateDoc(storiesRef, {`
-`    [chosenGenre]: genreData`
-`  });`
-`console.log("Genre data updated successfully");`
+```
+// Push the new leaderboard item to the genreData array
+genreData.push(leaderboardItem);
+  // Update the genreData in Firestore
+  await updateDoc(storiesRef, {
+    [chosenGenre]: genreData
+  });
+console.log("Genre data updated successfully");
+```
 
   * The competitions do not need to be monitored to see if they are open or closed as they will always be open.
 </br>
 
-  1. <b>Vote on an entry</b>
+    2. <b>Vote on an entry</b>
 * The page will first test to see if the user is allowed to vote: It will compare the author's ID with the user's, and  if they are the same, the user cannot vote. It will also test to see if the user is an Admin, in which case they cannot vote either.
 * The page will then test to see if the user has already voted on this story (by looping through the votes array and flagging if it sees the logged in user's ID).
 * Finally, if the user is eligible for voting, they can choose an amount out of 10 (represented by stars) and submit their rating:
-`// Handle rating function`
-`  const handleRating = async () => {`
-`    // Convert the string to an integer`
-`    const ratingValue = parseInt(rating, 10);`
-`      // Validation`
-`      // --If the rating is less than 1, more than 10 or not a number at all`
-`      if (ratingValue < 1 || ratingValue > 10 || isNaN(ratingValue)) {`
-`        Alert.alert('Invalid Rating', 'Please enter a rating between 1 and 10.');`
-`        // Exit the function if there is an error so it does not try to upload invalid information.`
-`        return;`
-`      }`
-`      try {`
-`        // Show loader`
-`        setLoadingVisible(true);`
-`        // Submit the data to add the rating`
-`        const result = await rateStory(story.authorID, ratingValue, story.title, story.genre);`
-`      if (result) {`
-`        Alert.alert('Success', 'Your rating has been submitted.');`
-`        // rerender the stars`
-`        setReRender(reRender === false);`
-`      } else {`
-`        Alert.alert('Error', 'You have already voted on this story.');`
-`      }`
-`    } catch (error) {`
-`      console.error('Error rating the story:', error.message);`
-`      Alert.alert('Error', 'Failed to rate the story. Please try again later.');`
-`    } finally {`
-`      // Hide loader`
-`      setLoadingVisible(false);`
-`  }`
-`};`
+```
+// Handle rating function
+  const handleRating = async () => {
+    // Convert the string to an integer
+    const ratingValue = parseInt(rating, 10);
+      // Validation
+      // --If the rating is less than 1, more than 10 or not a number at all
+      if (ratingValue < 1 || ratingValue > 10 || isNaN(ratingValue)) {
+        Alert.alert('Invalid Rating', 'Please enter a rating between 1 and 10.');
+        // Exit the function if there is an error so it does not try to upload invalid information.
+        return;
+      }
+      try {
+        // Show loader
+        setLoadingVisible(true);
+        // Submit the data to add the rating
+        const result = await rateStory(story.authorID, ratingValue, story.title, story.genre);
+      if (result) {
+        Alert.alert('Success', 'Your rating has been submitted.');
+        // rerender the stars
+        setReRender(reRender === false);
+      } else {
+        Alert.alert('Error', 'You have already voted on this story.');
+      }
+    } catch (error) {
+      console.error('Error rating the story:', error.message);
+      Alert.alert('Error', 'Failed to rate the story. Please try again later.');
+    } finally {
+      // Hide loader
+      setLoadingVisible(false);
+  }
+};
+```
 </br>
+    iii. <b>View Competition & Results</b>
 
-  1. <b>View Competition & Results</b>
 * The user can view the competition by viewing the leaderboards page, which displays the top 5 highest ranking stories. It will only display the leaderboard if there are 5 stories with at least 5 votes each. This prevents users with 1 vote from winning due to having a higher percentage than others with more votes.
 * To view the results, the user can view other profiles to see their awards. Only the top 3 stories will give users awards:
-`<FlatList`
-`  data={stories}`
-`  keyExtractor={(item) => item.id}`
-`  renderItem={({ item, index }) => (`
-`    <View key={index} style={styles.storyCard}>`
-`      ...`
-`      <View style={styles.ratingHolder}>`
-`        <Text style={styles.averageRating}>{calculateAverageRating(item.chapters[0].ratings).toFixed(1)}%</Text>`
-`      </View>`
+```
+<FlatList
+  data={stories}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item, index }) => (
+    <View key={index} style={styles.storyCard}>
+      ...
+      <View style={styles.ratingHolder}>
+        <Text style={styles.averageRating}>{calculateAverageRating(item.chapters[0].ratings).toFixed(1)}%</Text>
+      </View>
+```
 </br>
 
 * The rating is also visualised using a percentage graph, which uses the rating as a percentage to declare the width of the graph.
-`<View`
-`  style={{`
-`    height: 20,`
-`    backgroundColor: '#CAA775',`
-`    width: '${calculateAverageRating(item.chapters[0].ratings)}%',`
-`    alignSelf: 'start',`
-`    borderTopRightRadius: 10,`
-`    borderBottomRightRadius: 10`
-`  }}`
-`/>`
+```
+<View
+  style={{
+    height: 20,
+    backgroundColor: '#CAA775',
+    width: '${calculateAverageRating(item.chapters[0].ratings)}%',
+    alignSelf: 'start',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10
+  }}
+/>
+```
 
 * The administrator can end a competition from the leaderboard screen
-`{isAdmin ? (`
-`  <TouchableOpacity style={styles.button} onPress={() => handleEndCompetition(genre)}>`
-`    <Text style={styles.buttonText}> End Competition</Text>`
-`  </TouchableOpacity>`
-`) : null}`
+```
+{isAdmin ? (
+  <TouchableOpacity style={styles.button} onPress={() => handleEndCompetition(genre)}>
+    <Text style={styles.buttonText}> End Competition</Text>
+  </TouchableOpacity>
+) : null}
+```
 
   * Service function:
 `export const endCompetition = async (genre) => {`
