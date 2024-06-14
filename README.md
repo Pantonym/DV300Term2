@@ -261,7 +261,7 @@ console.log("Genre data updated successfully");
 
   * The competitions do not need to be monitored to see if they are open or closed as they will always be open.
 </br>
-    iii. <b>Vote on an entry</b>
+    ii. <b>Vote on an entry</b>
 
 * The page will first test to see if the user is allowed to vote: It will compare the author's ID with the user's, and  if they are the same, the user cannot vote. It will also test to see if the user is an Admin, in which case they cannot vote either.
 * The page will then test to see if the user has already voted on this story (by looping through the votes array and flagging if it sees the logged in user's ID).
@@ -341,63 +341,69 @@ console.log("Genre data updated successfully");
 ```
 
   * Service function:
-`export const endCompetition = async (genre) => {`
-`  try {`
-`    ...`
-`    genreStories.sort((a, b) => b.averageRating - a.averageRating);`
-`    const top3Stories = genreStories.slice(0, 3);`
-`    const year = new Date().getFullYear();`
-`    ...`
-`      // Add story to previousLeaders collection under genre/year`
-`      const previousLeaderRef = doc(db, 'previousLeaders/${normalizedGenre}/${year.toString()}/${story.id}');`
-`      await setDoc(previousLeaderRef, {`
-`        ...story,`
-`        place,`
-`        year`
-`      });`
-`      // Add award to the user`
-`      await addAward(story.authorID, genre, place, year.toString());`
-`      }`
-`    // Set the genre stories to an empty array`
-`    allStories[normalizedGenre] = [];`
-`    // Update the leaderboards collection`
-`    await updateDoc(storyRef, allStories);`
-`    ...`
+```
+export const endCompetition = async (genre) => {
+  try {
+    ...
+    genreStories.sort((a, b) => b.averageRating - a.averageRating);
+    const top3Stories = genreStories.slice(0, 3);
+    const year = new Date().getFullYear();
+    ...
+      // Add story to previousLeaders collection under genre/year
+      const previousLeaderRef = doc(db, 'previousLeaders/${normalizedGenre}/${year.toString()}/${story.id}');
+      await setDoc(previousLeaderRef, {
+        ...story,
+        place,
+        year
+      });
+      // Add award to the user
+      await addAward(story.authorID, genre, place, year.toString());
+      }
+    // Set the genre stories to an empty array
+    allStories[normalizedGenre] = [];
+    // Update the leaderboards collection
+    await updateDoc(storyRef, allStories);
+    ...
+```
 </br>
 
 * Winners are awarded with awards, a card applied to their profile that displays either gold, silver or bronze. It also displays the genre they won an award for, as well as the year they won it.
-`export const addAward = async (userID, selectedGenre, selectedPlace, selectedYear) => {`
-`  ...`
-`  var data = docSnap.data();`
-`    data.awards.push({`
-`      "genre": selectedGenre,`
-`      "place": selectedPlace,`
-`      "year": selectedYear`
-`    })`
-`  await updateDoc(docRef, data);`
-`  } else {`
-`    console.log("No such document!");`
-`  }`
-`}`
+```
+export const addAward = async (userID, selectedGenre, selectedPlace, selectedYear) => {
+  ...
+  var data = docSnap.data();
+    data.awards.push({
+      "genre": selectedGenre,
+      "place": selectedPlace,
+      "year": selectedYear
+    })
+  await updateDoc(docRef, data);
+  } else {
+    console.log("No such document!");
+  }
+}
+```
 <br>
 
 4. Project Planning Functionality - Comments
 * The comment is simply pushed into the array of comments on the story, saving the commenter's id and the content of the comment.
-`...`
-`if (docSnap.exists()) {`
-`  const allStories = docSnap.data();`
-`  for (const genre in allStories) {`
-`    const stories = allStories[genre];`
-`    for (let story of stories) {`
-`      if (story.id === storyID) {`
-`      // Add the comment to the specified chapter (future proofing for other story types with more than one chapter)`
-`      story.chapters[chapterIndex].comments.push(comment);`
-`      // Update the Firestore document`
-`      await updateDoc(storiesRef, { [genre]: allStories[genre] });`
-`      return true;`
-`    }`
-`  }`
-`}`
+```
+...
+if (docSnap.exists()) {
+  const allStories = docSnap.data();
+  for (const genre in allStories) {
+    const stories = allStories[genre];
+    for (let story of stories) {
+      if (story.id === storyID) {
+      // Add the comment to the specified chapter (future proofing for other story types with more than one chapter)
+      story.chapters[chapterIndex].comments.push(comment);
+      // Update the Firestore document
+      await updateDoc(storiesRef, { [genre]: allStories[genre] });
+      return true;
+    }
+  }
+}
+```
 </br>
 
 5. Advanced functionality:
@@ -408,29 +414,31 @@ console.log("Genre data updated successfully");
    2. <b>Favourite Stories</b>
 * A user can add a story to their favourites list for the duration of a leaderboard/competition. It adds the story ID to an array on the user's account, and then the Profile Page will loop through it to fetch each story by its ID, sending it to the Favourite Stories Page to display. 
 * In addition, if a competition ends and a story is no longer accessible, the page automatically removes the undefined item from the user's favourites list.
-`if (data.favouriteStories) {`
-`  const validStories = [];`
-`  const invalidStoryIDs = [];`
-`  for (const storyID of data.favouriteStories) {`
-`  const storyData = await getShortStoryByID(storyID);`
-`  if (storyData) {`
-`    validStories.push({ ...storyData, id: storyID });`
-`  } else {`
-`    console.log('Story not found:', storyID);`
-`    invalidStoryIDs.push(storyID);`
-`    // Immediately remove the invalid story from the user's favourite stories`
-`    const userRef = doc(db, 'users', userID);`
-`    await updateDoc(userRef, {`
-`      favouriteStories: data.favouriteStories.filter(id => id !== storyID)`
-`    });`
-`    // Update the data object to reflect the change`
-`    data.favouriteStories = data.favouriteStories.filter(id => id !== storyID);`
-`  }`
-`}`
-`if (invalidStoryIDs.length > 0) {`
-`    console.log('Removed invalid stories:', invalidStoryIDs.join(', '));`
-`}`
-`setFaves(validStories);`
+```
+if (data.favouriteStories) {
+  const validStories = [];
+  const invalidStoryIDs = [];
+  for (const storyID of data.favouriteStories) {
+  const storyData = await getShortStoryByID(storyID);
+  if (storyData) {
+    validStories.push({ ...storyData, id: storyID });
+  } else {
+    console.log('Story not found:', storyID);
+    invalidStoryIDs.push(storyID);
+    // Immediately remove the invalid story from the user's favourite stories
+    const userRef = doc(db, 'users', userID);
+    await updateDoc(userRef, {
+      favouriteStories: data.favouriteStories.filter(id => id !== storyID)
+    });
+    // Update the data object to reflect the change
+    data.favouriteStories = data.favouriteStories.filter(id => id !== storyID);
+  }
+}
+if (invalidStoryIDs.length > 0) {
+    console.log('Removed invalid stories:', invalidStoryIDs.join(', '));
+}
+setFaves(validStories);
+```
   * The undefined item is immediately removed without importing a function to ensure it is properly removed. This causes one of the inly exceptions to storing database-accessing functions in a service file.
 </br>
 
@@ -440,57 +448,65 @@ console.log("Genre data updated successfully");
 
    4. <b>Search Stories/Users</b>
 * Users can search through stories, and admins can search through stories and users. Both searches function similarly, so only one will be shown:
-`// Handle search functionality`
-`  const handleSearch = (text) => {`
-`    setSearchQuery(text);`
-`    const filtered = shortStories.filter(item =>`
-`      item.title.toLowerCase().includes(text.toLowerCase())`
-`    );`
-`  setFilteredData(filtered);`
-`};`
+```
+// Handle search functionality
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    const filtered = shortStories.filter(item =>
+      item.title.toLowerCase().includes(text.toLowerCase())
+    );
+  setFilteredData(filtered);
+};
+```
 </br>
 
    5. <b>Upload profile icon/change it and other profile data</b>
 * Authentication data is updated with Firestore functions:
-`updatePassword(user, newPassword).then(() => ...`
+```
+updatePassword(user, newPassword).then(() => ...
+```
 </br>
 
 * For the profile icon, an image is uploaded and the uri is saved to the database while the image is saved to FireStore
-`export const changeUserProfileIcon = async (uri, userID) => {`
-`    const docRef = doc(db, "users", userID);`
-`    const docSnap = await getDoc(docRef);`
-`    if (docSnap.exists()) {`
-`        const userData = docSnap.data();`
-`        var userImg = userData.userImg;`
-`        // Add the new story to the works array`
-`        userImg = uri;`
-`        // Update the user's document in Firestore with the new works array`
-`        await setDoc(docRef, { ...userData, userImg });`
-`        console.log("Profile Changed Successfully");`
-`    } else {`
-`        console.log("No such document!");`
-`    }`
-`}`
+```
+export const changeUserProfileIcon = async (uri, userID) => {
+    const docRef = doc(db, "users", userID);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        const userData = docSnap.data();
+        var userImg = userData.userImg;
+        // Add the new story to the works array
+        userImg = uri;
+        // Update the user's document in Firestore with the new works array
+        await setDoc(docRef, { ...userData, userImg });
+        console.log("Profile Changed Successfully");`
+    } else {
+        console.log("No such document!");
+    }
+}
+```
   * FireStore upload:
-`export const handleImageUpload = async (uri, fileName) => {`
-`    const blob = await new Promise((resolve, reject) => {`
-`        const xhr = new XMLHttpRequest();`
-`        xhr.onload = function () {`
-`            resolve(xhr.response);`
-`        }`
-`        xhr.onerror = function (e) {`
-`            console.log(e);`
-`            reject(new TypeError("Network request failed"));`
-`        }`
-`        xhr.responseType = "blob";`
-`        xhr.open('GET', uri, true);`
-`        xhr.send(null);`
-`    })`
-`    const imageRef = ref(storage, fileName);`
-`    const uploadResult = await uploadBytes(imageRef, blob);`
-`    await changeUserProfileIcon(await getDownloadURL(imageRef), fileName)`
-`    blob.close();`
-`}`
+```
+export const handleImageUpload = async (uri, fileName) => {
+    const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            resolve(xhr.response);
+        }
+        xhr.onerror = function (e) {
+            console.log(e);
+            reject(new TypeError("Network request failed"));
+        }
+        xhr.responseType = "blob";
+        xhr.open('GET', uri, true);
+        xhr.send(null);
+    })
+    const imageRef = ref(storage, fileName);
+    const uploadResult = await uploadBytes(imageRef, blob);
+    await changeUserProfileIcon(await getDownloadURL(imageRef), fileName)
+    blob.close();
+}
+```
 
 <!-- Development PROCESS -->
 ## Development Process
