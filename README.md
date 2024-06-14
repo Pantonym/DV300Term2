@@ -261,8 +261,8 @@ console.log("Genre data updated successfully");
 
   * The competitions do not need to be monitored to see if they are open or closed as they will always be open.
 </br>
+    iii. <b>Vote on an entry</b>
 
-    2. <b>Vote on an entry</b>
 * The page will first test to see if the user is allowed to vote: It will compare the author's ID with the user's, and  if they are the same, the user cannot vote. It will also test to see if the user is an Admin, in which case they cannot vote either.
 * The page will then test to see if the user has already voted on this story (by looping through the votes array and flagging if it sees the logged in user's ID).
 * Finally, if the user is eligible for voting, they can choose an amount out of 10 (represented by stars) and submit their rating:
