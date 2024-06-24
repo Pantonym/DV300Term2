@@ -23,6 +23,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
     const storyContent = story.chapters[0].chapterContent;
     const storyDescription = story.description;
     const storyGenre = story.genre;
+    const storyID = story.id;
 
     // Genre data
     const genres = arrGenres;
@@ -47,7 +48,7 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
         var newDescription = chapterDescription;
         var newGenre = selectedGenre;
 
-        await updateStory(userID, storyTitle, newContent, newTitle, newDescription, newGenre);
+        await updateStory(userID, storyID, newContent, newTitle, newDescription, newGenre);
 
         // Remove editing inputs
         setIsEditing(false);

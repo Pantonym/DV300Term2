@@ -7,9 +7,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 const GenreScreen = ({ route, navigation }) => {
     // Parameters
     // --For display reasons (It should be displayed oin a correct grammatical way)
-    const activeGenre = route.params;
+    const { genre: activeGenre } = route.params || {};
     // --For database reasons (it is lowercase in the database)
-    const activeGenreParam = activeGenre.toLowerCase();
+    const activeGenreParam = activeGenre ? activeGenre.toLowerCase() : '';
 
     // All stories information
     const [stories, setStories] = useState([]);
@@ -21,27 +21,30 @@ const GenreScreen = ({ route, navigation }) => {
 
     // Change what is displayed when a different genre is selected. This will rerender the data with the new genre as a filter
     useEffect(() => {
+        if (!activeGenreParam) {
+            console.error('No genre provided');
+            setLoading(false);
+            return;
+        }
+    
         // Function to fetch the stories
         const fetchStories = async () => {
             // Activate loader
             setLoading(true);
-
+    
             try {
                 // Get the data
                 const data = await getShortStoriesByGenre(activeGenreParam);
                 if (data) {
-                    // Map the stories
-                    const stories = data.flatMap(story => story || []);
                     // --Set the stories
-                    setStories(stories);
-
+                    setStories(data);
+    
                     // Map the usernames 
                     const usernames = await Promise.all(
-                        stories.map(story => getAuthorUsername(story.authorID))
+                        data.map(story => getAuthorUsername(story.authorID))
                     );
                     // Set the usernames
                     setAuthorUsernames(usernames);
-
                 } else {
                     console.log('No Data');
                     setStories([]);
@@ -54,7 +57,7 @@ const GenreScreen = ({ route, navigation }) => {
                 setLoading(false);
             }
         };
-
+    
         // Activate the function
         fetchStories();
     }, [activeGenreParam]);
@@ -126,7 +129,7 @@ const GenreScreen = ({ route, navigation }) => {
             <View>
                 <Text style={styles.genreTitle}>{activeGenre}</Text>
             </View>
-            
+
             <ScrollView contentContainerStyle={styles.storiesContainer}>
                 {renderStories()}
             </ScrollView>

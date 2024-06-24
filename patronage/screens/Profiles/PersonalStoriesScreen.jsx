@@ -51,7 +51,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
     }
 
     // Confirm that the user wants to publish a story
-    const confirmPublish = (clickedTitle) => {
+    const confirmPublish = (clickedID) => {
         Alert.alert(
             "Confirm Publish",
             "Are you sure you want to publish this story? Future edits here will not be reflected on the leaderboards.",
@@ -63,7 +63,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
                 },
                 {
                     text: "OK",
-                    onPress: () => handlePublish(clickedTitle)
+                    onPress: () => handlePublish(clickedID)
                 }
             ],
             { cancelable: false }
@@ -71,7 +71,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
     };
 
     // Confirm that the user wants to unpublish a story
-    const confirmUnPublish = (clickedTitle) => {
+    const confirmUnPublish = (clickedID) => {
         Alert.alert(
             "Confirm Unpublish",
             "Are you sure you want to unpublish this story? All votes and comments will be lost.",
@@ -83,7 +83,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
                 },
                 {
                     text: "OK",
-                    onPress: () => handleUnPublish(clickedTitle)
+                    onPress: () => handleUnPublish(clickedID)
                 }
             ],
             { cancelable: false }
@@ -91,7 +91,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
     };
 
     // Confirm that the user wants to delete a story
-    const confirmDelete = (clickedTitle) => {
+    const confirmDelete = (clickedID) => {
         Alert.alert(
             "Confirm Delete",
             "Are you sure you want to delete this story? It will not be recoverable.",
@@ -103,7 +103,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
                 },
                 {
                     text: "OK",
-                    onPress: () => handleDelete(clickedTitle)
+                    onPress: () => handleDelete(clickedID)
                 }
             ],
             { cancelable: false }
@@ -112,6 +112,7 @@ const PersonalStoriesScreen = ({ navigation }) => {
 
     // Truncate the text
     const truncateText = (text, length) => {
+        if (!text) return ''; // Return an empty string if text is null or undefined
         if (text.length <= length) return text;
         const truncated = text.substring(0, length);
         const lastSpaceIndex = truncated.lastIndexOf(' ');
@@ -137,9 +138,9 @@ const PersonalStoriesScreen = ({ navigation }) => {
 
             <ScrollView>
                 {/* Map all of the stories */}
-                {stories.map((story, index) => (
+                {stories.map((story) => (
                     <TouchableOpacity
-                        key={index}
+                        key={story.id} // Use story.id as the unique key
                         style={styles.storyContainer}
                         // Go to the single story screen with this story's information
                         onPress={() => navigation.navigate('SingleStoryEditorScreen', { story, refreshStories: fetchStories })}>
@@ -153,21 +154,21 @@ const PersonalStoriesScreen = ({ navigation }) => {
                                 <View style={{ flexDirection: 'row' }}>
                                     <TouchableOpacity
                                         style={styles.btnDelete}
-                                        onPress={() => confirmDelete(story.title)}>
+                                        onPress={() => confirmDelete(story.id)}>
                                         <Text style={styles.buttonText}>Delete Story</Text>
                                     </TouchableOpacity>
 
-                                    {/* Change the button depending on wether or not the story is completed */}
+                                    {/* Change the button depending on whether or not the story is completed */}
                                     {story.completed ? (
                                         <TouchableOpacity
                                             style={styles.btnUnPublish}
-                                            onPress={() => confirmUnPublish(story.title)}>
+                                            onPress={() => confirmUnPublish(story.id)}>
                                             <Text style={styles.buttonText}>Unpublish Story</Text>
                                         </TouchableOpacity>
                                     ) : (
                                         <TouchableOpacity
                                             style={styles.btnPublish}
-                                            onPress={() => confirmPublish(story.title)}>
+                                            onPress={() => confirmPublish(story.id)}>
                                             <Text style={styles.buttonText}>Publish Story</Text>
                                         </TouchableOpacity>
                                     )}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { addComment, deleteComment, getAuthorUsername, getShortStoryID, rateStory } from '../../services/storiesService';
+import { addComment, deleteComment, getAuthorUsername, rateStory } from '../../services/storiesService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FavouriteStory, UnFavouriteStory, getUser } from '../../services/accountService';
@@ -166,7 +166,7 @@ const StoryScreen = ({ route, navigation }) => {
             setLoadingVisible(true);
 
             // Submit the data to add the rating
-            const result = await rateStory(story.authorID, ratingValue, story.title, story.genre);
+            const result = await rateStory(story.authorID, ratingValue, story.genre, story.id);
 
             if (result) {
                 Alert.alert('Success', 'Your rating has been submitted.');
@@ -204,7 +204,7 @@ const StoryScreen = ({ route, navigation }) => {
 
         try {
             setLoadingVisible(true);
-            const result = await addComment(story.id, 0, comment);
+            const result = await addComment(story.id, 0, comment, story.genre);
             if (result) {
                 Alert.alert('Success', 'Your comment has been added.');
                 story.chapters[0].comments.push(comment);
@@ -224,7 +224,7 @@ const StoryScreen = ({ route, navigation }) => {
     const handleDeleteComment = async (commentIndex) => {
         try {
             setLoadingVisible(true);
-            const result = await deleteComment(story.id, 0, commentIndex); // Assuming chapterIndex is 0
+            const result = await deleteComment(story.id, 0, commentIndex, story.genre);
             if (result) {
                 Alert.alert('Success', 'Your comment has been deleted.');
                 story.chapters[0].comments.splice(commentIndex, 1);
@@ -280,7 +280,7 @@ const StoryScreen = ({ route, navigation }) => {
 
     const handleFavourite = async (authorID, storyTitle) => {
         setLoadingVisible(true);
-        const storyID = await getShortStoryID(authorID, storyTitle);
+        const storyID = story.id;
 
         await FavouriteStory(storyID, userID);
         setFavouriteStatus(true)
@@ -289,7 +289,7 @@ const StoryScreen = ({ route, navigation }) => {
 
     const handleUnFavourite = async (authorID, storyTitle) => {
         setLoadingVisible(true);
-        const storyID = await getShortStoryID(authorID, storyTitle);
+        const storyID = story.id;
 
         await UnFavouriteStory(storyID, userID);
         setFavouriteStatus(false)

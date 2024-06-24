@@ -572,6 +572,7 @@ Patronage was designed to evoke the feelings of the old system of patronage - wh
 <!-- Future Implementation -->
 ### Future Implementation
 * Refactor the database to use subcollections.
+  * Refactored the users database, as well as adding years for every leaderboard so that previous entries are not lost each year.
 * Allow other story types to be added, such as poems or long stories.
 * Allow multiple chapters to be added to stories, even short stories.
 * Add another collection that stores published stories without relying on the leaderboards collection, allowing all past stories to be saved (not just the winning three stories).

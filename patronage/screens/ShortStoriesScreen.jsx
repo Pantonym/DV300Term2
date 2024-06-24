@@ -15,7 +15,7 @@ const ShortStoriesScreen = ({ navigation }) => {
                 key={index}
                 style={styles.genreCard}
                 // Navigate to the genre screen for this specific genre
-                onPress={() => navigation.navigate('GenreScreen', genre.value)}
+                onPress={() => navigation.navigate('GenreScreen', { genre: genre.value })}
             >
                 <Text style={styles.genreText}>{genre.label}</Text>
             </TouchableOpacity>

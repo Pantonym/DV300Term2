@@ -18,16 +18,18 @@ export const getUser = async (userID) => {
 
 // Create user from data, using the ID generated from Authentication so auto generated ID's are not used.
 export const createUser = async (data, userID) => {
-
     try {
-        await setDoc(doc(db, "users", userID), data);
-        console.log("Created user: ", userID)
-    } catch (error) {
-        console.log(error)
-        console.log("error data: ", data)
-    }
+        const userDocRef = doc(db, "users", userID);
 
-}
+        // Initialize the user document with the provided data
+        await setDoc(userDocRef, data);
+
+        console.log("Created user: ", userID);
+    } catch (error) {
+        console.log(error);
+        console.log("error data: ", data);
+    }
+};
 
 // Change the user's profile icon, receiving the uri to change the image link. It finds the correct user through userID
 export const changeUserProfileIcon = async (uri, userID) => {
@@ -169,42 +171,50 @@ export const unFollowAuthor = async (authorID, userID) => {
 
 // Favourite a Story
 export const FavouriteStory = async (storyID, userID) => {
-    const docRef = doc(db, "users", userID);
-    const docSnap = await getDoc(docRef);
+    try {
+        const userRef = doc(db, "users", userID);
+        const userDoc = await getDoc(userRef);
 
-    if (docSnap.exists()) {
-        const userData = docSnap.data();
-        let favouriteStories = userData.favouriteStories || [];
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            let favouriteStories = userData.favouriteStories || [];
 
-        if (!favouriteStories.includes(storyID)) {
-            favouriteStories.push(storyID);
-            await setDoc(docRef, { ...userData, favouriteStories });
-            console.log("Story favourited successfully");
+            if (!favouriteStories.includes(storyID)) {
+                favouriteStories.push(storyID);
+                await setDoc(userRef, { ...userData, favouriteStories });
+                console.log("Story favourited successfully");
+            } else {
+                console.log("Story is already favourited");
+            }
         } else {
-            console.log("Story is already favourited");
+            console.log("No such user document!");
         }
-    } else {
-        console.log("No such document!");
+    } catch (error) {
+        console.error("Error favouriting story: ", error);
     }
-}
+};
 
 // Unfavourite a story
 export const UnFavouriteStory = async (storyID, userID) => {
-    const docRef = doc(db, "users", userID);
-    const docSnap = await getDoc(docRef);
+    try {
+        const userRef = doc(db, "users", userID);
+        const userDoc = await getDoc(userRef);
 
-    if (docSnap.exists()) {
-        const userData = docSnap.data();
-        let favouriteStories = userData.favouriteStories || [];
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            let favouriteStories = userData.favouriteStories || [];
 
-        if (favouriteStories.includes(storyID)) {
-            favouriteStories = favouriteStories.filter(id => id !== storyID);
-            await setDoc(docRef, { ...userData, favouriteStories });
-            console.log("Story unfavourited successfully");
+            if (favouriteStories.includes(storyID)) {
+                favouriteStories = favouriteStories.filter(id => id !== storyID);
+                await setDoc(userRef, { ...userData, favouriteStories });
+                console.log("Story unfavourited successfully");
+            } else {
+                console.log("Story is not favourited");
+            }
         } else {
-            console.log("Story is not favourited");
+            console.log("No such user document!");
         }
-    } else {
-        console.log("No such document!");
+    } catch (error) {
+        console.error("Error unfavouriting story: ", error);
     }
-}
+};

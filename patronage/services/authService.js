@@ -34,10 +34,8 @@ export const handleRegister = (email, password, username) => {
                 "username": username,
                 "email": email,
                 "userImg": "https://firebasestorage.googleapis.com/v0/b/patronage-31cea.appspot.com/o/defaultIcon.png?alt=media&token=dda3538d-50f5-40b0-bb47-e16d5bbfaa07",
-                "awards": [],
-                "works": [],
-                "favouriteStories": [],
-                "following": []
+                "awards": []
+                // "works", "favouriteStories", and "following" will be initialized as empty subcollections
             };
 
             await createUser(userData, user.uid);

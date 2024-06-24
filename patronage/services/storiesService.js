@@ -1,28 +1,22 @@
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addAward } from "./accountService";
+import { arrGenres } from "../context/genres";
 
 // create a new story
 export const handleStoryCreate = async (storyDetails, userID) => {
     try {
-        const docRef = doc(db, "users", userID);
-        const docSnap = await getDoc(docRef);
+        const userDocRef = doc(db, "users", userID);
 
-        if (docSnap.exists()) {
-            const userData = docSnap.data();
-            const works = userData.works || [];
+        // Create a subcollection for works within the user's document and add the story
+        const worksCollectionRef = collection(userDocRef, "works");
+        const newStoryDocRef = doc(worksCollectionRef, storyDetails.id);
 
-            // Add the new story to the works array
-            works.push(storyDetails);
+        // Set the story details in the Firestore
+        await setDoc(newStoryDocRef, storyDetails);
 
-            // Update the user's document in Firestore with the new works array
-            await setDoc(docRef, { ...userData, works });
-
-            console.log("Story added successfully");
-        } else {
-            console.log("No such document!");
-        }
+        console.log("Story added successfully");
     } catch (error) {
         console.error("Error adding story: ", error);
     }
@@ -31,16 +25,15 @@ export const handleStoryCreate = async (storyDetails, userID) => {
 // fetch user stories
 export const fetchUserStories = async (userID) => {
     try {
-        const docRef = doc(db, "users", userID);
-        const docSnap = await getDoc(docRef);
+        const worksCollectionRef = collection(db, "users", userID, "works");
+        const querySnapshot = await getDocs(worksCollectionRef);
 
-        if (docSnap.exists()) {
-            const userData = docSnap.data();
-            return userData.works || [];
-        } else {
-            console.log("No such document!");
-            return [];
-        }
+        let stories = [];
+        querySnapshot.forEach((doc) => {
+            stories.push(doc.data());
+        });
+
+        return stories;
     } catch (error) {
         console.error("Error fetching stories: ", error);
         return [];
@@ -48,247 +41,173 @@ export const fetchUserStories = async (userID) => {
 };
 
 // Delete a work
-export const deleteStory = async (userID, storyTitle) => {
-    console.log('Delete: ', userID, storyTitle);
+export const deleteStory = async (userID, storyID) => {
+    console.log('Delete: ', userID, storyID);
 
     try {
-        const docRef = doc(db, "users", userID);
-        const docSnap = await getDoc(docRef);
+        const worksCollectionRef = collection(db, "users", userID, "works");
+        const querySnapshot = await getDocs(worksCollectionRef);
 
-        if (docSnap.exists()) {
-            const userData = docSnap.data();
-            var works = userData.works;
-            var newWorks = [];
-
-            // Find the index of the story the user clicked on
-            for (let k = 0; k < works.length; k++) {
-
-                if (works[k].title == storyTitle) {
-                    // Skip the story the user wants to delete
-                    console.log('Found Item To Delete')
-                } else {
-                    // push all other works
-                    newWorks.push(works[k])
-                }
-
+        let storyDocId = null;
+        querySnapshot.forEach((doc) => {
+            if (doc.data().id === storyID) {
+                storyDocId = doc.id;
             }
+        });
 
-            works = newWorks;
-
-            // Update the user's document in Firestore with the new works array
-            await setDoc(docRef, { ...userData, works });
-
+        if (storyDocId) {
+            const storyDocRef = doc(db, "users", userID, "works", storyDocId);
+            await deleteDoc(storyDocRef);
             console.log("Story deleted successfully");
         } else {
-            console.log("No such document!");
+            console.log("No such story found!");
         }
     } catch (error) {
-        console.error("Error publishing story: ", error);
+        console.error("Error deleting story: ", error);
     }
-}
+};
 
 // Publish a work
-export const publishStory = async (userID, storyTitle) => {
-    console.log('Publish: ', userID, storyTitle);
+export const publishStory = async (userID, storyID) => {
+    console.log('Publish: ', userID, storyID);
 
     try {
-        const docRef = doc(db, "users", userID);
-        const docSnap = await getDoc(docRef);
+        const userDocRef = doc(db, "users", userID);
+        const worksCollectionRef = collection(userDocRef, "works");
+        const querySnapshot = await getDocs(worksCollectionRef);
 
-        if (docSnap.exists()) {
-            const userData = docSnap.data();
-            var works = userData.works;
-            var leaderboardItem = []
-            var chosenGenre = "";
+        let chosenGenre = "";
+        let leaderboardItem = null;
+        const currentYear = new Date().getFullYear().toString();
 
-            // Find the index of the story the user clicked on
-            for (let k = 0; k < works.length; k++) {
+        console.log('Number of works found: ', querySnapshot.size);
 
-                if (works[k].title == storyTitle) {
-                    // Set that work's completed value to true
-                    works[k].completed = true
+        // Find the story in the user's works subcollection
+        querySnapshot.forEach((doc) => {
+            const work = doc.data();
 
-                    // build the leaderboard item
-                    leaderboardItem = {
-                        "id": works[k].id,
-                        "authorID": userID,
-                        "genre": works[k].genre,
-                        "description": works[k].description,
-                        "title": works[k].title,
-                        "chapters": [
-                            {
-                                "chapterTitle": works[k].title,
-                                "chapterContent": works[k].chapters[0].chapterContent,
-                                "comments": [],
-                                "ratings": []
-                            }
-                        ]
-                    }
+            if (work.id === storyID) {
+                // Set that work's completed value to true
+                work.completed = true;
 
-                    chosenGenre = works[k].genre;
-                    chosenGenre = chosenGenre.toLowerCase();
+                // Build the leaderboard item
+                leaderboardItem = {
+                    "id": work.id,
+                    "authorID": userID,
+                    "genre": work.genre,
+                    "description": work.description,
+                    "title": work.title,
+                    "chapters": work.chapters.map((chapter) => ({
+                        "chapterTitle": chapter.chapterTitle,
+                        "chapterContent": chapter.chapterContent,
+                        "comments": [],
+                        "ratings": []
+                    }))
+                };
 
-                }
-
+                chosenGenre = work.genre.toLowerCase();
+                console.log(`Found story to publish: ${work.title}`);
             }
+        });
 
-            // Update the user's document in Firestore with the new works array
-            await setDoc(docRef, { ...userData, works });
+        if (leaderboardItem) {
+            // Update the user's work as completed in Firestore
+            const storyDocRef = doc(worksCollectionRef, leaderboardItem.id);
+            await updateDoc(storyDocRef, { completed: true });
 
-            console.log("Story published successfully");
+            console.log("Story marked as completed in user's works");
 
-            // Once everything is done, upload the data
-            try {
-                const storiesRef = doc(db, 'leaderboards', 'shortStories');
-                const docSnapLeader = await getDoc(storiesRef);
+            // Add the story to the leaderboard
+            const leaderboardCollectionRef = collection(db, 'leaderboards');
+            const shortStoriesDocRef = doc(leaderboardCollectionRef, 'shortStories');
+            const yearCollectionRef = collection(shortStoriesDocRef, currentYear);
+            const genreCollectionRef = collection(yearCollectionRef, chosenGenre, 'stories');
+            const leaderboardStoryDocRef = doc(genreCollectionRef, leaderboardItem.id);
 
-                if (docSnapLeader.exists()) {
-                    const leaderboardsData = docSnapLeader.data();
-                    const genreData = leaderboardsData[chosenGenre];
+            await setDoc(leaderboardStoryDocRef, leaderboardItem);
 
-                    if (genreData) {
-                        // Push the new leaderboard item to the genreData array
-                        genreData.push(leaderboardItem);
-                        // Update the genreData in Firestore
-                        await updateDoc(storiesRef, {
-                            [chosenGenre]: genreData
-                        });
-                        console.log("Genre data updated successfully");
-                    } else {
-                        console.log(`No such genre '${chosenGenre}' in 'shortStories'!`);
-                    }
-                } else {
-                    console.log("No such document 'shortStories'!");
-                }
-            } catch (error) {
-                console.error("Error updating genre data: ", error);
-            }
-
+            console.log("Story published to leaderboard successfully");
         } else {
-            console.log("No such document!");
+            console.log("No such story found in user's works!");
         }
     } catch (error) {
         console.error("Error publishing story: ", error);
     }
-}
+};
 
 // unpublish a work
-export const unPublishStory = async (userID, storyTitle) => {
-    console.log('Unpublish: ', userID, storyTitle)
+export const unPublishStory = async (userID, storyID) => {
+    console.log('Unpublish: ', userID, storyID);
 
     try {
-        const docRef = doc(db, "users", userID);
-        const docSnap = await getDoc(docRef);
+        const userDocRef = doc(db, "users", userID);
+        const worksCollectionRef = collection(userDocRef, "works");
+        const querySnapshot = await getDocs(worksCollectionRef);
 
-        if (docSnap.exists()) {
-            const userData = docSnap.data();
-            var works = userData.works;
-            var chosenGenre = "";
+        let chosenGenre = "";
+        const currentYear = new Date().getFullYear().toString();
+        let unpublishedItemID = null;
 
-            let unpublishedItem = null;
+        // Find the story in the user's works subcollection
+        querySnapshot.forEach((doc) => {
+            const work = doc.data();
+            if (work.id === storyID) {
+                // Set that work's completed value to false
+                work.completed = false;
+                unpublishedItemID = doc.id;
 
-            // Find the index of the story the user clicked on
-            for (let k = 0; k < works.length; k++) {
-                if (works[k].title === storyTitle) {
-                    // Set that work's completed value to false
-                    works[k].completed = false;
-
-                    // Prepare the unpublished item for deletion
-                    unpublishedItem = {
-                        authorID: userID,
-                        title: works[k].title
-                    };
-
-                    chosenGenre = works[k].genre;
-                    chosenGenre = chosenGenre.toLowerCase();
-                }
+                chosenGenre = work.genre.toLowerCase();
+                console.log(`Found story to unpublish: ${work.title}`);
             }
+        });
 
-            // Update the user's document in Firestore with the new works array
-            await setDoc(docRef, { ...userData, works });
+        if (unpublishedItemID) {
+            const storyDocRef = doc(worksCollectionRef, unpublishedItemID);
+            await updateDoc(storyDocRef, { completed: false });
 
-            console.log("Story unpublished successfully");
+            console.log("Story marked as not completed in user's works");
 
-            // Delete the item from the leaderboard
-            try {
-                const storiesRef = doc(db, 'leaderboards', 'shortStories');
-                const docSnapLeader = await getDoc(storiesRef);
+            // Delete the story from the leaderboard
+            const leaderboardCollectionRef = collection(db, 'leaderboards');
+            const shortStoriesDocRef = doc(leaderboardCollectionRef, 'shortStories');
+            const yearCollectionRef = collection(shortStoriesDocRef, currentYear);
+            const genreCollectionRef = collection(yearCollectionRef, chosenGenre, 'stories');
+            const leaderboardStoryDocRef = doc(genreCollectionRef, unpublishedItemID);
 
-                if (docSnapLeader.exists()) {
-                    const leaderboardsData = docSnapLeader.data();
-                    const genreData = leaderboardsData[chosenGenre];
+            await deleteDoc(leaderboardStoryDocRef);
 
-                    console.log(genreData)
-
-                    if (genreData) {
-                        // Find the index of the item to delete
-                        const indexToDelete = genreData.findIndex(item =>
-                            item.authorID === unpublishedItem.authorID &&
-                            item.title === unpublishedItem.title
-                        );
-
-                        if (indexToDelete !== -1) {
-                            // Remove the item from the array
-                            genreData.splice(indexToDelete, 1);
-
-                            // Update the genreData in Firestore
-                            await updateDoc(storiesRef, {
-                                [chosenGenre]: genreData
-                            });
-
-                            console.log("Item deleted from leaderboard");
-                        } else {
-                            console.log(`No matching item found in leaderboard for ${unpublishedItem.title}`);
-                        }
-                    } else {
-                        console.log(`No such genre '${chosenGenre}' in 'shortStories'!`);
-                    }
-                } else {
-                    console.log("No such document 'shortStories'!");
-                }
-            } catch (error) {
-                console.error("Error deleting item from leaderboard: ", error);
-            }
-
+            console.log("Story deleted from leaderboard successfully");
         } else {
-            console.log("No such document!");
+            console.log("No such story found in user's works!");
         }
     } catch (error) {
         console.error("Error unpublishing story: ", error);
     }
-}
+};
 
 // update a work
-export const updateStory = async (userID, storyTitle, newContent, newTitle, newDescription, newGenre) => {
+export const updateStory = async (userID, storyID, newContent, newTitle, newDescription, newGenre) => {
     try {
-        const docRef = doc(db, "users", userID);
-        const docSnap = await getDoc(docRef);
+        const userDocRef = doc(db, "users", userID);
+        const worksCollectionRef = collection(userDocRef, "works");
+        const storyDocRef = doc(worksCollectionRef, storyID);
 
-        if (docSnap.exists()) {
-            const userData = docSnap.data();
-            var works = userData.works;
+        const storyDocSnap = await getDoc(storyDocRef);
 
-            // Find the index of the story the user clicked on
-            for (let k = 0; k < works.length; k++) {
+        if (storyDocSnap.exists()) {
+            const storyData = storyDocSnap.data();
 
-                if (works[k].title == storyTitle) {
+            // Update the story's values
+            storyData.title = newTitle;
+            storyData.description = newDescription;
+            storyData.genre = newGenre;
+            storyData.chapters[0].chapterTitle = newTitle;
+            storyData.chapters[0].chapterContent = newContent;
 
-                    console.log(works[k].title);
+            console.log(storyData);
 
-                    // Set that work's new values
-                    works[k].chapters[0].chapterTitle = newTitle;
-                    works[k].chapters[0].chapterContent = newContent;
-                    works[k].title = newTitle;
-                    works[k].description = newDescription;
-                    works[k].genre = newGenre;
-
-                    console.log(works[k])
-                }
-
-            }
-
-            // Update the user's document in Firestore with the new works array
-            await setDoc(docRef, { ...userData, works });
+            // Update the story document in Firestore
+            await updateDoc(storyDocRef, storyData);
 
             console.log("Story edited successfully");
         } else {
@@ -302,26 +221,22 @@ export const updateStory = async (userID, storyTitle, newContent, newTitle, newD
 // Get short stories of a specific genre and calculate average ratings
 export const getShortStoriesByGenre = async (genre) => {
     try {
-        const storiesRef = doc(db, 'leaderboards', 'shortStories');
-        const docSnap = await getDoc(storiesRef);
+        const currentYear = new Date().getFullYear().toString();
+        const storiesCollectionRef = collection(db, 'leaderboards', 'shortStories', currentYear, genre.toLowerCase(), 'stories');
+        const querySnapshot = await getDocs(storiesCollectionRef);
 
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            const stories = data[genre] || [];
+        let stories = [];
 
-            // Calculate the average rating for each story
-            stories.forEach(story => {
-                const ratings = story.chapters[0].ratings || [];
-                const totalRating = ratings.reduce((sum, rating) => sum + rating.voteAmount, 0);
-                const averageRating = ratings.length > 0 ? totalRating / ratings.length : 0;
-                story.averageRating = averageRating;
-            });
+        querySnapshot.forEach((doc) => {
+            let storyData = doc.data();
+            const ratings = storyData.chapters[0].ratings || [];
+            const totalRating = ratings.reduce((sum, rating) => sum + rating.voteAmount, 0);
+            const averageRating = ratings.length > 0 ? totalRating / ratings.length : 0;
+            storyData.averageRating = averageRating;
+            stories.push(storyData);
+        });
 
-            return stories;
-        } else {
-            console.log("No such document!");
-            return [];
-        }
+        return stories;
     } catch (error) {
         console.error("Error fetching short stories by genre:", error);
         return [];
@@ -344,30 +259,43 @@ export const getAuthorUsername = async (userID) => {
 // Get all short stories
 export const getAllShortStories = async () => {
     try {
-        const storiesRef = doc(db, 'leaderboards', 'shortStories');
-        const docSnap = await getDoc(storiesRef);
+        const currentYear = new Date().getFullYear().toString();
+        let allStories = [];
 
-        if (docSnap.exists()) {
-            const storiesData = docSnap.data();
-            return storiesData; // Return the entire shortStories object
-        } else {
-            console.log("No such document!");
-            return null;
-        }
+        // Fetch stories for all predefined genres concurrently
+        const fetchStoriesByGenrePromises = arrGenres.map(async (genreObj) => {
+            const genre = genreObj.value.toLowerCase();
+            const storiesCollectionRef = collection(db, 'leaderboards', 'shortStories', currentYear, genre, 'stories');
+            const storiesSnapshot = await getDocs(storiesCollectionRef);
+
+            storiesSnapshot.forEach(storyDoc => {
+                let storyData = storyDoc.data();
+                const ratings = storyData.chapters[0].ratings || [];
+                const totalRating = ratings.reduce((sum, rating) => sum + rating.voteAmount, 0);
+                const averageRating = ratings.length > 0 ? totalRating / ratings.length : 0;
+                storyData.averageRating = averageRating;
+                allStories.push(storyData);
+            });
+        });
+
+        await Promise.all(fetchStoriesByGenrePromises);
+        return allStories;
     } catch (error) {
         console.error("Error fetching short stories", error);
-        return null;
+        return [];
     }
 };
 
 // Rate a story
-export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
+export const rateStory = async (authorID, voteAmount, workGenre, storyID) => {
     try {
         // Get the ID of the logged in user
         const userID = await AsyncStorage.getItem('UserID');
         const selectedGenre = workGenre.toLowerCase();
+        const currentYear = new Date().getFullYear().toString();
 
-        const storyRef = doc(db, 'leaderboards', 'shortStories');
+        // Reference to the specific story document
+        const storyRef = doc(db, 'leaderboards', 'shortStories', currentYear, selectedGenre, 'stories', storyID);
         const storyDoc = await getDoc(storyRef);
 
         // Test if the user is the author
@@ -377,49 +305,26 @@ export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
         }
 
         if (storyDoc.exists()) {
-            const allStories = storyDoc.data();
-            const genreStories = allStories[selectedGenre];
+            const storyData = storyDoc.data();
 
-            let storyFound = null;
-            let storyIndex = -1;
+            // Check if the user has already voted
+            const hasVoted = storyData.chapters[0].ratings.some(rating => rating.voterID === userID);
 
-            // Find the story to update
-            for (let k = 0; k < genreStories.length; k++) {
-                if (genreStories[k].authorID === authorID && genreStories[k].title === workTitle) {
-                    storyFound = genreStories[k];
-                    storyIndex = k;
-                    break;
-                }
-            }
-
-            if (storyFound) {
-                // Check if the user has already voted
-                const hasVoted = storyFound.chapters[0].ratings.some(rating => rating.voterID === userID);
-
-                if (hasVoted) {
-
-                    return false;
-
-                } else {
-
-                    // Build the new ratings
-                    storyFound.chapters[0].ratings.push({ "voterID": userID, "voteAmount": voteAmount });
-
-                    // Update the genreStories array
-                    genreStories[storyIndex] = storyFound;
-
-                    // Write the updated genreStories back to Firestore
-                    await updateDoc(storyRef, {
-                        [selectedGenre]: genreStories
-                    });
-
-                    console.log("Rating added successfully.");
-                    return true;
-
-                }
-            } else {
-                console.log("No matching story found to update.");
+            if (hasVoted) {
+                console.log("User has already voted on this story.");
                 return false;
+            } else {
+                // Build the new rating object
+                const newRating = { "voterID": userID, "voteAmount": voteAmount };
+                storyData.chapters[0].ratings.push(newRating);
+
+                // Update the document with the new ratings
+                await updateDoc(storyRef, {
+                    chapters: storyData.chapters
+                });
+
+                console.log("Rating added successfully.");
+                return true;
             }
         } else {
             console.log("No such story!");
@@ -434,86 +339,51 @@ export const rateStory = async (authorID, voteAmount, workTitle, workGenre) => {
 // Get leaderboard stories
 export const getLeaderboards = async (genre) => {
     try {
-        const storyRef = doc(db, 'leaderboards', 'shortStories');
-        const storyDoc = await getDoc(storyRef);
+        const currentYear = new Date().getFullYear().toString();
+        const genreRef = collection(db, 'leaderboards', 'shortStories', currentYear, genre.toLowerCase(), 'stories');
+        const querySnapshot = await getDocs(genreRef);
 
-        if (storyDoc.exists()) {
+        let genreStories = [];
 
-            // Only get leaderboard stories from a specific genre
-            const allStories = storyDoc.data();
-            const genreStories = allStories[genre.toLowerCase()] || [];
+        querySnapshot.forEach((doc) => {
+            let storyData = doc.data();
+            const ratings = storyData.chapters[0].ratings || [];
+            const totalRating = ratings.reduce((sum, rating) => sum + rating.voteAmount, 0);
+            const averageRating = ratings.length > 0 ? totalRating / ratings.length : 0;
+            storyData.averageRating = averageRating;
+            genreStories.push(storyData);
+        });
 
-            // Calculate the average rating for each story
-            genreStories.forEach(story => {
-                const ratings = story.chapters[0].ratings || [];
-                const totalRating = ratings.reduce((sum, rating) => sum + rating.voteAmount, 0);
-                const averageRating = ratings.length > 0 ? totalRating / ratings.length : 0;
-                story.averageRating = averageRating;
-            });
-
-            return genreStories;
-
-        } else {
-            console.log("No such document!");
-            return [];
-        }
+        return genreStories;
     } catch (error) {
-        console.error("Error fetching stories: ", error);
+        console.error("Error fetching stories:", error);
         return [];
-    }
-};
-
-// Get a single story's ID
-export const getShortStoryID = async (authorID, storyTitle) => {
-    try {
-        const storiesRef = doc(db, 'leaderboards', 'shortStories');
-        const docSnap = await getDoc(storiesRef);
-
-        if (docSnap.exists()) {
-            const allStories = docSnap.data();
-            for (const genre in allStories) {
-                const stories = allStories[genre];
-                for (const story of stories) {
-                    if (story.authorID === authorID && story.title === storyTitle) {
-                        return story.id;
-                    }
-                }
-            }
-
-            console.error("No matching story found.");
-            return null;
-        } else {
-            console.error("No document found.");
-            return null;
-        }
-    } catch (error) {
-        console.error("Error fetching storyID: ", error);
-        return null;
     }
 };
 
 // Get a single story by its ID
 export const getShortStoryByID = async (storyID) => {
     try {
-        const storiesRef = doc(db, 'leaderboards', 'shortStories');
-        const docSnap = await getDoc(storiesRef);
+        const year = new Date().getFullYear().toString();
+        const genres = arrGenres;
 
-        if (docSnap.exists()) {
-            const allStories = docSnap.data();
-            for (const genre in allStories) {
-                const stories = allStories[genre];
-                for (const story of stories) {
-                    if (story.id === storyID) {
-                        return story;
-                    }
-                }
+        for (const genre of genres) {
+            const storyRef = doc(db, 'leaderboards', 'shortStories', year, genre.value.toLowerCase(), 'stories', storyID);
+            const docSnap = await getDoc(storyRef);
+
+            if (docSnap.exists()) {
+                let storyData = docSnap.data();
+                const ratings = storyData.chapters[0].ratings || [];
+                const totalRating = ratings.reduce((sum, rating) => sum + rating.voteAmount, 0);
+                const averageRating = ratings.length > 0 ? totalRating / ratings.length : 0;
+                storyData.averageRating = averageRating;
+
+                return storyData;
             }
-            console.error("No matching story found.");
-            return null;
-        } else {
-            console.error("No such document!");
-            return null;
         }
+
+        console.error("No matching story found.");
+        return null;
     } catch (error) {
         console.error("Error fetching story: ", error);
         return null;
@@ -521,31 +391,23 @@ export const getShortStoryByID = async (storyID) => {
 };
 
 // Add comment function
-export const addComment = async (storyID, chapterIndex, comment) => {
+export const addComment = async (storyID, chapterIndex, comment, genre) => {
     try {
-        const storiesRef = doc(db, 'leaderboards', 'shortStories');
-        const docSnap = await getDoc(storiesRef);
+        const year = new Date().getFullYear().toString();
+        const storyRef = doc(db, 'leaderboards', 'shortStories', year, genre.toLowerCase(), 'stories', storyID);
+        const docSnap = await getDoc(storyRef);
 
         if (docSnap.exists()) {
-            const allStories = docSnap.data();
-            for (const genre in allStories) {
-                const stories = allStories[genre];
-                for (let story of stories) {
-                    if (story.id === storyID) {
-                        // Add the comment to the specified chapter (future proofing for other story types with more than one chapter)
-                        story.chapters[chapterIndex].comments.push(comment);
+            const storyData = docSnap.data();
+            // Add the comment to the specified chapter (assuming 'chapters' exists as a subcollection)
+            storyData.chapters[chapterIndex].comments.push(comment);
 
-                        // Update the Firestore document
-                        await updateDoc(storiesRef, { [genre]: allStories[genre] });
+            // Update the Firestore document
+            await setDoc(storyRef, storyData);
 
-                        return true;
-                    }
-                }
-            }
-            console.error("No matching story found.");
-            return false;
+            return true;
         } else {
-            console.error("No such document!");
+            console.error("No matching story found.");
             return false;
         }
     } catch (error) {
@@ -555,31 +417,23 @@ export const addComment = async (storyID, chapterIndex, comment) => {
 };
 
 // Delete your own comment from a story
-export const deleteComment = async (storyID, chapterIndex, commentIndex) => {
+export const deleteComment = async (storyID, chapterIndex, commentIndex, genre) => {
     try {
-        const storiesRef = doc(db, 'leaderboards', 'shortStories');
-        const docSnap = await getDoc(storiesRef);
+        const year = new Date().getFullYear().toString();
+        const storyRef = doc(db, 'leaderboards', 'shortStories', year, genre.toLowerCase(), 'stories', storyID);
+        const docSnap = await getDoc(storyRef);
 
         if (docSnap.exists()) {
-            const allStories = docSnap.data();
-            for (const genre in allStories) {
-                const stories = allStories[genre];
-                for (let story of stories) {
-                    if (story.id === storyID) {
-                        // Remove the comment from the specified chapter
-                        story.chapters[chapterIndex].comments.splice(commentIndex, 1);
+            const storyData = docSnap.data();
+            // Remove the comment from the specified chapter
+            storyData.chapters[chapterIndex].comments.splice(commentIndex, 1);
 
-                        // Update the Firestore document
-                        await updateDoc(storiesRef, { [genre]: allStories[genre] });
+            // Update the Firestore document
+            await setDoc(storyRef, storyData);
 
-                        return true;
-                    }
-                }
-            }
-            console.error("No matching story found.");
-            return false;
+            return true;
         } else {
-            console.error("No such document!");
+            console.error("No matching story found.");
             return false;
         }
     } catch (error) {
@@ -588,36 +442,34 @@ export const deleteComment = async (storyID, chapterIndex, commentIndex) => {
     }
 };
 
-// Function to end the competition, remove stories, move top 3 to previousLeaders, and add awards to relevant users
+// Function to end the competition, move top 3 to previousLeaders, and add awards to relevant users
+// --It is no longer needed to remove the stories as the competitions would be ended at 11:59 31 December, meaning the next year's stories will be displayed by the time users use the app again.
 export const endCompetition = async (genre) => {
     try {
-        const storyRef = doc(db, 'leaderboards', 'shortStories');
-        const storyDoc = await getDoc(storyRef);
+        const year = new Date().getFullYear().toString();
+        const normalizedGenre = genre.trim().toLowerCase();
 
-        if (storyDoc.exists()) {
-            const allStories = storyDoc.data();
-            const normalizedGenre = genre.trim().toLowerCase();
-            const genreStories = allStories[normalizedGenre] || [];
+        // Reference to the stories collection for the specific genre and year
+        const storyRef = collection(db, 'leaderboards', 'shortStories', year, normalizedGenre, 'stories');
+        const storySnapshot = await getDocs(storyRef);
 
+        if (!storySnapshot.empty) {
             // Filter stories by those with 5 or more ratings
-            const filteredStories = genreStories.filter(story => story.chapters[0].ratings.length >= 5);
+            const filteredStories = storySnapshot.docs.filter(doc => doc.data().chapters[0].ratings.length >= 5);
 
             // Sort filtered stories by average rating percentage descending
-            filteredStories.sort((a, b) => b.averageRating - a.averageRating);
+            filteredStories.sort((a, b) => b.data().averageRating - a.data().averageRating);
 
             // Get the top 3 stories
             const top3Stories = filteredStories.slice(0, 3);
 
-            // Get the current year
-            const year = new Date().getFullYear();
-
             // Add the top 3 stories to the previousLeaders collection
             for (let i = 0; i < top3Stories.length; i++) {
-                const story = top3Stories[i];
+                const story = top3Stories[i].data();
                 const place = i === 0 ? 'gold' : i === 1 ? 'silver' : 'bronze';
 
-                // Add story to previousLeaders collection under genre/year
-                const previousLeaderRef = doc(db, `previousLeaders/${normalizedGenre}/${year.toString()}/${story.id}`);
+                // Add story to previousLeaders collection under genre/year/storyID
+                const previousLeaderRef = doc(db, 'previousLeaders', normalizedGenre, year, top3Stories[i].id);
                 await setDoc(previousLeaderRef, {
                     ...story,
                     place,
@@ -625,18 +477,12 @@ export const endCompetition = async (genre) => {
                 });
 
                 // Add award to the user
-                await addAward(story.authorID, genre, place, year.toString());
+                await addAward(story.authorID, normalizedGenre, place, year);
             }
-
-            // Set the genre stories to an empty array
-            allStories[normalizedGenre] = [];
-
-            // Update the leaderboards collection
-            await updateDoc(storyRef, allStories);
 
             console.log(`Competition ended for ${genre}. Top 3 stories moved to previousLeaders and awards assigned.`);
         } else {
-            console.log("No such document!");
+            console.log("No matching documents found for the genre and year.");
         }
     } catch (error) {
         console.error("Error ending competition: ", error);

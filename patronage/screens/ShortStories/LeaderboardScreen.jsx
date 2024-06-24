@@ -68,7 +68,7 @@ const LeaderboardScreen = ({ route, navigation }) => {
         return (total / ratings.length) * 10; // Convert to percentage
     };
 
-    const handleEndCompetition = async (genre) => {    
+    const handleEndCompetition = async (genre) => {
         // Call endCompetition and navigate to ShortStoriesScreen
         await endCompetition(genre);
         navigation.navigate('ShortStoriesScreen');

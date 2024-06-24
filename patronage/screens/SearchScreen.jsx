@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, FlatList, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAllShortStories, getAuthorUsername } from '../services/storiesService';
 
@@ -25,10 +25,9 @@ const SearchScreen = ({ navigation }) => {
     // Gather all information for the stories
     const fetchShortStories = async () => {
         try {
-            const storiesData = await getAllShortStories();
-            if (storiesData) {
-                // Flatten the shortStories object into an array of stories
-                const storiesArray = Object.values(storiesData).flat();
+            const storiesArray = await getAllShortStories();
+
+            if (storiesArray.length) {
                 setShortStories(storiesArray);
 
                 const usernames = await Promise.all(
@@ -36,10 +35,14 @@ const SearchScreen = ({ navigation }) => {
                 );
 
                 setAuthorUsernames(usernames);
-                setLoading(false); // Set loading to false once data is fetched
+            } else {
+                setShortStories([]);
             }
         } catch (error) {
             console.error("Error fetching short stories", error);
+            setShortStories([]);
+        } finally {
+            setLoading(false); // Set loading to false once data is fetched
         }
     };
 
@@ -90,7 +93,7 @@ const SearchScreen = ({ navigation }) => {
             {/* Display search results */}
             <FlatList
                 data={searchQuery ? filteredData : shortStories}
-                keyExtractor={(item) => item.title}
+                keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         onPress={() => navigateToStoryScreen(item)}

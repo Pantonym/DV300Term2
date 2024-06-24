@@ -71,7 +71,6 @@ const NavbarComponent = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.navbar}>
 
-                {/* TODO: FIX Hoe icon not active on startup */}
                 {/* The item sends several pages through as params because in each of them this icon should be active as they are sub pages */}
                 <Ionicons
                     style={styles.navImage}
