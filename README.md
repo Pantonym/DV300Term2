@@ -57,6 +57,7 @@
     - [Highlights](#highlights)
     - [Challenges](#challenges)
   - [Future Implementation](#future-implementation)
+  - [Future Implementation - Implemented For Portfolio](#future-implementation---implemented-for-portfolio)
 - [Final Outcome](#final-outcome)
   - [Mockups](#mockups)
   - [Video Demonstration](#video-demonstration)
@@ -571,11 +572,16 @@ Patronage was designed to evoke the feelings of the old system of patronage - wh
 
 <!-- Future Implementation -->
 ### Future Implementation
-* Refactor the database to use subcollections.
-  * Refactored the users database, as well as adding years for every leaderboard so that previous entries are not lost each year.
 * Allow other story types to be added, such as poems or long stories.
 * Allow multiple chapters to be added to stories, even short stories.
+
+### Future Implementation - Implemented For Portfolio
+* Refactor the database to use subcollections.
+  * Refactored the users database, as well as adding years for every leaderboard so that previous entries are not lost each year.
 * Add another collection that stores published stories without relying on the leaderboards collection, allowing all past stories to be saved (not just the winning three stories).
+  * Completed through adding a previousLeaders collection, which acts as the container for 1stm 2bd and 3rd places for each genre, for each year, while allowing the normal leaderboards database to remain as it is.
+* Add data to a story that has its publishing year, allowing users to correctly interact with previous years' items.
+  * In addition, the database no longer uses fixed years but rather saves the year a competition was first introduced, then loops to get each year after that start date. This means that admins don't have to update the static years each year, only adding the start year once.
 
 <!-- Final Outcome -->
 ## Final Outcome

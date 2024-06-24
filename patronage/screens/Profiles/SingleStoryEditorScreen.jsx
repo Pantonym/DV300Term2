@@ -47,8 +47,9 @@ const SingleStoryEditorScreen = ({ route, navigation }) => {
         var newContent = chapterContent;
         var newDescription = chapterDescription;
         var newGenre = selectedGenre;
+        var newYear = new Date().getFullYear().toString();
 
-        await updateStory(userID, storyID, newContent, newTitle, newDescription, newGenre);
+        await updateStory(userID, storyID, newContent, newTitle, newDescription, newGenre, newYear);
 
         // Remove editing inputs
         setIsEditing(false);

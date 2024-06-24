@@ -4,6 +4,7 @@ import { FollowAuthor, addAward, getUser, removeReward, unFollowAuthor } from '.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { arrGenres } from '../../context/genres';
+import { arrStartYears } from '../../context/years';
 
 const AuthorProfileScreen = ({ route, navigation }) => {
     // Parameters
@@ -21,8 +22,20 @@ const AuthorProfileScreen = ({ route, navigation }) => {
 
     // Awards data
     const genres = arrGenres;
-    // TODO: Future Implementation to have the leaderboards be separated by years, and then using those years to fill this array. 
-    const years = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'];
+    const [years, setYears] = useState([]);;
+
+    const getYears = () => {
+        const startYear = arrStartYears.find(item => item.label === 'shortStories')?.value || 0;
+        const currentYear = new Date().getFullYear();
+        let arrYears = []
+
+        for (let year = startYear; year <= currentYear; year++) {
+            arrYears.push(year.toString());
+        }
+
+        setYears(arrYears);
+    };
+
     const places = ['bronze', 'silver', 'gold'];
 
     // Admin useStates
@@ -40,6 +53,7 @@ const AuthorProfileScreen = ({ route, navigation }) => {
     };
 
     useEffect(() => {
+        getYears();
         getUserID();
     }, []);
 

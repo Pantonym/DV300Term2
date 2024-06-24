@@ -78,7 +78,7 @@ export const publishStory = async (userID, storyID) => {
 
         let chosenGenre = "";
         let leaderboardItem = null;
-        const currentYear = new Date().getFullYear().toString();
+        let storyYear = null;
 
         console.log('Number of works found: ', querySnapshot.size);
 
@@ -106,6 +106,7 @@ export const publishStory = async (userID, storyID) => {
                 };
 
                 chosenGenre = work.genre.toLowerCase();
+                storyYear = work.date;
                 console.log(`Found story to publish: ${work.title}`);
             }
         });
@@ -120,7 +121,7 @@ export const publishStory = async (userID, storyID) => {
             // Add the story to the leaderboard
             const leaderboardCollectionRef = collection(db, 'leaderboards');
             const shortStoriesDocRef = doc(leaderboardCollectionRef, 'shortStories');
-            const yearCollectionRef = collection(shortStoriesDocRef, currentYear);
+            const yearCollectionRef = collection(shortStoriesDocRef, storyYear);
             const genreCollectionRef = collection(yearCollectionRef, chosenGenre, 'stories');
             const leaderboardStoryDocRef = doc(genreCollectionRef, leaderboardItem.id);
 
@@ -145,7 +146,7 @@ export const unPublishStory = async (userID, storyID) => {
         const querySnapshot = await getDocs(worksCollectionRef);
 
         let chosenGenre = "";
-        const currentYear = new Date().getFullYear().toString();
+        let storyYear = null;
         let unpublishedItemID = null;
 
         // Find the story in the user's works subcollection
@@ -157,6 +158,7 @@ export const unPublishStory = async (userID, storyID) => {
                 unpublishedItemID = doc.id;
 
                 chosenGenre = work.genre.toLowerCase();
+                storyYear = work.date;
                 console.log(`Found story to unpublish: ${work.title}`);
             }
         });
@@ -170,7 +172,7 @@ export const unPublishStory = async (userID, storyID) => {
             // Delete the story from the leaderboard
             const leaderboardCollectionRef = collection(db, 'leaderboards');
             const shortStoriesDocRef = doc(leaderboardCollectionRef, 'shortStories');
-            const yearCollectionRef = collection(shortStoriesDocRef, currentYear);
+            const yearCollectionRef = collection(shortStoriesDocRef, storyYear);
             const genreCollectionRef = collection(yearCollectionRef, chosenGenre, 'stories');
             const leaderboardStoryDocRef = doc(genreCollectionRef, unpublishedItemID);
 
@@ -186,7 +188,7 @@ export const unPublishStory = async (userID, storyID) => {
 };
 
 // update a work
-export const updateStory = async (userID, storyID, newContent, newTitle, newDescription, newGenre) => {
+export const updateStory = async (userID, storyID, newContent, newTitle, newDescription, newGenre, newYear) => {
     try {
         const userDocRef = doc(db, "users", userID);
         const worksCollectionRef = collection(userDocRef, "works");
@@ -199,6 +201,7 @@ export const updateStory = async (userID, storyID, newContent, newTitle, newDesc
 
             // Update the story's values
             storyData.title = newTitle;
+            storyData.date = newYear;
             storyData.description = newDescription;
             storyData.genre = newGenre;
             storyData.chapters[0].chapterTitle = newTitle;

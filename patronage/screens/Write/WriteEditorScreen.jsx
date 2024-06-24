@@ -85,10 +85,13 @@ const WriteEditorScreen = ({ navigation }) => {
 
                 // Generate a unique storyID
                 const storyID = uuid.v4();
+                // Generate the year the story was made/updated
+                const year = new Date().getFullYear().toString();
 
                 // Generate the data that will be sent to the database
                 const storyDetails = {
                     id: storyID,
+                    date: year,
                     completed: false,
                     genre: selectedGenre,
                     title: storyTitle,
