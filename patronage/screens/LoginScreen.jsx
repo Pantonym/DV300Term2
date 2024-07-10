@@ -12,11 +12,11 @@ const LoginScreen = ({ navigation }) => {
     // --For logins, once a build is made to launch the app, the admin login info must be deleted and the useState must be set to ''
     // --In addition, admin email must be changed fro security reasons as the password will be visible on GitHub
     // ----User Login:
-    // const [email, setEmail] = useState('Glen@gmail.com');
-    // const [password, setPassword] = useState('Glen1234');
+    const [email, setEmail] = useState('Glen@gmail.com');
+    const [password, setPassword] = useState('Glen1234');
     // ----Admin Login:
-    const [email, setEmail] = useState('GreatQuill.patronage@gmail.com');
-    const [password, setPassword] = useState('Quill1234');
+    // const [email, setEmail] = useState('GreatQuill.patronage@gmail.com');
+    // const [password, setPassword] = useState('Quill1234');
 
     // Error State
     const [error, setError] = useState(false)
