@@ -408,11 +408,11 @@ if (docSnap.exists()) {
 </br>
 
 5. Advanced functionality:
-   1. <b>Administrator account</b>
+   i. <b>Administrator account</b>
 * This was chosen as it eased the ending of competitions, moving away from an automated system to an administrator-controlled one. I have already shown how the user is tested ti see if they are an admin, but in addition to that the administrator has a different navbar to reflect different functionalities (search for users, etc).
 </br>
 
-    ii. <b>Favourite Stories</b>
+  ii. <b>Favourite Stories</b>
 * A user can add a story to their favourites list for the duration of a leaderboard/competition. It adds the story ID to an array on the user's account, and then the Profile Page will loop through it to fetch each story by its ID, sending it to the Favourite Stories Page to display. 
 * In addition, if a competition ends and a story is no longer accessible, the page automatically removes the undefined item from the user's favourites list.
 ```
