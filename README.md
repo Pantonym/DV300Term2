@@ -600,7 +600,7 @@ Patronage was designed to evoke the feelings of the old system of patronage - wh
 
 <!-- LICENSE -->
 ## License
-Distributed under the MIT License. See `LICENSE` for more information.
+This repository is proprietary and distributed with all rights reserved. Use, copying, modification, or distribution of this software is prohibited without explicit permission from Nico van Wyk. 
 
 <!-- AUTHORS -->
 ## Authors
